@@ -14,12 +14,8 @@ export class UserService {
     return this.userRepository.find({ where: { role: UserRoles.TEACHER } });
   }
 
-  find(surname: string, id?: string) {
-    return id
-      ? this.userRepository.findOne({ where: { id } })
-      : this.userRepository.findOne({
-          where: { fullName: { surname: surname } },
-        });
+  find(id: string) {
+    return this.userRepository.findOne({ where: { id } });
   }
 
   async create(user: User) {
@@ -31,9 +27,7 @@ export class UserService {
     return this.userRepository.save(createdUser);
   }
 
-  async delete(surname: string, id?: string) {
-    return id
-      ? await this.userRepository.delete(id)
-      : this.userRepository.delete({ fullName: { surname } });
+  async delete(id: string) {
+    return await this.userRepository.delete({ id });
   }
 }

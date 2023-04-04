@@ -14,4 +14,7 @@ export enum UserErrors {
 
   fullname_empty = 'Отсутствует ФИО',
   role_empty = 'Должна быть установлена роль',
+
+  user_not_found = 'Пользователь не найден',
+  user_deleted = 'Пользователь удалён',
 }
