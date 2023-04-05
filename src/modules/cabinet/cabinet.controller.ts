@@ -2,45 +2,72 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
-  Patch,
   Post,
+  Put,
+  UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
-import { AddTeachersDTO, Cabinet } from './cabinet.entity';
+import { Cabinet, EditCabinetDTO } from './cabinet.entity';
+import { CabinetErrors } from './cabinet.i18n';
 import { CabinetService } from './cabinet.service';
+import { TypeOrmFilter } from './idk';
 
 @UseInterceptors(ClassSerializerInterceptor)
+@UseFilters(TypeOrmFilter)
 @Controller('cabinet')
 export class CabinetController {
   constructor(private cabinerService: CabinetService) {}
 
+  @Get()
+  async getAllCabinets() {
+    return await this.cabinerService.getAll();
+  }
+
   @Get(':id')
   async getCabinetData(@Param('id') id: string) {
-    return await this.cabinerService.get(id);
+    const cabinet = await this.cabinerService.get(id);
+    if (!cabinet) {
+      throw new HttpException(
+        { message: CabinetErrors.cabinet_not_found },
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      return cabinet;
+    }
   }
 
-  @Patch(':id')
-  async editCabinetData(@Param('id') id: string, @Body() dto: any) {}
-
-  @Post()
+  @Post('create')
   async createCabinet(@Body() dto: Cabinet) {
-    // создать кабинет, потом добавить учителей и вещи
-
-    return await this.cabinerService.create(dto);
+    const cabinet = await this.cabinerService.create(dto);
+    return await this.cabinerService.get(cabinet.id);
   }
 
-  @Post('/add-teachers')
-  async addTeachers(@Body() dto: AddTeachersDTO) {
-    return await this.cabinerService.addTeachers(dto.teachersId, dto.cabinetId);
+  @Put('edit')
+  async editCabinet(@Body() dto: EditCabinetDTO) {
+    const cabinet = await this.cabinerService.update(dto);
+    if (!cabinet) {
+      return {
+        message: CabinetErrors.cabinet_not_found,
+      };
+    } else {
+      return cabinet;
+    }
   }
 
-  @Post('/remove-teachers')
-  async removeTeachers(@Body() dto: AddTeachersDTO) {
-    return await this.cabinerService.removeTeachers(
-      dto.teachersId,
-      dto.cabinetId,
-    );
+  @Delete(':id')
+  async deleteCabinet(@Param('id') id: string) {
+    const result = await this.cabinerService.delete(id);
+
+    return {
+      message:
+        CabinetErrors[
+          result.affected > 0 ? 'cabinet_deleted' : 'cabinet_not_found'
+        ],
+    };
   }
 }

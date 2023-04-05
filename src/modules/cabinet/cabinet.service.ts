@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { User } from '../user/user.entity';
-import { Cabinet } from './cabinet.entity';
+import { Cabinet, EditCabinetDTO } from './cabinet.entity';
 
 @Injectable()
 export class CabinetService {
@@ -23,30 +23,30 @@ export class CabinetService {
     return await this.cabinetRepository.findOne({ where: { id } });
   }
 
-  async addTeachers(teachersId: string[], cabinetId: string) {
+  async getAll() {
+    return await this.cabinetRepository.find();
+  }
+
+  async update(dto: EditCabinetDTO): Promise<Cabinet | null> {
     const cabinet = await this.cabinetRepository.findOne({
-      where: { id: cabinetId },
+      where: { id: dto.id },
     });
-    const teachers = await this.userRepository.findBy({ id: In(teachersId) });
-    cabinet.teachers = cabinet.teachers.concat(
-      teachers.filter(
-        (teacher) =>
-          !cabinet.teachers.find((c_teacher) => c_teacher.id === teacher.id),
-      ),
-    );
+
+    if (!cabinet) return null;
+
+    if (dto.cabinetNumber) cabinet.cabinetNumber = dto.cabinetNumber;
+
+    if (dto.teachers) {
+      const teachers = await this.userRepository.findBy({
+        id: In(dto.teachers),
+      });
+      cabinet.teachers = teachers;
+    }
+
     return await this.cabinetRepository.save(cabinet);
   }
 
-  async removeTeachers(teachersId: string[], cabinetId: string) {
-    const cabinet = await this.cabinetRepository.findOne({
-      where: { id: cabinetId },
-    });
-
-    // console.log(cabinet.teachers);
-
-    cabinet.teachers = cabinet.teachers.filter(
-      (teacher) => !teachersId.includes(teacher.id),
-    );
-    return await this.cabinetRepository.save(cabinet);
+  async delete(id: string) {
+    return await this.cabinetRepository.delete(id);
   }
 }

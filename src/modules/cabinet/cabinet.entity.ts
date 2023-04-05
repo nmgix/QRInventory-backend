@@ -5,6 +5,7 @@ import {
   JoinTable,
   ManyToMany,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 import { Item } from '../item/item.entity';
 import { User } from '../user/user.entity';
@@ -17,7 +18,7 @@ export class Cabinet {
 
   @IsNotEmpty({ message: CabinetErrors.cabinet_number_empty })
   @IsNumber({ allowInfinity: false, maxDecimalPlaces: 3000, allowNaN: false })
-  @Column()
+  @Column({ unique: true })
   cabinetNumber: number;
 
   @ManyToMany(() => User, (user) => user.id, { cascade: true, eager: true })
@@ -36,4 +37,15 @@ export class Cabinet {
 export class AddTeachersDTO {
   cabinetId: string;
   teachersId: string[];
+}
+
+export class EditCabinetDTO {
+  id: string;
+
+  @IsNumber({ allowInfinity: false, maxDecimalPlaces: 3000, allowNaN: false })
+  cabinetNumber?: number;
+
+  teachers?: string[];
+
+  items?: string[];
 }
