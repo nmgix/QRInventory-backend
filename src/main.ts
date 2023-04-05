@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app/app.module';
+import { AppModule } from './modules/app/app.module';
 import { formatErrorPipe } from './helpers/formatErrors';
 // import * as csurf from 'csurf';
 import { rateLimit } from 'express-rate-limit';

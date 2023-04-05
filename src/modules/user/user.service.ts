@@ -1,6 +1,7 @@
-import { Catch, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, TypeORMError } from 'typeorm';
+import { Repository } from 'typeorm';
+import { CabinetService } from '../cabinet/cabinet.service';
 import { User, UserRoles } from './user.entity';
 
 @Injectable()
@@ -8,6 +9,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private cabinetService: CabinetService,
   ) {}
 
   getAllTeachers() {

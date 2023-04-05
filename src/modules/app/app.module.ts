@@ -1,15 +1,17 @@
 import { Module } from '@nestjs/common';
 import { UserModule } from '../user/user.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/user/user.entity';
-import { DatabaseModule } from 'src/database/database.module';
+import { ConfigModule } from '@nestjs/config';
+import { DatabaseModule } from 'src/modules/database/database.module';
+import { CabinetModule } from '../cabinet/cabinet.module';
+import { ItemModule } from '../item/item.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: ['.env'], isGlobal: true }),
     DatabaseModule,
     UserModule,
+    CabinetModule,
+    ItemModule,
   ],
   controllers: [],
   providers: [],
