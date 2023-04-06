@@ -1,6 +1,6 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
-import { GlobalErrors } from 'src/global.i18n';
-import { UserErrors } from 'src/modules/user/user.i18n';
+import { GlobalErrors } from '../global.i18n';
+import { UserErrors } from '../modules/user/user.i18n';
 import * as zxcvbn from 'zxcvbn';
 
 export function IsPasswordValid(validationOptions?: ValidationOptions) {

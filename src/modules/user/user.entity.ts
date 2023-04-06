@@ -1,14 +1,7 @@
-import { Exclude, Expose, Type } from 'class-transformer';
+import { Exclude, Type } from 'class-transformer';
 import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-import { IsPasswordValid } from 'src/helpers/passwordValid';
-import {
-  Column,
-  Entity,
-  Index,
-  ManyToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Cabinet } from '../cabinet/cabinet.entity';
+import { IsPasswordValid } from '../../helpers/passwordValid';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { UserErrors } from './user.i18n';
 
 export enum UserRoles {

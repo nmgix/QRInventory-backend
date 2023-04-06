@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { User } from '../user/user.entity';
-import { Cabinet, EditCabinetDTO } from './cabinet.entity';
+import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from './cabinet.entity';
+import { CabinetErrors } from './cabinet.i18n';
 
 @Injectable()
 export class CabinetService {
@@ -13,10 +14,20 @@ export class CabinetService {
     private userRepository: Repository<User>,
   ) {}
 
-  async create(cabinet: Cabinet) {
-    const createdCabinet = await this.cabinetRepository.create(cabinet);
+  async create(dto: CreateCabinetDTO) {
+    let cabinet: Cabinet = { ...dto } as unknown as Cabinet;
 
-    return await this.cabinetRepository.save(createdCabinet);
+    if (dto.teachers) {
+      const teachers = await this.userRepository.findBy({
+        id: In(dto.teachers),
+      });
+      cabinet.teachers = teachers;
+    }
+
+    const createdCabinet = await this.cabinetRepository.create(cabinet);
+    await this.cabinetRepository.save(createdCabinet);
+
+    return this.get(createdCabinet.id);
   }
 
   async get(id: string) {
@@ -32,7 +43,9 @@ export class CabinetService {
       where: { id: dto.id },
     });
 
-    if (!cabinet) return null;
+    if (!cabinet) {
+      throw new Error(CabinetErrors.cabinet_not_found);
+    }
 
     if (dto.cabinetNumber) cabinet.cabinetNumber = dto.cabinetNumber;
 
@@ -48,5 +61,9 @@ export class CabinetService {
 
   async delete(id: string) {
     return await this.cabinetRepository.delete(id);
+  }
+
+  async clearTable() {
+    return await this.cabinetRepository.delete({});
   }
 }

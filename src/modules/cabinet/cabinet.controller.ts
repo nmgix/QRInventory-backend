@@ -13,7 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { GlobalException } from 'src/helpers/GlobalException';
-import { Cabinet, EditCabinetDTO } from './cabinet.entity';
+import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from './cabinet.entity';
 import { CabinetErrors } from './cabinet.i18n';
 import { CabinetService } from './cabinet.service';
 
@@ -30,19 +30,11 @@ export class CabinetController {
 
   @Get(':id')
   async getCabinetData(@Param('id') id: string) {
-    const cabinet = await this.cabinerService.get(id);
-    if (!cabinet) {
-      throw new HttpException(
-        { message: CabinetErrors.cabinet_not_found },
-        HttpStatus.BAD_REQUEST,
-      );
-    } else {
-      return cabinet;
-    }
+    return await this.cabinerService.get(id);
   }
 
   @Post('create')
-  async createCabinet(@Body() dto: Cabinet) {
+  async createCabinet(@Body() dto: CreateCabinetDTO) {
     const cabinet = await this.cabinerService.create(dto);
     return await this.cabinerService.get(cabinet.id);
   }

@@ -30,10 +30,6 @@ export class Cabinet {
   items: Item[];
 }
 
-// export class EditCabinetDTO {
-
-// }
-
 export class AddTeachersDTO {
   cabinetId: string;
   teachersId: string[];
@@ -49,3 +45,5 @@ export class EditCabinetDTO {
 
   items?: string[];
 }
+
+export type CreateCabinetDTO = Omit<EditCabinetDTO, 'id'>;

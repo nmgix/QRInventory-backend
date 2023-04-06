@@ -13,7 +13,7 @@ export class GlobalException implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    let message = (exception as any).message.message;
+    let message = (exception as any).message;
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let description = '';
 
@@ -21,6 +21,9 @@ export class GlobalException implements ExceptionFilter {
     // отправка логов
 
     switch (exception.constructor) {
+      case Error: {
+        status = HttpStatus.UNPROCESSABLE_ENTITY;
+      }
       case QueryFailedError: {
         message = this.queryFail;
         status = HttpStatus.UNPROCESSABLE_ENTITY;
