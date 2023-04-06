@@ -6,9 +6,9 @@ import { formatErrorPipe } from './helpers/formatErrors';
 import { rateLimit } from 'express-rate-limit';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { UserSwagger } from './modules/user/swagger.docs';
-import { ItemSwagger } from './modules/item/swagger.docs';
-import { CabinetSwagger } from './modules/cabinet/swagger.docs';
+import { UserSwagger } from './modules/user/user.docs';
+import { ItemSwagger } from './modules/item/item.docs';
+import { CabinetSwagger } from './modules/cabinet/cabinet.docs';
 
 enum SwaggerData {
   api_name = 'Апи инвентаризации колледжа',

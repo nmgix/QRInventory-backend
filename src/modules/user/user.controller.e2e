@@ -1,0 +1,50 @@
+import { BadRequestException } from "@nestjs/common";
+import { Test, TestingModule } from "@nestjs/testing";
+import { TypeOrmTestingModule } from "../database/database.module";
+import { UserController } from "./user.controller";
+import { CreateUserDTO } from "./user.entity";
+import { UserService } from "./user.service";
+
+describe("Контроллер учителей / администраторов", () => {
+  let service: UserService;
+  let controller: UserController;
+
+  const teacherMockup: CreateUserDTO = {
+    fullName: {
+      surname: "Фамилия",
+      name: "Имя",
+      patronymic: "Отчество"
+    },
+    password: "default-password"
+  };
+
+  const createTeacher = async (dto: CreateUserDTO) => {
+    return await controller.createTeacher(dto);
+  };
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [...TypeOrmTestingModule()],
+      controllers: [UserController],
+      providers: [UserService]
+    }).compile();
+
+    controller = module.get<UserController>(UserController);
+    service = module.get<UserService>(UserService);
+    await service.clearTable();
+  });
+
+  afterEach(async () => {
+    await service.clearTable();
+  });
+
+  describe("Создание учителя с неправильными данными выдаёт ошибку", () => {
+    it("Создание учителя неверными данными DTO", async () => {
+      const newFullName = new Date();
+      const newPassword = 0;
+      const newUser = { fullName: newFullName, password: newPassword } as unknown as CreateUserDTO;
+      console.log(newUser);
+      await expect(createTeacher(newUser)).rejects.toThrow(BadRequestException);
+    });
+  });
+});

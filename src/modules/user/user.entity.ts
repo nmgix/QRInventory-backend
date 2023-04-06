@@ -1,13 +1,13 @@
-import { Exclude, Type } from 'class-transformer';
-import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-import { IsPasswordValid } from '../../helpers/passwordValid';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { UserErrors } from './user.i18n';
-import { ApiProperty } from '@nestjs/swagger';
+import { Exclude, Type } from "class-transformer";
+import { IsNotEmpty, IsString, ValidateNested } from "class-validator";
+import { IsPasswordValid } from "../../helpers/passwordValid";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { UserErrors } from "./user.i18n";
+import { ApiProperty } from "@nestjs/swagger";
 
 export enum UserRoles {
-  ADMIN = 'admin',
-  TEACHER = 'teacher',
+  ADMIN = "admin",
+  TEACHER = "teacher"
 }
 
 export class FullName {
@@ -28,42 +28,35 @@ export class FullName {
 @Entity()
 export class User {
   @ApiProperty()
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @ApiProperty({ type: () => FullName })
-  @Column('simple-json')
+  @Column("simple-json")
   fullName: FullName;
 
   @ApiProperty({ enum: UserRoles })
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: UserRoles,
-    default: UserRoles.TEACHER,
+    default: UserRoles.TEACHER
   })
   role: UserRoles;
 
   @ApiProperty()
   @Exclude({ toPlainOnly: true })
-  @Column()
+  @Column({ type: "varchar" })
   password: string;
 }
 
-export class UserDTO {
-  @ApiProperty()
-  id: string;
-
+export class CreateUserDTO {
   @ApiProperty()
   @IsNotEmpty({ message: UserErrors.fullname_empty })
-  @ValidateNested()
+  @ValidateNested({ each: true })
   @Type(() => FullName)
   fullName: FullName;
 
   @ApiProperty()
-  role: UserRoles;
-
-  @ApiProperty()
-  @IsPasswordValid()
   @IsString({ message: UserErrors.password_string })
   password: string;
 }

@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ItemSwagger } from './swagger.docs';
+import { ItemSwagger } from './item.docs';
 
 @ApiTags(ItemSwagger.tag)
 @Controller('item')

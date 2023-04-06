@@ -1,21 +1,16 @@
-import {
-  ArgumentsHost,
-  ExceptionFilter,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
-import { Response } from 'express';
-import { QueryFailedError } from 'typeorm';
+import { ArgumentsHost, BadRequestException, ExceptionFilter, HttpStatus, Logger } from "@nestjs/common";
+import { Response } from "express";
+import { QueryFailedError } from "typeorm";
 
 export class GlobalException implements ExceptionFilter {
-  constructor(public queryFail: string) {}
+  constructor(public queryFail: string, public badRequest: string) {}
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     let message = (exception as any).message;
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let description = '';
+    let description = "";
 
     Logger.error(message, (exception as any).stack);
     // отправка логов
@@ -29,9 +24,14 @@ export class GlobalException implements ExceptionFilter {
         status = HttpStatus.UNPROCESSABLE_ENTITY;
         description = (exception as any).message;
       }
+      case BadRequestException: {
+        message = this.badRequest;
+        status = HttpStatus.UNPROCESSABLE_ENTITY;
+        description = (exception as any).message;
+      }
     }
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       return response.status(status).json({ message, description });
     } else {
       return response.status(status).json({ message });
