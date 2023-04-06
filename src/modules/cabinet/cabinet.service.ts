@@ -30,7 +30,7 @@ export class CabinetService {
     return this.get(createdCabinet.id);
   }
 
-  async get(id: string) {
+  async get(id: string): Promise<Cabinet | null> {
     return await this.cabinetRepository.findOne({ where: { id } });
   }
 

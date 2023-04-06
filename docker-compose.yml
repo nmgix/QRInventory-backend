@@ -1,0 +1,29 @@
+services:
+  api:
+    container_name: nest_api
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: build
+    volumes:
+      - .:/usr/src/app
+    env_file:
+      - .env
+    command: npm run start:prod
+    ports:
+      - 80:3000
+  postgres:
+    image: postgres
+    restart: always
+    container_name: ${POSTGRES_HOST}
+    command: postgres -c port=${POSTGRES_PORT}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    volumes:
+      - docker-nest-invetorying:/var/lib/postgresql/data
+volumes:
+  docker-nest-invetorying:
