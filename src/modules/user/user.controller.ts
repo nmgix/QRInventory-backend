@@ -10,13 +10,16 @@ import {
   HttpCode,
   HttpException,
   HttpStatus,
+  UseFilters,
 } from '@nestjs/common';
+import { GlobalException } from 'src/helpers/GlobalException';
 import { UserDTO } from './user.entity';
 import { UserErrors } from './user.i18n';
 import { UserService } from './user.service';
 
-@UseInterceptors(ClassSerializerInterceptor)
 @Controller('user')
+@UseInterceptors(ClassSerializerInterceptor)
+@UseFilters(new GlobalException(UserErrors.user_data_input_error))
 export class UserController {
   constructor(private userService: UserService) {}
 

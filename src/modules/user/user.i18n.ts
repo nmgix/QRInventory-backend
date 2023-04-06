@@ -17,4 +17,6 @@ export enum UserErrors {
 
   user_not_found = 'Пользователь не найден',
   user_deleted = 'Пользователь удалён',
+
+  user_data_input_error = 'Ошибка ввода пользовательских данных',
 }

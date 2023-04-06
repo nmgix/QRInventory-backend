@@ -12,14 +12,14 @@ import {
   UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
+import { GlobalException } from 'src/helpers/GlobalException';
 import { Cabinet, EditCabinetDTO } from './cabinet.entity';
 import { CabinetErrors } from './cabinet.i18n';
 import { CabinetService } from './cabinet.service';
-import { TypeOrmFilter } from './idk';
 
-@UseInterceptors(ClassSerializerInterceptor)
-@UseFilters(TypeOrmFilter)
 @Controller('cabinet')
+@UseInterceptors(ClassSerializerInterceptor)
+@UseFilters(new GlobalException(CabinetErrors.cabinet_edit_error))
 export class CabinetController {
   constructor(private cabinerService: CabinetService) {}
 
