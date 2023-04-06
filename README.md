@@ -1,5 +1,23 @@
 # Бекенд димпломного проекта по инвентаризации
 
+## `.env`
+
+```md
+NODE_ENV=development
+
+POSTGRES_PORT=5436
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=any
+POSTGRES_DB=default_back
+POSTGRES_HOST=nest_pg
+
+POSTGRES_TEST_PORT=5437
+POSTGRES_TEST_USER=postgres
+POSTGRES_TEST_PASSWORD=any
+POSTGRES_TEST_DB=default_back
+POSTGRES_TEST_HOST=localhost
+```
+
 ## Что необходимо выполнить
 
 1. [ ] Роуты
