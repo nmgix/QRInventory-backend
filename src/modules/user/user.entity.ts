@@ -47,6 +47,9 @@ export class User {
   @Exclude({ toPlainOnly: true })
   @Column({ type: "varchar" })
   password: string;
+
+  @Column()
+  refreshToken: string;
 }
 
 export class CreateUserDTO {
