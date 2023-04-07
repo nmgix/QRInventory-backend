@@ -12,7 +12,7 @@ export class GlobalException implements ExceptionFilter {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let description = "";
 
-    Logger.error(message, (exception as any).stack);
+    // Logger.error(message, (exception as any).stack);
     // отправка логов
 
     switch (exception.constructor) {

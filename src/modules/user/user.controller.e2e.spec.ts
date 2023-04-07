@@ -13,14 +13,14 @@ describe("E2E учителей / администраторов", () => {
   let service: UserService;
   let apiUrl;
 
-  // const teacherMockup: CreateUserDTO = {
-  //   fullName: {
-  //     surname: "Фамилия",
-  //     name: "Имя",
-  //     patronymic: "Отчество"
-  //   },
-  //   password: "default-password"
-  // };
+  const teacherMockup: CreateUserDTO = {
+    fullName: {
+      surname: "Фамилия",
+      name: "Имя",
+      patronymic: "Отчество"
+    },
+    password: "default-password"
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -49,5 +49,11 @@ describe("E2E учителей / администраторов", () => {
     const newUser = { fullName: newFullName, password: newPassword } as unknown as CreateUserDTO;
     const res = await request(apiUrl).post("/user/create").send(newUser).set("Content-Type", "application/json").set("Accept", "*/*");
     expect(res.status).toBe(422);
+  });
+
+  it("Создание учителя", async () => {
+    const createResponse = await request(apiUrl).post("/user/create").send(teacherMockup).set("Content-Type", "application/json");
+    const foundResponse = await request(apiUrl).get(`/user/${createResponse.body.id}`);
+    expect(createResponse.body).toStrictEqual(foundResponse.body);
   });
 });
