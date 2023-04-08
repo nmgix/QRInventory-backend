@@ -1,4 +1,4 @@
-import { Controller, Body, Post, ClassSerializerInterceptor, UseInterceptors, Get, Param, Delete, HttpCode, UseFilters, Req, SerializeOptions } from "@nestjs/common";
+import { Controller, Body, Post, ClassSerializerInterceptor, UseInterceptors, Get, Param, Delete, HttpCode, UseFilters, Req, SerializeOptions, UseGuards } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/GlobalException";
 import { Roles } from "../roles/roles.decorator";
@@ -9,6 +9,7 @@ import { UserService } from "./user.service";
 // import { Csrf } from "ncsrf";
 import { Public } from "../auth/auth.decorator";
 import { AuthedRequest } from "../auth/types";
+import { AuthGuard } from "../auth/auth.guard";
 
 @ApiTags(UserSwagger.tag)
 @Controller("user")
@@ -37,9 +38,9 @@ export class UserController {
   @Roles(UserRoles.TEACHER)
   // @Csrf()
   @Get()
-  @SerializeOptions({
-    groups: ["role:customer", "role:admin"]
-  })
+  // @SerializeOptions({
+  //   groups: ["role:teacher", "role:admin"]
+  // })
   @ApiOperation({ summary: "Получение себя (учителя) по id" })
   @ApiResponse({ status: 200, description: "Учитель, найденный в БД (либо null)", type: User })
   async getMe(@Req() req: AuthedRequest) {

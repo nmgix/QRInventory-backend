@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { CreateUserDTO } from "../user/user.entity";
+import { CreateUserDTO, User } from "../user/user.entity";
 import { UserService } from "../user/user.service";
 import * as argon2 from "argon2";
 import { AuthLoginDTO } from "./auth.dto";
@@ -15,7 +15,7 @@ export class AuthService {
     const hashedPassword = await argon2.hash(dto.password);
     const user = await this.userService.create({ ...dto, password: hashedPassword });
 
-    const tokens = await this.createTokens(user.id);
+    const tokens = await this.createTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     return { user, tokens };
   }
@@ -25,15 +25,15 @@ export class AuthService {
     if (!user) throw new BadRequestException(AuthErrors.user_not_found);
     const passwordMatch = await argon2.verify(user.password, dto.password);
     if (!passwordMatch) throw new BadRequestException(AuthErrors.password_mismatch);
-    const tokens = await this.createTokens(user.id);
+    const tokens = await this.createTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     return { user, tokens };
   }
 
-  async createTokens(userId: number) {
+  async createTokens(user: User) {
     const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync({ id: userId }, { secret: this.configService.get("JWT_ACCESS_SECRET"), expiresIn: this.configService.get("ACCESS_TIMEOUT") }),
-      this.jwtService.signAsync({ id: userId }, { secret: this.configService.get("JWT_REFRESH_SECRET"), expiresIn: this.configService.get("REFRESH_TIMEOUT") })
+      this.jwtService.signAsync({ id: user.id, role: user.role }, { secret: this.configService.get("JWT_ACCESS_SECRET"), expiresIn: +this.configService.get("ACCESS_TIMEOUT") * 1000 }),
+      this.jwtService.signAsync({ id: user.id, role: user.role }, { secret: this.configService.get("JWT_REFRESH_SECRET"), expiresIn: +this.configService.get("REFRESH_TIMEOUT") * 1000 })
     ]);
 
     return {
@@ -49,10 +49,10 @@ export class AuthService {
 
   async refreshTokens(userId: number, refreshToken: string) {
     const user = await this.userService.get(userId);
-    if (!user || !refreshToken) throw new ForbiddenException(AuthErrors.access_denied);
+    if (!user || !refreshToken) throw new ForbiddenException(AuthErrors.access_denied, `Пользователь не найден, либо не указан refresh-токен`);
     const refreshTokenMatch = await argon2.verify(user.refreshToken, refreshToken);
-    if (!refreshTokenMatch) throw new ForbiddenException(AuthErrors.access_denied);
-    const tokens = await this.createTokens(user.id);
+    if (!refreshTokenMatch) throw new ForbiddenException(AuthErrors.access_denied, `Refresh-токены не сходятся`);
+    const tokens = await this.createTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     return tokens;
   }

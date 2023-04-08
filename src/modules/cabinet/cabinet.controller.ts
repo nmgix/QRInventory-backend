@@ -46,7 +46,7 @@ export class CabinetController {
   }
 
   // администратор или только учитель относящийся к своему кабинету
-  @Roles(UserRoles.ADMIN)
+  @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
   // @Csrf()
   @Post("edit")
   @ApiOperation({ summary: "Изменение кабинета" })
@@ -57,7 +57,7 @@ export class CabinetController {
 
     // сырая имплементация, лучше потом уберу роли и оставлю про по правам изменения, #PoliciesGuard https://docs-nestjs.netlify.app/security/authorization
     // либо админу добавлять и то, и другое (TEACHER и ADMIN)
-    if (req.user.roles.includes(UserRoles.TEACHER) && cabinet.teachers.some(teacher => teacher.id === req.user.id)) {
+    if (req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) {
       return this.cabinetService.update(dto);
     }
   }

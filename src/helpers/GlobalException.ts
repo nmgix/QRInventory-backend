@@ -10,7 +10,7 @@ export class GlobalException implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     let message = (exception as any).message;
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let description = "";
+    let description = (exception as any).response.error ?? "";
 
     if (process.env.NODE_ENV !== "production") Logger.error(message, (exception as any).stack);
 

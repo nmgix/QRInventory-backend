@@ -44,13 +44,15 @@ export class User {
   role: UserRoles;
 
   @ApiProperty()
-  @Expose({ groups: ["role:teacher", "role:admin"] })
+  // @Expose({ groups: ["role:teacher", "role:admin"] })
+  @Expose({ groups: ["expose"] })
   @Exclude({ toPlainOnly: true })
   @Column({ type: "varchar" })
   password: string;
 
   @ApiProperty({ required: false })
-  @Expose({ groups: ["role:teacher", "role:admin"] })
+  // @Expose({ groups: ["role:teacher", "role:admin"] })
+  @Expose({ groups: ["expose"] })
   @Column({ nullable: true })
   refreshToken: string;
 }
