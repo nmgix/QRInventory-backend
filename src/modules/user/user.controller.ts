@@ -2,7 +2,7 @@ import { Controller, Body, Post, ClassSerializerInterceptor, UseInterceptors, Ge
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/GlobalException";
 import { Roles } from "../roles/roles.decorator";
-import { UserSwagger } from "./user.docs";
+import { UserSwagger } from "../../documentation/user.docs";
 import { CreateUserDTO, User, UserRoles } from "./user.entity";
 import { UserErrors } from "./user.i18n";
 import { UserService } from "./user.service";

@@ -1,9 +1,11 @@
 import { INestApplication } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { AuthSwagger } from "../modules/auth/auth.docs";
-import { CabinetSwagger } from "../modules/cabinet/cabinet.docs";
-import { ItemSwagger } from "../modules/item/item.docs";
-import { UserSwagger } from "../modules/user/user.docs";
+import { Tokens } from "../modules/auth/types";
+
+import { AuthSwagger } from "./auth.docs";
+import { CabinetSwagger } from "./cabinet.docs";
+import { ItemSwagger } from "./item.docs";
+import { UserSwagger } from "./user.docs";
 
 enum SwaggerData {
   api_name = "Апи инвентаризации колледжа",
@@ -20,6 +22,8 @@ const config = new DocumentBuilder()
   .addTag(UserSwagger.tag, UserSwagger.description)
   .addTag(ItemSwagger.tag, ItemSwagger.description)
   .addTag(AuthSwagger.tag, AuthSwagger.description)
+  .addCookieAuth(Tokens.access_token, { type: "apiKey", name: "Основной токен доступа", description: `Живёт 30 минут, после чего кука удаляется` }, Tokens.access_token)
+  .addCookieAuth(Tokens.refresh_token, { type: "apiKey", name: "Рефреш токен доступа", description: `Живёт 7 дней, после чего кука удаляется. Если кука не удалилась, используется для получения новой пары токенов в любом запросе` }, Tokens.refresh_token)
   .build();
 
 export default function swaggerSetup(app: INestApplication) {

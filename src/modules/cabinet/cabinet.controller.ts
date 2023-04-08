@@ -4,7 +4,7 @@ import { GlobalException } from "../../helpers/GlobalException";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
 import { CabinetErrors } from "./cabinet.i18n";
 import { CabinetService } from "./cabinet.service";
-import { CabinetSwagger } from "./cabinet.docs";
+import { CabinetSwagger } from "../../documentation/cabinet.docs";
 import { Roles } from "../roles/roles.decorator";
 import { UserRoles } from "../user/user.entity";
 // import { Csrf } from "ncsrf";
