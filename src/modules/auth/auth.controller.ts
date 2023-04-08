@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Get, Post, Req, Res, UseFilters, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Get, HttpCode, Post, Req, Res, UseFilters, UseInterceptors } from "@nestjs/common";
 import { Roles } from "../roles/roles.decorator";
 import { CreateUserDTO, User, UserRoles } from "../user/user.entity";
 import { AuthLoginDTO } from "./auth.dto";
@@ -37,6 +37,7 @@ export class AuthController {
   @Post("login")
   @ApiOperation({ summary: "Авторизация под id и паролем" })
   @ApiResponse({ status: 200, description: "Учитель / Админ", type: User })
+  @HttpCode(200)
   async login(@Body() dto: AuthLoginDTO, @Res({ passthrough: true }) res: Response) {
     const { user, tokens } = await this.authService.login(dto);
     // возможно поставить same site есть смысл
@@ -50,7 +51,10 @@ export class AuthController {
   @Get("logout")
   @ApiOperation({ summary: "Выход из пользователя" })
   @ApiResponse({ status: 200 })
-  async logout(@Req() req: AuthedRequest) {
-    return this.authService.logout(req.user.id);
+  async logout(@Req() req: AuthedRequest, @Res({ passthrough: true }) res: Response) {
+    res.clearCookie(Tokens.access_token);
+    res.clearCookie(Tokens.refresh_token);
+    await this.authService.logout(req.user.id);
+    return;
   }
 }
