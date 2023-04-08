@@ -8,25 +8,25 @@
 
 ## Переменные окружения
 
-Создавать в папке `envs`
+Создавать в корне приложения (скажите спасибо `docker-compose`)
 
-1. `app.env`
-
-```md
-GLOBAL_PORT=3000 APP_PORT=3000
-```
-
-2. `auth.env`
-
-`ACCESS_TIMEOUT` и `REFRESH_TIMEOUT` в секундах (например 30 минут и 7 дней в секунды)
+`.env`
 
 ```md
-JWT_ACCESS_SECRET=any JWT_REFRESH_SECRET=any ACCESS_TIMEOUT=1800 REFRESH_TIMEOUT=604800 JWT_COOKIE=any
-```
+# app
 
-1. `postgres.env`
+GLOBAL_PORT=80 APP_PORT=5000
 
-```md
+# auth
+
+JWT_ACCESS_SECRET=any JWT_REFRESH_SECRET=any
+
+# `ACCESS_TIMEOUT` и `REFRESH_TIMEOUT` в секундах (например 30 минут и 7 дней в секунды)
+
+ACCESS_TIMEOUT=1800 REFRESH_TIMEOUT=604800 JWT_COOKIE=any
+
+# db
+
 POSTGRES_PORT=5436 POSTGRES_USER=postgres POSTGRES_PASSWORD=any POSTGRES_DB=default_back POSTGRES_HOST=nest_pg
 
 POSTGRES_TEST_PORT=5437 POSTGRES_TEST_USER=postgres POSTGRES_TEST_PASSWORD=any POSTGRES_TEST_DB=default_back POSTGRES_TEST_HOST=nest_test_pg

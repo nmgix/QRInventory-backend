@@ -5,12 +5,8 @@ services:
       dockerfile: Dockerfile
       context: .
       target: build
-    volumes:
-      - .:/usr/src/app
     env_file:
-      - envs/app.env
-      - envs/auth.env
-      - envs/postgres.env
+      - .env
     environment:
       NODE_ENV: production
     command: npm run start:prod

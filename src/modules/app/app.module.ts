@@ -7,7 +7,7 @@ import { ItemModule } from "../item/item.module";
 import { AuthModule } from "../auth/auth.module";
 
 @Module({
-  imports: [ConfigModule.forRoot({ envFilePath: ["envs/app.env", "envs/auth.env", "envs/postgres.env"], isGlobal: true }), AuthModule, DatabaseModule, UserModule, CabinetModule, ItemModule],
+  imports: [ConfigModule.forRoot({ envFilePath: [".env"], isGlobal: true }), AuthModule, DatabaseModule, UserModule, CabinetModule, ItemModule],
   controllers: [],
   providers: []
 })
