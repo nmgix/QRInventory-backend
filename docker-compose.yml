@@ -8,12 +8,14 @@ services:
     volumes:
       - .:/usr/src/app
     env_file:
-      - .env
+      - envs/app.env
+      - envs/auth.env
+      - envs/postgres.env
     environment:
       NODE_ENV: production
     command: npm run start:prod
     ports:
-      - 80:3000
+      - "${GLOBAL_PORT}:${APP_PORT}"
   postgres:
     image: postgres
     restart: always
@@ -24,7 +26,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
       - docker-nest-invetorying:/var/lib/postgresql/data
   postgres_test:
@@ -37,7 +39,7 @@ services:
       POSTGRES_USER: ${POSTGRES_TEST_USER}
       POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD}
     ports:
-      - '${POSTGRES_TEST_PORT}:${POSTGRES_TEST_PORT}'
+      - "${POSTGRES_TEST_PORT}:${POSTGRES_TEST_PORT}"
     volumes:
       - docker-nest-invetorying:/var/lib/postgresql/data
 volumes:

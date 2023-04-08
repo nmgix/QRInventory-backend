@@ -1,4 +1,3 @@
-import { BadRequestException } from "@nestjs/common";
 import { INestApplication } from "@nestjs/common/interfaces";
 import { Test, TestingModule } from "@nestjs/testing";
 import { DatabaseModule, TypeOrmTestingModule } from "../database/database.module";

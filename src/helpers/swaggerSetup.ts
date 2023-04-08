@@ -1,5 +1,6 @@
 import { INestApplication } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { AuthSwagger } from "../modules/auth/auth.docs";
 import { CabinetSwagger } from "../modules/cabinet/cabinet.docs";
 import { ItemSwagger } from "../modules/item/item.docs";
 import { UserSwagger } from "../modules/user/user.docs";
@@ -18,6 +19,7 @@ const config = new DocumentBuilder()
   .addTag(CabinetSwagger.tag, CabinetSwagger.description)
   .addTag(UserSwagger.tag, UserSwagger.description)
   .addTag(ItemSwagger.tag, ItemSwagger.description)
+  .addTag(AuthSwagger.tag, AuthSwagger.description)
   .build();
 
 export default function swaggerSetup(app: INestApplication) {

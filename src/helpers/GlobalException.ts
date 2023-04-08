@@ -1,4 +1,4 @@
-import { ArgumentsHost, BadRequestException, ExceptionFilter, HttpStatus, Logger } from "@nestjs/common";
+import { ArgumentsHost, BadRequestException, ExceptionFilter, HttpStatus, InternalServerErrorException, Logger } from "@nestjs/common";
 import { Response } from "express";
 import { QueryFailedError } from "typeorm";
 
@@ -12,8 +12,7 @@ export class GlobalException implements ExceptionFilter {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let description = "";
 
-    // Logger.error(message, (exception as any).stack);
-    // отправка логов
+    if (process.env.NODE_ENV !== "production") Logger.error(message, (exception as any).stack);
 
     switch (exception.constructor) {
       case Error: {
@@ -24,6 +23,8 @@ export class GlobalException implements ExceptionFilter {
         status = HttpStatus.UNPROCESSABLE_ENTITY;
         description = (exception as any).message;
       }
+      case TypeError:
+      case InternalServerErrorException:
       case BadRequestException: {
         message = this.badRequest;
         status = HttpStatus.UNPROCESSABLE_ENTITY;

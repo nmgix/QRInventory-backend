@@ -1,29 +1,46 @@
 # Бекенд димпломного проекта по инвентаризации
 
-## `.env`
+Команда для генерации секрета
+
+```ts
+   node -e "console.log(require('crypto').randomBytes(256).toString('base64'));"
+```
+
+## Переменные окружения
+
+Создавать в папке `envs`
+
+1. `app.env`
 
 ```md
-POSTGRES_PORT=5436
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=any
-POSTGRES_DB=default_back
-POSTGRES_HOST=nest_pg
+GLOBAL_PORT=3000 APP_PORT=3000
+```
 
-POSTGRES_TEST_PORT=5437
-POSTGRES_TEST_USER=postgres
-POSTGRES_TEST_PASSWORD=any
-POSTGRES_TEST_DB=default_back
-POSTGRES_TEST_HOST=localhost
+2. `auth.env`
+
+`ACCESS_TIMEOUT` и `REFRESH_TIMEOUT` в секундах (например 30 минут и 7 дней в секунды)
+
+```md
+JWT_ACCESS_SECRET=any JWT_REFRESH_SECRET=any ACCESS_TIMEOUT=1800 REFRESH_TIMEOUT=604800 JWT_COOKIE=any
+```
+
+1. `postgres.env`
+
+```md
+POSTGRES_PORT=5436 POSTGRES_USER=postgres POSTGRES_PASSWORD=any POSTGRES_DB=default_back POSTGRES_HOST=nest_pg
+
+POSTGRES_TEST_PORT=5437 POSTGRES_TEST_USER=postgres POSTGRES_TEST_PASSWORD=any POSTGRES_TEST_DB=default_back POSTGRES_TEST_HOST=nest_test_pg
 ```
 
 ## Что необходимо выполнить
 
 1. [ ] Роуты
    1. [ ] Роут авторизации учителей/админов (jwt)
-      1. [ ] авторизация посредствам почты и пароля
-      2. [ ] access и refresh токены
+      1. [ ] авторизация посредствам айди и пароля
+         1. [ ] access и refresh токены
    2. [ ] Роут учителей / админов
       1. [ ] создание / удаление каскадом (из всех комнат) учителя
+         1. [ ] ошибка если в пароле пробел (регистрация или логин) (защита от идиота), проверка насколько пароль слабый
       2. [ ] редактирование назначенных комнат учителем
       3. [ ] редактирование любой комнаты админом
    3. [ ] Роут комнат
@@ -43,13 +60,18 @@ POSTGRES_TEST_HOST=localhost
       2. [ ] Логи (gray log + kibana)
    6. [ ] Документация
       1. [ ] Swagger настроить
+         1. [ ] Разобраться с куками для логина и использования API внутри GUI
    7. [ ] Авторизация на уровнях
       1. [ ] Учитель
          1. [ ] Редактирование классов
       2. [ ] Админ
          1. [ ] Создание / удаление / редактирование классов
          2. [ ] Добавление / удаление предметов из реестра
+   8. [ ] Безопасность
+      1. [ ] Поставить `secure` в куки () когда будет фронт писаться (если всё же в не том-же `docker compose`) (`auth.controller.ts`)
+      2. [ ] включить (`appSetup.ts`, все контроллеры) и разобраться с CSRF (`ncsrf` и `@Csrf` декоратором), понять когда создавать токен безопасности
+      3. [ ] решить что делать с CORS и `same-site` у кук (если всё-же фронт будет не в том-же `docker compose`)
 3. [ ] Связь с внешним миром
    1. [ ] Nginx
-4. [ ] Системная сторона
-   1. [ ] Docker
+4. [x] Системная сторона
+   1. [x] Docker

@@ -14,21 +14,25 @@ export class UserService {
     return this.userRepository.find({ where: { role: UserRoles.TEACHER } });
   }
 
-  get(id: string) {
+  get(id: number) {
     return this.userRepository.findOne({ where: { id } });
   }
 
   async create(user: CreateUserDTO) {
-    const createdUser = await this.userRepository.create({ ...user, role: UserRoles.TEACHER });
+    const createdUser = await this.userRepository.create({ ...user, role: UserRoles.TEACHER, refreshToken: null });
 
     return this.userRepository.save(createdUser);
   }
 
-  async delete(id: string) {
-    return await this.userRepository.delete({ id });
+  async update(userId: number, data: Partial<User>) {
+    return this.userRepository.update({ id: userId }, data);
+  }
+
+  async delete(id: number) {
+    return this.userRepository.delete({ id });
   }
 
   async clearTable() {
-    return await this.userRepository.delete({});
+    return this.userRepository.delete({});
   }
 }

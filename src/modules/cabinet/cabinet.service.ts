@@ -29,11 +29,11 @@ export class CabinetService {
   }
 
   async get(id: string): Promise<Cabinet | null> {
-    return await this.cabinetRepository.findOne({ where: { id } });
+    return this.cabinetRepository.findOne({ where: { id } });
   }
 
   async getAll() {
-    return await this.cabinetRepository.find();
+    return this.cabinetRepository.find();
   }
 
   async update(dto: EditCabinetDTO): Promise<Cabinet | null> {
@@ -42,18 +42,20 @@ export class CabinetService {
 
     if (dto.cabinetNumber) cabinet.cabinetNumber = dto.cabinetNumber;
     if (dto.teachers) {
+      // разобраться как можно передавать учителей и предметы без этих костылей
       const teachers = await this.userRepository.findBy({ id: In(dto.teachers) });
+      // и начать пользоваться repository.update({ id }, dto)
       cabinet.teachers = teachers;
     }
 
-    return await this.cabinetRepository.save(cabinet);
+    return this.cabinetRepository.save(cabinet);
   }
 
   async delete(id: string) {
-    return await this.cabinetRepository.delete(id);
+    return this.cabinetRepository.delete(id);
   }
 
   async clearTable() {
-    return await this.cabinetRepository.delete({});
+    return this.cabinetRepository.delete({});
   }
 }

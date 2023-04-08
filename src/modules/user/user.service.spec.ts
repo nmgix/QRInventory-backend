@@ -17,7 +17,7 @@ describe("Сервис учителей / администраторов", () =>
   };
 
   const createTeacher = async (dto: CreateUserDTO) => {
-    return await service.create(dto);
+    return service.create(dto);
   };
 
   beforeEach(async () => {

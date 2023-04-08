@@ -1,4 +1,4 @@
-import { Exclude, Type } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
 import { IsNotEmpty, IsString, ValidateNested } from "class-validator";
 import { IsPasswordValid } from "../../helpers/passwordValid";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
@@ -28,8 +28,8 @@ export class FullName {
 @Entity()
 export class User {
   @ApiProperty()
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ApiProperty({ type: () => FullName })
   @Column("simple-json")
@@ -44,11 +44,14 @@ export class User {
   role: UserRoles;
 
   @ApiProperty()
+  @Expose({ groups: ["role:teacher", "role:admin"] })
   @Exclude({ toPlainOnly: true })
   @Column({ type: "varchar" })
   password: string;
 
-  @Column()
+  @ApiProperty({ required: false })
+  @Expose({ groups: ["role:teacher", "role:admin"] })
+  @Column({ nullable: true })
   refreshToken: string;
 }
 
