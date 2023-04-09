@@ -1,5 +1,5 @@
-import { ValidationPipe, BadRequestException } from '@nestjs/common';
-import { ValidationError } from 'class-validator';
+import { ValidationPipe, BadRequestException } from "@nestjs/common";
+import { ValidationError } from "class-validator";
 
 type IErrorMessage = Record<string, any>;
 
@@ -23,5 +23,5 @@ function formatErrorsHelper(errors: ValidationError[]): IErrorMessage[] {
 export const formatErrorPipe = new ValidationPipe({
   exceptionFactory: (errors: ValidationError[]) => {
     return new BadRequestException(formatErrorsHelper(errors));
-  },
+  }
 });

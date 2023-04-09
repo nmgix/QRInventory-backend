@@ -13,6 +13,7 @@ describe("E2E учителей / администраторов", () => {
   let apiUrl;
 
   const teacherMockup: CreateUserDTO = {
+    email: "test@mail.com",
     fullName: {
       surname: "Фамилия",
       name: "Имя",
@@ -24,10 +25,7 @@ describe("E2E учителей / администраторов", () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
-    })
-      .overrideProvider(DatabaseModule)
-      .useValue(TypeOrmTestingModule)
-      .compile();
+    }).compile();
 
     app = module.createNestApplication();
     await app.init();

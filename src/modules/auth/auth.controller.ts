@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Get, HttpCode, Post, Req, Res, UseFilters, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Get, HttpCode, Post, Query, Req, Res, UseFilters, UseInterceptors } from "@nestjs/common";
 import { Roles } from "../roles/roles.decorator";
 import { CreateUserDTO, User, UserRoles } from "../user/user.entity";
 import { AuthLoginDTO } from "./auth.dto";
@@ -10,8 +10,7 @@ import { Public } from "./auth.decorator";
 import { AuthSwagger } from "../../documentation/auth.docs";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/GlobalException";
-import { AuthErrors } from "./auth.i18n";
-import { Cabinet } from "../cabinet/cabinet.entity";
+import { AuthErrors, AuthMessages } from "./auth.i18n";
 
 @ApiTags(AuthSwagger.tag)
 @UseInterceptors(ClassSerializerInterceptor)
@@ -24,13 +23,13 @@ export class AuthController {
   @Roles(UserRoles.ADMIN)
   //   @Csrf()
   @ApiOperation({ summary: "Регистрация учителя (доступна админу)" })
-  @ApiResponse({ status: 200, description: "Учитель", type: User })
+  @ApiResponse({ status: 200, description: "Учитель" })
   @Post("register")
   async register(@Body() dto: CreateUserDTO, @Res({ passthrough: true }) res: Response) {
-    const { user, tokens } = await this.authService.register(dto);
-    res.cookie(Tokens.access_token, tokens.accessToken, { signed: true, httpOnly: true, maxAge: +process.env.ACCESS_TIMEOUT * 1000 });
-    res.cookie(Tokens.refresh_token, tokens.refreshToken, { signed: true, httpOnly: true, maxAge: +process.env.REFRESH_TIMEOUT * 1000 });
-    return user;
+    await this.authService.register(dto);
+    return {
+      message: AuthMessages.user_created
+    };
   }
 
   @Public()

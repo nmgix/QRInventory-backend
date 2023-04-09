@@ -9,7 +9,6 @@ import { UserService } from "./user.service";
 // import { Csrf } from "ncsrf";
 import { Public } from "../auth/auth.decorator";
 import { AuthedRequest } from "../auth/types";
-import { AuthGuard } from "../auth/auth.guard";
 
 @ApiTags(UserSwagger.tag)
 @Controller("user")
@@ -32,7 +31,7 @@ export class UserController {
   @ApiOperation({ summary: "Получение учителя по id" })
   @ApiResponse({ status: 200, description: "Учитель, найденный в БД (либо null)", type: User })
   async getTeacher(@Param("id") id: number) {
-    return this.userService.get(id);
+    return this.userService.get(null, id);
   }
 
   @Roles(UserRoles.TEACHER)
@@ -44,7 +43,7 @@ export class UserController {
   @ApiOperation({ summary: "Получение себя (учителя) по id" })
   @ApiResponse({ status: 200, description: "Учитель, найденный в БД (либо null)", type: User })
   async getMe(@Req() req: AuthedRequest) {
-    return this.userService.get(req.user.id);
+    return this.userService.get(null, req.user.id);
   }
 
   @Roles(UserRoles.ADMIN)

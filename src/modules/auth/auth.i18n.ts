@@ -11,3 +11,7 @@ export enum AuthErrors {
   query_fail = "Введены ошибочные данные",
   bad_request = "Неправильный запрос"
 }
+
+export enum AuthMessages {
+  user_created = "Пользователь создан"
+}

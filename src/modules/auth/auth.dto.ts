@@ -1,12 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { UserErrors } from "../user/user.i18n";
 import { AuthErrors } from "./auth.i18n";
 
 export class AuthLoginDTO {
   @ApiProperty()
-  @IsNotEmpty({ message: AuthErrors.id_empty })
-  @IsNumber({ allowInfinity: false, maxDecimalPlaces: 3000, allowNaN: false }, { message: AuthErrors.id_number })
-  id: number;
+  @IsNotEmpty({ message: UserErrors.email_empty })
+  @IsEmail({}, { message: UserErrors.email_not_email })
+  email: string;
 
   @ApiProperty()
   @IsNotEmpty({ message: AuthErrors.password_empty })

@@ -1,6 +1,5 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { IsNotEmpty, IsString, ValidateNested } from "class-validator";
-import { IsPasswordValid } from "../../helpers/passwordValid";
+import { IsEmail, IsNotEmpty, IsString, ValidateNested } from "class-validator";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { UserErrors } from "./user.i18n";
 import { ApiProperty } from "@nestjs/swagger";
@@ -30,6 +29,11 @@ export class User {
   @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ApiProperty()
+  @IsEmail()
+  @Column({ unique: true })
+  email: string;
 
   @ApiProperty({ type: () => FullName })
   @Column("simple-json")
@@ -63,6 +67,11 @@ export class CreateUserDTO {
   @ValidateNested({ each: true })
   @Type(() => FullName)
   fullName: FullName;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: UserErrors.email_empty })
+  @IsEmail({}, { message: UserErrors.email_not_email })
+  email: string;
 
   @ApiProperty()
   @IsString({ message: UserErrors.password_string })

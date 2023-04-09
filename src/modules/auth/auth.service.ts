@@ -21,7 +21,7 @@ export class AuthService {
   }
 
   async login(dto: AuthLoginDTO) {
-    const user = await this.userService.get(dto.id);
+    const user = await this.userService.get(dto.email);
     if (!user) throw new BadRequestException(AuthErrors.user_not_found);
     const passwordMatch = await argon2.verify(user.password, dto.password);
     if (!passwordMatch) throw new BadRequestException(AuthErrors.password_mismatch);
@@ -48,7 +48,7 @@ export class AuthService {
   }
 
   async refreshTokens(userId: number, refreshToken: string) {
-    const user = await this.userService.get(userId);
+    const user = await this.userService.get(null, userId);
     if (!user || !refreshToken) throw new ForbiddenException(AuthErrors.access_denied, `Пользователь не найден, либо не указан refresh-токен`);
     const refreshTokenMatch = await argon2.verify(user.refreshToken, refreshToken);
     if (!refreshTokenMatch) throw new ForbiddenException(AuthErrors.access_denied, `Refresh-токены не сходятся`);

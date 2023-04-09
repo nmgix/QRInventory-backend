@@ -10,7 +10,8 @@ export class GlobalException implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     let message = (exception as any).message;
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let description = (exception as any).response.error ?? "";
+    let description = null;
+    let developerDescription = (exception as any)?.response?.error ?? "";
 
     if (process.env.NODE_ENV !== "production") Logger.error(message, (exception as any).stack);
 
@@ -21,21 +22,25 @@ export class GlobalException implements ExceptionFilter {
       case QueryFailedError: {
         message = this.queryFail;
         status = HttpStatus.UNPROCESSABLE_ENTITY;
-        description = (exception as any).message;
+        developerDescription = (exception as any).message;
       }
       case TypeError:
-      case InternalServerErrorException:
+      case InternalServerErrorException: {
+        message = this.badRequest;
+        status = HttpStatus.UNPROCESSABLE_ENTITY;
+        developerDescription = (exception as any).message;
+      }
       case BadRequestException: {
         message = this.badRequest;
         status = HttpStatus.UNPROCESSABLE_ENTITY;
-        description = (exception as any).message;
+        description = (exception as any)?.response?.message;
       }
     }
 
     if (process.env.NODE_ENV === "development") {
-      return response.status(status).json({ message, description });
+      return response.status(status).json({ message, description, developerDescription });
     } else {
-      return response.status(status).json({ message });
+      return response.status(status).json({ message, description });
     }
   }
 }

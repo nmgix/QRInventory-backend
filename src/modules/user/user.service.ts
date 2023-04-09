@@ -14,8 +14,8 @@ export class UserService {
     return this.userRepository.find({ where: { role: UserRoles.TEACHER } });
   }
 
-  get(id: number) {
-    return this.userRepository.findOne({ where: { id } });
+  get(email?: string, id?: number) {
+    return this.userRepository.findOne({ where: { email, id } });
   }
 
   async create(user: CreateUserDTO) {

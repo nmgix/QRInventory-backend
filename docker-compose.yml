@@ -23,8 +23,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
-    volumes:
-      - docker-nest-invetorying:/var/lib/postgresql/data
   postgres_test:
     image: postgres
     restart: always
@@ -36,7 +34,5 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD}
     ports:
       - "${POSTGRES_TEST_PORT}:${POSTGRES_TEST_PORT}"
-    volumes:
-      - docker-nest-invetorying:/var/lib/postgresql/data
 volumes:
   docker-nest-invetorying:

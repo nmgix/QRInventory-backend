@@ -18,10 +18,10 @@ export default async function appSetup(app: NestExpressApplication) {
   app.enableCors();
   app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
   app.use(cookieParser(configService.get("JWT_COOKIE")));
+  app.useGlobalPipes(formatErrorPipe);
   app.useGlobalGuards(new AuthGuard(jwtService, configService, reflector, authService), new RolesGuard(reflector));
   // app.use(nestCsrf({ signed: true }));
   // app.useGlobalFilters(new CsrfFilter()); // вот это исправить, там есть два exception'а, https://www.skypack.dev/view/ncsrf, их можно обработать кастомным pipe со своими текстами ошибок
   // app.set("trust proxy", 1);
-  app.useGlobalPipes(formatErrorPipe);
   await app.listen(configService.get("APP_PORT"));
 }
