@@ -18,7 +18,7 @@ describe("AuthController", () => {
     app = module.createNestApplication();
     await app.init();
     const configService: ConfigService = app.get(ConfigService);
-    apiUrl = `http://localhost:${configService.get("NODE_ENV") === "development" ? configService.get("APP_PORT") : configService.get("GLOBAL_PORT")}`;
+    apiUrl = `http://localhost:${configService.get("NODE_ENV") !== "production" ? configService.get("APP_PORT") : configService.get("GLOBAL_PORT")}`;
 
     const response = await request(apiUrl).post("/auth/login").send({ email: "test@mail.com", password: "any-password" });
     user = response.body;

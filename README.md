@@ -35,7 +35,8 @@ POSTGRES_TEST_PORT=5437 POSTGRES_TEST_USER=postgres POSTGRES_TEST_PASSWORD=any P
 ## Shorthand-команды для БД
 
 1. `psql -d default_back -U postgres -p 5437`
-2. `INSERT INTO public.user ("id", "fullName", "role", "password", "refreshToken", "email") VALUES (0, '{"surname":"Фамилия","name":"Имя","patronymic":"Отчество"}', 'admin', '$argon2id$v=19$m=65536,t=3,p=4$k3mbjwl428IxPEpqbo2Alw$Lu56f0su+Qw2w9QOUCMMJufiOWpUaboddUki50cTykM', '$argon2id$v=19$m=65536,t=3,p=4$TQdGNricgWcDhwNrpZIQmQ$FCnImpZM/Z7j+OurlfcegctyXiVObOXHSI/d+fUh+EE', 'test@mail.com');`
+2. `select * from public.user`
+3. `INSERT INTO public.user ("id", "fullName", "role", "password", "refreshToken", "email") VALUES (0, '{"surname":"Фамилия","name":"Имя","patronymic":"Отчество"}', 'admin', '$argon2id$v=19$m=65536,t=3,p=4$USXvM0Gx1hAnsazvNNQkXA$py/zN5qguEElCxEoP+nLMkaaB1NiRFX+BnRZBvyOoS4', '$argon2id$v=19$m=65536,t=3,p=4$TQdGNricgWcDhwNrpZIQmQ$FCnImpZM/Z7j+OurlfcegctyXiVObOXHSI/d+fUh+EE', 'test@mail.com');`
    > P.S. почта `test@mail.com`, пароль - `any-password`
 
 ## Что необходимо выполнить

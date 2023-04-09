@@ -35,4 +35,8 @@ export class UserService {
   async clearTable() {
     return this.userRepository.delete({});
   }
+
+  async createAdmin(user: CreateUserDTO) {
+    await this.userRepository.create({ ...user, role: UserRoles.ADMIN, refreshToken: null });
+  }
 }

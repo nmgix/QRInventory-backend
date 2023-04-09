@@ -20,12 +20,13 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   // регистрировать только учителей, админ создаётся вручную в докере
-  @Roles(UserRoles.ADMIN)
+  @Public()
+  // @Roles(UserRoles.ADMIN)
   //   @Csrf()
   @ApiOperation({ summary: "Регистрация учителя (доступна админу)" })
   @ApiResponse({ status: 200, description: "Учитель" })
   @Post("register")
-  async register(@Body() dto: CreateUserDTO, @Res({ passthrough: true }) res: Response) {
+  async register(@Body() dto: CreateUserDTO) {
     await this.authService.register(dto);
     return {
       message: AuthMessages.user_created

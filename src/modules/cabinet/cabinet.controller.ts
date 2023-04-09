@@ -1,4 +1,4 @@
-import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Req, UseFilters, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Req, UseFilters, UseInterceptors } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/GlobalException";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
@@ -10,6 +10,7 @@ import { UserRoles } from "../user/user.entity";
 // import { Csrf } from "ncsrf";
 import { AuthedRequest } from "../auth/types";
 import { Public } from "../auth/auth.decorator";
+import { AuthErrors } from "../auth/auth.i18n";
 
 @ApiTags(CabinetSwagger.tag)
 @Controller("cabinet")
@@ -51,6 +52,7 @@ export class CabinetController {
   @Post("edit")
   @ApiOperation({ summary: "Изменение кабинета" })
   @ApiResponse({ status: 200, description: "Изменённый кабинет", type: Cabinet })
+  @HttpCode(200)
   async editCabinet(@Req() req: AuthedRequest, @Body() dto: EditCabinetDTO) {
     const cabinet = await this.cabinetService.get(dto.id);
     if (!cabinet) throw new BadRequestException(CabinetErrors.cabinet_not_found);
@@ -59,6 +61,8 @@ export class CabinetController {
     // либо админу добавлять и то, и другое (TEACHER и ADMIN)
     if (req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) {
       return this.cabinetService.update(dto);
+    } else {
+      throw new ForbiddenException(AuthErrors.access_denied);
     }
   }
 

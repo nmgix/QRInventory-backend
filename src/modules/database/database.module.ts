@@ -42,7 +42,6 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
       synchronize: false
     }
   };
-
   return configs[configService.get("NODE_ENV")];
 };
 

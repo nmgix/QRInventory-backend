@@ -30,7 +30,7 @@ describe("E2E учителей / администраторов", () => {
     app = module.createNestApplication();
     await app.init();
     const configService: ConfigService = app.get(ConfigService);
-    apiUrl = `http://localhost:${configService.get("NODE_ENV") === "development" ? configService.get("APP_PORT") : configService.get("GLOBAL_PORT")}`;
+    apiUrl = `http://localhost:${configService.get("NODE_ENV") !== "production" ? configService.get("APP_PORT") : configService.get("GLOBAL_PORT")}`;
 
     service = module.get<UserService>(UserService);
     await service.clearTable();

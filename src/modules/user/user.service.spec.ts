@@ -13,7 +13,8 @@ describe("Сервис учителей / администраторов", () =>
       name: "Имя",
       patronymic: "Отчество"
     },
-    password: "default-password"
+    email: "test2@mail.com",
+    password: "any-password"
   };
 
   const createTeacher = async (dto: CreateUserDTO) => {
@@ -45,7 +46,7 @@ describe("Сервис учителей / администраторов", () =>
 
   it("Создание учителя", async () => {
     const teacher = await createTeacher(teacherMockup);
-    const foundTeacher = await service.get(teacher.id);
+    const foundTeacher = await service.get(teacher.email);
 
     expect(teacher).toStrictEqual(foundTeacher);
   });
