@@ -179,4 +179,40 @@ describe("E2E кабинетов", () => {
       expect(cabinets.length).toBe(2);
     });
   });
+
+  it("Удаление учителя из всех комнат каскадом", async () => {
+    let cabinetRes1 = await agent
+      .post("/cabinet/create")
+      .send({ cabinetNumber: 1 } as CreateCabinetDTO)
+      .set("Content-Type", "application/json")
+      .set("Accept", "*/*");
+
+    let cabinetRes2 = await agent
+      .post("/cabinet/create")
+      .send({ cabinetNumber: 2 } as CreateCabinetDTO)
+      .set("Content-Type", "application/json")
+      .set("Accept", "*/*");
+
+    let cabinetRes3 = await agent
+      .post("/cabinet/create")
+      .send({ cabinetNumber: 3 } as CreateCabinetDTO)
+      .set("Content-Type", "application/json")
+      .set("Accept", "*/*");
+
+    await agent.get("/auth/logout");
+
+    await authSevice.register({ ...adminUser, role: UserRoles.ADMIN });
+    const res = await agent.post("/auth/login").send({ email: adminUser.email, password: adminUser.password }).set("Content-Type", "application/json").set("Accept", "*/*");
+    user = res.body;
+
+    let testTeacher = await userService.get(testUser.email);
+
+    const cabinetBeforeRes1 = await cabinetService.get(cabinetRes1.body.id);
+    expect(cabinetBeforeRes1.teachers.length).toBe(1);
+
+    await agent.delete(`/user/${testTeacher.id}`);
+
+    const cabinetAfterRes1 = await cabinetService.get(cabinetRes1.body.id);
+    expect(cabinetAfterRes1.teachers.length).toBe(0);
+  });
 });
