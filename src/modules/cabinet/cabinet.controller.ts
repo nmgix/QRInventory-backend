@@ -1,4 +1,4 @@
-import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Req, UseFilters, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Put, Req, UseFilters, UseInterceptors } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/GlobalException";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
@@ -21,9 +21,10 @@ export class CabinetController {
 
   @Roles(UserRoles.ADMIN)
   // @Csrf()
-  @Get()
+  @Get("all")
   @ApiOperation({ summary: "Получение всех кабинетов" })
   @ApiResponse({ status: 200, description: "Найденные кабинеты (со всеми найденными в БД учителями и предметами)", type: [Cabinet] })
+  @HttpCode(200)
   async getAllCabinets() {
     return this.cabinetService.getAll();
   }
@@ -32,6 +33,7 @@ export class CabinetController {
   @Get(":id")
   @ApiOperation({ summary: "Поиск кабинета по id" })
   @ApiResponse({ status: 200, description: "Найденный кабинет (со всеми найденными в БД учителями и предметами)", type: Cabinet })
+  @HttpCode(200)
   async getCabinetData(@Param("id") id: string) {
     return this.cabinetService.get(id);
   }
@@ -40,7 +42,8 @@ export class CabinetController {
   // @Csrf()
   @Post("create")
   @ApiOperation({ summary: "Создание кабинета, необходим номер кабинета, опционально предметы и учителя" })
-  @ApiResponse({ status: 200, description: "Созданный кабинет (со всеми найденными в БД учителями и предметами)", type: Cabinet })
+  @ApiResponse({ status: 201, description: "Созданный кабинет (со всеми найденными в БД учителями и предметами)", type: Cabinet })
+  @HttpCode(201)
   async createCabinet(@Req() req: AuthedRequest, @Body() dto: CreateCabinetDTO) {
     const cabinet = await this.cabinetService.create({ ...dto, teachers: req.user.role !== UserRoles.ADMIN ? [String(req.user.id)] : [] });
     return this.cabinetService.get(cabinet.id);
@@ -72,6 +75,7 @@ export class CabinetController {
   @Delete(":id")
   @ApiOperation({ summary: "Удаление кабинета по id" })
   @ApiResponse({ status: 200, description: "Статус удален ли кабинет или не найден" })
+  @HttpCode(200)
   async deleteCabinet(@Req() req: AuthedRequest, @Param("id") id: string) {
     const cabinet = await this.cabinetService.get(id);
     if ((req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) || req.user.role === UserRoles.ADMIN) {

@@ -35,11 +35,11 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @ApiProperty({ type: () => FullName })
+  @ApiProperty({ type: () => FullName, description: "Фамилия - Имя - Отчество" })
   @Column("simple-json")
   fullName: FullName;
 
-  @ApiProperty({ enum: UserRoles })
+  @ApiProperty({ enum: UserRoles, default: UserRoles.TEACHER })
   @Column({
     type: "enum",
     enum: UserRoles,
@@ -48,21 +48,19 @@ export class User {
   role: UserRoles;
 
   @ApiProperty()
-  // @Expose({ groups: ["role:teacher", "role:admin"] })
   @Expose({ groups: ["expose"] })
   @Exclude({ toPlainOnly: true })
   @Column({ type: "varchar" })
   password: string;
 
   @ApiProperty({ required: false })
-  // @Expose({ groups: ["role:teacher", "role:admin"] })
   @Expose({ groups: ["expose"] })
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: null })
   refreshToken: string;
 }
 
 export class CreateUserDTO {
-  @ApiProperty()
+  @ApiProperty({ description: "Фамилия - Имя - Отчество" })
   @IsNotEmpty({ message: UserErrors.fullname_empty })
   @ValidateNested({ each: true })
   @Type(() => FullName)

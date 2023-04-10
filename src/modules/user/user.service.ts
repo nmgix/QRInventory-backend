@@ -20,7 +20,6 @@ export class UserService {
 
   async create(user: Partial<User>) {
     const createdUser = await this.userRepository.create({ ...user, role: user.role ?? UserRoles.TEACHER, refreshToken: null });
-
     return this.userRepository.save(createdUser);
   }
 

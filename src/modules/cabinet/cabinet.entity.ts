@@ -18,12 +18,12 @@ export class Cabinet {
   cabinetNumber: number;
 
   @ApiProperty({ type: [User], uniqueItems: true })
-  @ManyToMany(() => User, user => user.id, { cascade: true, eager: true, onDelete: "CASCADE" })
+  @ManyToMany(() => User, user => user.id, { cascade: true, eager: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
   @JoinTable()
   teachers: User[];
 
   @ApiProperty({ type: [Item], uniqueItems: true })
-  @ManyToMany(() => Item, item => item.id, { cascade: true, eager: true, onDelete: "CASCADE" })
+  @ManyToMany(() => Item, item => item.id, { cascade: true, eager: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
   @JoinTable()
   items: Item[];
 }
