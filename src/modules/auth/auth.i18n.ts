@@ -13,5 +13,7 @@ export enum AuthErrors {
 }
 
 export enum AuthMessages {
-  user_created = "Пользователь создан"
+  user_created = "Пользователь создан",
+  user_logout = "Выход из пользователя выполнен",
+  user_cookies_cleaned = "Куки очищены"
 }

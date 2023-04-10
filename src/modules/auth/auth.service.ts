@@ -11,7 +11,7 @@ import { AuthErrors } from "./auth.i18n";
 export class AuthService {
   constructor(private userService: UserService, private jwtService: JwtService, private configService: ConfigService) {}
 
-  async register(dto: CreateUserDTO) {
+  async register(dto: Partial<User>) {
     const hashedPassword = await argon2.hash(dto.password);
     const user = await this.userService.create({ ...dto, password: hashedPassword });
 
@@ -21,7 +21,6 @@ export class AuthService {
   }
 
   async login(dto: AuthLoginDTO) {
-    console.log(dto);
     const user = await this.userService.get(dto.email);
     if (!user) throw new BadRequestException(AuthErrors.user_not_found);
     const passwordMatch = await argon2.verify(user.password, dto.password);

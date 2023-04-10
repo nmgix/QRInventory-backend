@@ -41,9 +41,12 @@ export class CabinetController {
   @Post("create")
   @ApiOperation({ summary: "Создание кабинета, необходим номер кабинета, опционально предметы и учителя" })
   @ApiResponse({ status: 200, description: "Созданный кабинет (со всеми найденными в БД учителями и предметами)", type: Cabinet })
-  async createCabinet(@Body() dto: CreateCabinetDTO) {
-    const cabinet = await this.cabinetService.create(dto);
-    return this.cabinetService.get(cabinet.id);
+  async createCabinet(@Req() req: AuthedRequest, @Body() dto: CreateCabinetDTO) {
+    console.log(req.user);
+    if (req.user.role !== UserRoles.ADMIN) {
+      const cabinet = await this.cabinetService.create({ ...dto, teachers: [String(req.user.id)] });
+      return this.cabinetService.get(cabinet.id);
+    }
   }
 
   // администратор или только учитель относящийся к своему кабинету

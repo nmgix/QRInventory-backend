@@ -51,10 +51,22 @@ export class AuthController {
   @Get("logout")
   @ApiOperation({ summary: "Выход из пользователя" })
   @ApiResponse({ status: 200 })
+  @HttpCode(200)
   async logout(@Req() req: AuthedRequest, @Res({ passthrough: true }) res: Response) {
-    res.clearCookie(Tokens.access_token);
-    res.clearCookie(Tokens.refresh_token);
+    let tokens: string[] = Object.values(Tokens).filter(value => typeof value === "string") as string[];
+    tokens.map(token => res.clearCookie(token));
+
     await this.authService.logout(req.user.id);
-    return;
+    return { message: AuthMessages.user_logout };
+  }
+
+  @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
+  @Get("clean-cookies")
+  @ApiOperation({ summary: "Очистка кук (для тестов)" })
+  @ApiResponse({ status: 200 })
+  @HttpCode(200)
+  async cookiesClean(@Res({ passthrough: true }) res: Response, @Body() dto: { tokens: Tokens[] }) {
+    dto.tokens.map(token => res.clearCookie(token));
+    return { message: AuthMessages.user_cookies_cleaned };
   }
 }

@@ -18,8 +18,8 @@ export class UserService {
     return this.userRepository.findOne({ where: { email, id } });
   }
 
-  async create(user: CreateUserDTO) {
-    const createdUser = await this.userRepository.create({ ...user, role: UserRoles.TEACHER, refreshToken: null });
+  async create(user: Partial<User>) {
+    const createdUser = await this.userRepository.create({ ...user, role: user.role ?? UserRoles.TEACHER, refreshToken: null });
 
     return this.userRepository.save(createdUser);
   }
