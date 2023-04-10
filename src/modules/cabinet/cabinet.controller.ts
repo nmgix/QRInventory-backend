@@ -67,16 +67,20 @@ export class CabinetController {
   }
 
   // администратор или только учитель относящийся к своему кабинету
-  @Roles(UserRoles.ADMIN)
+  @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
   // @Csrf()
   @Delete(":id")
   @ApiOperation({ summary: "Удаление кабинета по id" })
   @ApiResponse({ status: 200, description: "Статус удален ли кабинет или не найден" })
-  async deleteCabinet(@Param("id") id: string) {
-    const result = await this.cabinetService.delete(id);
-
-    return {
-      message: CabinetErrors[result.affected > 0 ? "cabinet_deleted" : "cabinet_not_found"]
-    };
+  async deleteCabinet(@Req() req: AuthedRequest, @Param("id") id: string) {
+    const cabinet = await this.cabinetService.get(id);
+    if ((req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) || req.user.role === UserRoles.ADMIN) {
+      const result = await this.cabinetService.delete(id);
+      return {
+        message: CabinetErrors[result.affected > 0 ? "cabinet_deleted" : "cabinet_not_found"]
+      };
+    } else {
+      throw new ForbiddenException(AuthErrors.access_denied);
+    }
   }
 }
