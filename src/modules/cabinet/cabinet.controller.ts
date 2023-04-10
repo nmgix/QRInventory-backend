@@ -42,11 +42,8 @@ export class CabinetController {
   @ApiOperation({ summary: "Создание кабинета, необходим номер кабинета, опционально предметы и учителя" })
   @ApiResponse({ status: 200, description: "Созданный кабинет (со всеми найденными в БД учителями и предметами)", type: Cabinet })
   async createCabinet(@Req() req: AuthedRequest, @Body() dto: CreateCabinetDTO) {
-    console.log(req.user);
-    if (req.user.role !== UserRoles.ADMIN) {
-      const cabinet = await this.cabinetService.create({ ...dto, teachers: [String(req.user.id)] });
-      return this.cabinetService.get(cabinet.id);
-    }
+    const cabinet = await this.cabinetService.create({ ...dto, teachers: req.user.role !== UserRoles.ADMIN ? [String(req.user.id)] : [] });
+    return this.cabinetService.get(cabinet.id);
   }
 
   // администратор или только учитель относящийся к своему кабинету
@@ -58,11 +55,11 @@ export class CabinetController {
   @HttpCode(200)
   async editCabinet(@Req() req: AuthedRequest, @Body() dto: EditCabinetDTO) {
     const cabinet = await this.cabinetService.get(dto.id);
+    // console.log(cabinet);
     if (!cabinet) throw new BadRequestException(CabinetErrors.cabinet_not_found);
 
     // сырая имплементация, лучше потом уберу роли и оставлю про по правам изменения, #PoliciesGuard https://docs-nestjs.netlify.app/security/authorization
-    // либо админу добавлять и то, и другое (TEACHER и ADMIN)
-    if (req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) {
+    if ((req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) || req.user.role === UserRoles.ADMIN) {
       return this.cabinetService.update(dto);
     } else {
       throw new ForbiddenException(AuthErrors.access_denied);

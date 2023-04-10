@@ -1,20 +1,14 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber } from 'class-validator';
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Item } from '../item/item.entity';
-import { User } from '../user/user.entity';
-import { CabinetErrors } from './cabinet.i18n';
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsNumber } from "class-validator";
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Item } from "../item/item.entity";
+import { User } from "../user/user.entity";
+import { CabinetErrors } from "./cabinet.i18n";
 
 @Entity()
 export class Cabinet {
   @ApiProperty()
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @ApiProperty()
@@ -24,12 +18,12 @@ export class Cabinet {
   cabinetNumber: number;
 
   @ApiProperty({ type: [User], uniqueItems: true })
-  @ManyToMany(() => User, (user) => user.id, { cascade: true, eager: true })
+  @ManyToMany(() => User, user => user.id, { cascade: true, eager: true })
   @JoinTable()
   teachers: User[];
 
   @ApiProperty({ type: [Item], uniqueItems: true })
-  @ManyToMany(() => Item, (item) => item.id, { cascade: true, eager: true })
+  @ManyToMany(() => Item, item => item.id, { cascade: true, eager: true })
   @JoinTable()
   items: Item[];
 }

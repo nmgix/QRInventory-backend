@@ -40,8 +40,8 @@ export class CabinetService {
     const cabinet = await this.cabinetRepository.findOne({ where: { id: dto.id } });
     if (!cabinet) throw new Error(CabinetErrors.cabinet_not_found);
 
-    if (dto.cabinetNumber) cabinet.cabinetNumber = dto.cabinetNumber;
-    if (dto.teachers) {
+    if (dto.cabinetNumber !== undefined) cabinet.cabinetNumber = dto.cabinetNumber;
+    if (dto.teachers !== undefined) {
       // разобраться как можно передавать учителей и предметы без этих костылей
       const teachers = await this.userRepository.findBy({ id: In(dto.teachers) });
       // и начать пользоваться repository.update({ id }, dto)
