@@ -1,4 +1,4 @@
 export enum AuthSwagger {
   tag = "Авторизация",
-  description = "Эндпоинты, относящиеся к авторизации"
+  description = "Все роуты, относящиеся к авторизации"
 }

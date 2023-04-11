@@ -11,10 +11,9 @@ import { ItemService } from "./item.service";
 import { CreateItemDTO, EditItemDTO, Item } from "./item.entity";
 
 @ApiTags(ItemSwagger.tag)
-// @Roles(UserRoles.ADMIN)
+@Controller("item")
 @UseFilters(new GlobalException(ItemErrors.item_query_fail, ItemErrors.item_query_fail))
 @UseInterceptors(ClassSerializerInterceptor)
-@Controller("item")
 export class ItemController {
   constructor(private itemService: ItemService) {}
 

@@ -89,4 +89,3 @@ POSTGRES_TEST_PORT=5437 POSTGRES_TEST_USER=postgres POSTGRES_TEST_PASSWORD=any P
 
 1. При использовании декоратора `@Patch` не приходит `@Body`,
 2. Сырая имплементация создания новой пары токенов после `expire'а` `access` токена
-3.

@@ -1,5 +1,5 @@
 import { Controller, Body, Post, ClassSerializerInterceptor, UseInterceptors, Get, Param, Delete, HttpCode, UseFilters, Req, SerializeOptions, UseGuards, Query, ForbiddenException, BadRequestException } from "@nestjs/common";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/GlobalException";
 import { Roles } from "../roles/roles.decorator";
 import { UserSwagger } from "../../documentation/user.docs";
@@ -63,9 +63,10 @@ export class UserController {
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
   @Post("edit")
   @ApiOperation({ summary: "Изменение учителя" })
+  @ApiQuery({ name: "id", description: "Id учителя, передавать этот параметр только при авторизации от имени администратора", required: false, type: String })
   @ApiResponse({ status: 200, description: "Статус удален ли учитель или не найден", type: User })
   @HttpCode(200)
-  async updateTeacher(@Req() req: AuthedRequest, @Query("id") id: number, @Body() dto: Partial<CreateUserDTO>) {
+  async updateTeacher(@Req() req: AuthedRequest, @Body() dto: Partial<CreateUserDTO>, @Query("id") id?: number) {
     if (req.user.role === UserRoles.TEACHER) {
       return this.userService.update(req.user.id, dto);
     } else if (req.user.role === UserRoles.ADMIN) {

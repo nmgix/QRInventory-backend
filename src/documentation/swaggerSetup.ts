@@ -11,24 +11,26 @@ enum SwaggerData {
   api_name = "Апи инвентаризации колледжа",
   api_description = "Бекенд часть проекта инвентаризации колледжа, данные хранятся в Postgres, приложение написано на Nest.JS",
   api_version = "1.0",
-  sagger_title = "Документация к API инвентаризации"
+  swagger_title = "Документация к API инвентаризации"
 }
 
 const config = new DocumentBuilder()
   .setTitle(SwaggerData.api_name)
   .setDescription(SwaggerData.api_description)
   .setVersion(SwaggerData.api_version)
-  .addTag(CabinetSwagger.tag, CabinetSwagger.description)
-  .addTag(UserSwagger.tag, UserSwagger.description)
-  .addTag(ItemSwagger.tag, ItemSwagger.description)
   .addTag(AuthSwagger.tag, AuthSwagger.description)
+  .addTag(UserSwagger.tag, UserSwagger.description)
+  .addTag(CabinetSwagger.tag, CabinetSwagger.description)
+  .addTag(ItemSwagger.tag, ItemSwagger.description)
   .addCookieAuth(Tokens.access_token, { type: "apiKey", name: "Основной токен доступа", description: `Живёт 30 минут, после чего кука удаляется` }, Tokens.access_token)
   .addCookieAuth(Tokens.refresh_token, { type: "apiKey", name: "Рефреш токен доступа", description: `Живёт 7 дней, после чего кука удаляется. Если кука не удалилась, используется для получения новой пары токенов в любом запросе` }, Tokens.refresh_token)
+  .addServer(`http://localhost:${process.env.APP_PORT}`)
+  .addServer(`http://localhost:${process.env.GLOBAL_PORT}`)
   .build();
 
 export default function swaggerSetup(app: INestApplication) {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document, {
-    customSiteTitle: SwaggerData.sagger_title
+    customSiteTitle: SwaggerData.swagger_title
   });
 }
