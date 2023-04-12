@@ -58,7 +58,9 @@ export class ItemController {
   @ApiOperation({ summary: "Удаление предмета по id или артикулу" })
   @ApiResponse({ status: 200, description: "Статус удален ли предмет или не найден" })
   @HttpCode(200)
-  async deleteItem(@Param() searchString: string) {
+  async deleteItem(@Param("searchString") searchString: string) {
+    console.log(searchString);
+
     const result = await this.itemService.deleteBy(searchString);
     return {
       message: ItemErrors[result.affected > 0 ? "item_deleted" : "item_not_found"]

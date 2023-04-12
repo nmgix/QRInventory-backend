@@ -1,14 +1,14 @@
 import { INestApplication } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
-import { AppModule } from "../app/app.module";
+import { AppModule } from "../../app/app.module";
 import * as request from "supertest";
-import { CreateUserDTO, User } from "../user/user.entity";
-import { CabinetService } from "../cabinet/cabinet.service";
-import { UserService } from "../user/user.service";
-import { AuthController } from "./auth.controller";
-import { Tokens } from "./types";
-import { AuthService } from "./auth.service";
+import { CreateUserDTO, User } from "../../user/user.entity";
+import { CabinetService } from "../../cabinet/cabinet.service";
+import { UserService } from "../../user/user.service";
+import { AuthController } from "../auth.controller";
+import { Tokens } from "../types";
+import { AuthService } from "../auth.service";
 
 describe("Авторизация и получение пользователя", () => {
   let app: INestApplication;

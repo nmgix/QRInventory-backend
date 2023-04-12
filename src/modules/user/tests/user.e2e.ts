@@ -1,17 +1,11 @@
 import { INestApplication } from "@nestjs/common/interfaces";
 import { Test, TestingModule } from "@nestjs/testing";
-import { CreateUserDTO, User, UserRoles } from "./user.entity";
-import { UserService } from "./user.service";
-import { AppModule } from "../app/app.module";
+import { CreateUserDTO, User, UserRoles } from "../user.entity";
+import { UserService } from "../user.service";
+import { AppModule } from "../../app/app.module";
 import * as request from "supertest";
 import { ConfigService } from "@nestjs/config";
-import { AuthController } from "../auth/auth.controller";
-import { AuthService } from "../auth/auth.service";
-import { AuthedRequest } from "../auth/types";
-
-// нужно создать админа
-// залогиниться за админа
-// пробовать создать пользователя (ну все тесты)
+import { AuthService } from "../../auth/auth.service";
 
 describe("E2E учителей / администраторов", () => {
   let app: INestApplication;

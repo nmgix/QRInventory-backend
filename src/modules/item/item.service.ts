@@ -31,8 +31,13 @@ export class ItemService {
   async deleteBy(searchString: string) {
     // сырая реализация, мне лень писать queryRunner (это может сэкономить ресурсы железа)
     // пример запроса `DELETE FROM subscription WHERE follower_id = 'xxxx' OR following_id = 'xxxx';`
+
     const item = await this.itemRepository.findOne({ where: [{ id: searchString }, { article: searchString }] });
     if (!item) throw new BadRequestException(ItemErrors.item_not_found);
     return this.itemRepository.delete({ id: item.id });
+  }
+
+  async clearTable() {
+    return this.itemRepository.delete({});
   }
 }

@@ -1,7 +1,7 @@
-import { CabinetService } from "./cabinet.service";
+import { CabinetService } from "../cabinet.service";
 import { Test, TestingModule } from "@nestjs/testing";
-import { TypeOrmTestingModule } from "../database/database.module";
-import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
+import { TypeOrmTestingModule } from "../../database/database.module";
+import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "../cabinet.entity";
 import { QueryFailedError } from "typeorm";
 
 describe("Сервис кабинета", () => {

@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
+import { Item } from "../item/item.entity";
 import { User } from "../user/user.entity";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
 import { CabinetErrors } from "./cabinet.i18n";
@@ -11,7 +12,9 @@ export class CabinetService {
     @InjectRepository(Cabinet)
     private cabinetRepository: Repository<Cabinet>,
     @InjectRepository(User)
-    private userRepository: Repository<User>
+    private userRepository: Repository<User>,
+    @InjectRepository(Item)
+    public itemRepository: Repository<Item>
   ) {}
 
   async create(dto: CreateCabinetDTO) {
@@ -20,6 +23,11 @@ export class CabinetService {
     if (dto.teachers) {
       const teachers = await this.userRepository.findBy({ id: In(dto.teachers) });
       cabinet.teachers = teachers;
+    }
+
+    if (dto.items !== undefined) {
+      const items = await this.itemRepository.findBy({ id: In(dto.items) });
+      cabinet.items = items;
     }
 
     const createdCabinet = await this.cabinetRepository.create(cabinet);
@@ -46,6 +54,11 @@ export class CabinetService {
       const teachers = await this.userRepository.findBy({ id: In(dto.teachers) });
       // и начать пользоваться repository.update({ id }, dto)
       cabinet.teachers = teachers;
+    }
+
+    if (dto.items !== undefined) {
+      const items = await this.itemRepository.findBy({ id: In(dto.items) });
+      cabinet.items = items;
     }
 
     return this.cabinetRepository.save(cabinet);

@@ -1,14 +1,16 @@
 import { INestApplication } from "@nestjs/common/interfaces";
 import { Test, TestingModule } from "@nestjs/testing";
-import { AppModule } from "../app/app.module";
+import { AppModule } from "../../app/app.module";
 import * as request from "supertest";
 import { ConfigService } from "@nestjs/config";
-import { CabinetService } from "./cabinet.service";
-import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
-import { UserService } from "../user/user.service";
-import { AuthController } from "../auth/auth.controller";
-import { CreateUserDTO, User, UserRoles } from "../user/user.entity";
-import { AuthService } from "../auth/auth.service";
+import { CabinetService } from "../cabinet.service";
+import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "../cabinet.entity";
+import { UserService } from "../../user/user.service";
+import { AuthController } from "../../auth/auth.controller";
+import { CreateUserDTO, User, UserRoles } from "../../user/user.entity";
+import { AuthService } from "../../auth/auth.service";
+import { CreateItemDTO } from "../../item/item.entity";
+import { ItemService } from "../../item/item.service";
 
 describe("E2E кабинетов", () => {
   let app: INestApplication;
@@ -19,6 +21,7 @@ describe("E2E кабинетов", () => {
   let authController: AuthController;
   let user: Omit<User, "password">;
   let authSevice: AuthService;
+  let itemService: ItemService;
 
   const adminUser: CreateUserDTO = {
     email: "adminUser@mail.com",
@@ -33,7 +36,7 @@ describe("E2E кабинетов", () => {
   };
 
   const cabinetMockup: CreateCabinetDTO = {
-    cabinetNumber: 555
+    cabinetNumber: 500
   };
 
   beforeEach(async () => {
@@ -49,6 +52,7 @@ describe("E2E кабинетов", () => {
     authController = module.get<AuthController>(AuthController);
     userService = module.get<UserService>(UserService);
     authSevice = module.get<AuthService>(AuthService);
+    itemService = module.get<ItemService>(ItemService);
 
     apiUrl = `http://localhost:${configService.get("NODE_ENV") !== "production" ? configService.get("APP_PORT") : configService.get("GLOBAL_PORT")}`;
     agent = request.agent(apiUrl);
@@ -60,11 +64,12 @@ describe("E2E кабинетов", () => {
     user = res.body;
 
     await cabinetService.clearTable();
+    await itemService.clearTable();
   });
   afterEach(async () => {
     await userService.clearTable();
-
     await cabinetService.clearTable();
+    await itemService.clearTable();
   });
 
   describe("Редактирование кабинетов", () => {
@@ -135,6 +140,68 @@ describe("E2E кабинетов", () => {
       const teachers3 = (editCabinetRes3.body as Cabinet).teachers;
       expect(teachers3.length).toBe(0);
     });
+
+    it("Удаление учителя из всех комнат каскадом", async () => {
+      let cabinetRes1 = await agent
+        .post("/cabinet/create")
+        .send({ cabinetNumber: 1 } as CreateCabinetDTO)
+        .set("Content-Type", "application/json")
+        .set("Accept", "*/*");
+
+      let cabinetRes2 = await agent
+        .post("/cabinet/create")
+        .send({ cabinetNumber: 2 } as CreateCabinetDTO)
+        .set("Content-Type", "application/json")
+        .set("Accept", "*/*");
+
+      let cabinetRes3 = await agent
+        .post("/cabinet/create")
+        .send({ cabinetNumber: 3 } as CreateCabinetDTO)
+        .set("Content-Type", "application/json")
+        .set("Accept", "*/*");
+
+      await agent.get("/auth/logout");
+
+      await authSevice.register({ ...adminUser, role: UserRoles.ADMIN });
+      const res = await agent.post("/auth/login").send({ email: adminUser.email, password: adminUser.password }).set("Content-Type", "application/json").set("Accept", "*/*");
+      user = res.body;
+
+      let testTeacher = await userService.get(testUser.email);
+
+      const cabinetBeforeRes1 = await cabinetService.get(cabinetRes1.body.id);
+      expect(cabinetBeforeRes1.teachers.length).toBe(1);
+
+      await agent.delete(`/user/${testTeacher.id}`);
+
+      const cabinetAfterRes1 = await cabinetService.get(cabinetRes1.body.id);
+      expect(cabinetAfterRes1.teachers.length).toBe(0);
+    });
+
+    it("Удаление предметов каскадом из всех кабинетов", async () => {
+      await agent.get("/auth/logout");
+
+      await authSevice.register({ ...adminUser, role: UserRoles.ADMIN });
+      const res = await agent.post("/auth/login").send({ email: adminUser.email, password: adminUser.password }).set("Content-Type", "application/json").set("Accept", "*/*");
+      user = res.body;
+
+      let itemRes1 = await agent.post("/item/create").send({ article: "123", name: "1" } as CreateItemDTO);
+      let itemRes2 = await agent.post("/item/create").send({ article: "456", name: "2" } as CreateItemDTO);
+      let itemRes3 = await agent.post("/item/create").send({ article: "789", name: "3" } as CreateItemDTO);
+
+      let cabinetRes = await agent
+        .post("/cabinet/create")
+        .send({ cabinetNumber: 1, items: [itemRes1.body.id, itemRes2.body.id, itemRes3.body.id] } as CreateCabinetDTO)
+        .set("Content-Type", "application/json")
+        .set("Accept", "*/*");
+
+      let foundCabinetRes1 = await cabinetService.get(cabinetRes.body.id);
+      expect(foundCabinetRes1.items.length).toBe(3);
+
+      await agent.delete(`/item/${itemRes1.body.id}`);
+
+      let foundCabinetRes2 = await cabinetService.get(cabinetRes.body.id);
+      expect(foundCabinetRes2.items.length).toBe(2);
+    });
   });
 
   describe("Удаление кабинетов", () => {
@@ -178,41 +245,5 @@ describe("E2E кабинетов", () => {
 
       expect(cabinets.length).toBe(2);
     });
-  });
-
-  it("Удаление учителя из всех комнат каскадом", async () => {
-    let cabinetRes1 = await agent
-      .post("/cabinet/create")
-      .send({ cabinetNumber: 1 } as CreateCabinetDTO)
-      .set("Content-Type", "application/json")
-      .set("Accept", "*/*");
-
-    let cabinetRes2 = await agent
-      .post("/cabinet/create")
-      .send({ cabinetNumber: 2 } as CreateCabinetDTO)
-      .set("Content-Type", "application/json")
-      .set("Accept", "*/*");
-
-    let cabinetRes3 = await agent
-      .post("/cabinet/create")
-      .send({ cabinetNumber: 3 } as CreateCabinetDTO)
-      .set("Content-Type", "application/json")
-      .set("Accept", "*/*");
-
-    await agent.get("/auth/logout");
-
-    await authSevice.register({ ...adminUser, role: UserRoles.ADMIN });
-    const res = await agent.post("/auth/login").send({ email: adminUser.email, password: adminUser.password }).set("Content-Type", "application/json").set("Accept", "*/*");
-    user = res.body;
-
-    let testTeacher = await userService.get(testUser.email);
-
-    const cabinetBeforeRes1 = await cabinetService.get(cabinetRes1.body.id);
-    expect(cabinetBeforeRes1.teachers.length).toBe(1);
-
-    await agent.delete(`/user/${testTeacher.id}`);
-
-    const cabinetAfterRes1 = await cabinetService.get(cabinetRes1.body.id);
-    expect(cabinetAfterRes1.teachers.length).toBe(0);
   });
 });

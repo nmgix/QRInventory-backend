@@ -1,8 +1,8 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { QueryFailedError } from "typeorm";
-import { TypeOrmTestingModule } from "../database/database.module";
-import { CreateUserDTO, User } from "./user.entity";
-import { UserService } from "./user.service";
+import { TypeOrmTestingModule } from "../../database/database.module";
+import { CreateUserDTO, User } from "../user.entity";
+import { UserService } from "../user.service";
 
 describe("Сервис учителей / администраторов", () => {
   let service: UserService;
