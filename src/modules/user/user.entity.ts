@@ -27,8 +27,8 @@ export class FullName {
 @Entity()
 export class User {
   @ApiProperty()
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @ApiProperty()
   @IsEmail()

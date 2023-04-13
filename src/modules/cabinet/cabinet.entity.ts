@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Item } from "../item/item.entity";
 import { User } from "../user/user.entity";
@@ -13,9 +13,9 @@ export class Cabinet {
 
   @ApiProperty()
   @IsNotEmpty({ message: CabinetErrors.cabinet_number_empty })
-  @IsNumber({ allowInfinity: false, maxDecimalPlaces: 3000, allowNaN: false })
+  @IsString({ message: CabinetErrors.cabinet_number_string })
   @Column({ unique: true })
-  cabinetNumber: number;
+  cabinetNumber: string;
 
   @ApiProperty({ type: [User], uniqueItems: true })
   @ManyToMany(() => User, user => user.id, { cascade: true, eager: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
@@ -40,8 +40,8 @@ export class EditCabinetDTO {
   id: string;
 
   @ApiProperty({ required: false })
-  @IsNumber({ allowInfinity: false, maxDecimalPlaces: 3000, allowNaN: false })
-  cabinetNumber?: number;
+  @IsString({ message: CabinetErrors.cabinet_number_string })
+  cabinetNumber?: string;
 
   @ApiProperty({ type: [String], required: false, uniqueItems: true })
   teachers?: string[];
@@ -52,8 +52,8 @@ export class EditCabinetDTO {
 
 export class CreateCabinetDTO {
   @ApiProperty()
-  @IsNumber({ allowInfinity: false, maxDecimalPlaces: 3000, allowNaN: false })
-  cabinetNumber?: number;
+  @IsString({ message: CabinetErrors.cabinet_number_string })
+  cabinetNumber?: string;
 
   @ApiProperty({ type: [String], required: false, uniqueItems: true })
   teachers?: string[];

@@ -14,7 +14,7 @@ export class UserService {
     return this.userRepository.find({ where: { role: UserRoles.TEACHER } });
   }
 
-  get(email?: string, id?: number) {
+  get(email?: string, id?: string) {
     return this.userRepository.findOne({ where: { email, id } });
   }
 
@@ -23,11 +23,11 @@ export class UserService {
     return this.userRepository.save(createdUser);
   }
 
-  async update(userId: number, data: Partial<User>) {
+  async update(userId: string, data: Partial<User>) {
     return this.userRepository.update({ id: userId }, data);
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     return this.userRepository.delete({ id });
   }
 

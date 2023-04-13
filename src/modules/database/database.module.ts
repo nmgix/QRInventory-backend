@@ -1,11 +1,16 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
+import { Institution } from "../../institution/institution.entity";
 import { User } from "../../modules/user/user.entity";
 import { Cabinet } from "../cabinet/cabinet.entity";
 import { Item } from "../item/item.entity";
 
+const entities = [User, Cabinet, Item, Institution];
+
 const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions => {
+  const mode = configService.get("NODE_ENV");
+
   const configs: {
     development: TypeOrmModuleOptions;
     test: TypeOrmModuleOptions;
@@ -18,7 +23,7 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
       username: configService.get("POSTGRES_TEST_USER"),
       password: configService.get("POSTGRES_TEST_PASSWORD"),
       database: configService.get("POSTGRES_TEST_DB"),
-      entities: [User, Cabinet, Item],
+      entities,
       synchronize: true
     },
     development: {
@@ -28,8 +33,9 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
       username: configService.get("POSTGRES_TEST_USER"),
       password: configService.get("POSTGRES_TEST_PASSWORD"),
       database: configService.get("POSTGRES_TEST_DB"),
-      entities: [User, Cabinet, Item],
-      synchronize: true
+      entities,
+      synchronize: true,
+      retryAttempts: 10
     },
     production: {
       type: "postgres",
@@ -38,11 +44,13 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
       username: configService.get("POSTGRES_USER"),
       password: configService.get("POSTGRES_PASSWORD"),
       database: configService.get("POSTGRES_DB"),
-      entities: [User, Cabinet, Item],
+      entities,
       synchronize: false
     }
   };
-  return configs[configService.get("NODE_ENV")];
+  Logger.warn(`Подключение к ${mode} БД`);
+
+  return configs[mode];
 };
 
 @Module({
@@ -56,4 +64,4 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
 })
 export class DatabaseModule {}
 
-export const TypeOrmTestingModule = () => [ConfigModule.forRoot({ envFilePath: [".env"], isGlobal: true }), DatabaseModule, TypeOrmModule.forFeature([User, Cabinet, Item])];
+export const TypeOrmTestingModule = () => [ConfigModule.forRoot({ envFilePath: [".env"], isGlobal: true }), DatabaseModule, TypeOrmModule.forFeature(entities)];

@@ -24,7 +24,7 @@ export class UserController {
   @ApiOperation({ summary: "Получение всех учителей" })
   @ApiResponse({ status: 200, description: "Все учителя", type: [User] })
   @HttpCode(200)
-  async getAllTeacher() {
+  async getAllTeachers() {
     return this.userService.getAllTeachers();
   }
 
@@ -33,7 +33,7 @@ export class UserController {
   @ApiOperation({ summary: "Получение учителя по id" })
   @ApiResponse({ status: 200, description: "Учитель, найденный в БД (либо null)", type: User })
   @HttpCode(200)
-  async getTeacher(@Param("id") id: number) {
+  async getTeacher(@Param("id") id: string) {
     return this.userService.get(null, id);
   }
 
@@ -66,7 +66,7 @@ export class UserController {
   @ApiQuery({ name: "id", description: "Id учителя, передавать этот параметр только при авторизации от имени администратора", required: false, type: String })
   @ApiResponse({ status: 200, description: "Статус удален ли учитель или не найден", type: User })
   @HttpCode(200)
-  async updateTeacher(@Req() req: AuthedRequest, @Body() dto: Partial<CreateUserDTO>, @Query("id") id?: number) {
+  async updateTeacher(@Req() req: AuthedRequest, @Body() dto: Partial<CreateUserDTO>, @Query("id") id?: string) {
     if (req.user.role === UserRoles.TEACHER) {
       return this.userService.update(req.user.id, dto);
     } else if (req.user.role === UserRoles.ADMIN) {
@@ -82,7 +82,7 @@ export class UserController {
   @ApiOperation({ summary: "Удаление учителя" })
   @ApiResponse({ status: 200, description: "Статус удален ли учитель или не найден", type: User })
   @HttpCode(200)
-  async deleteTeacher(@Param("id") id: number) {
+  async deleteTeacher(@Param("id") id: string) {
     const deleteResult = await this.userService.delete(id);
 
     return {

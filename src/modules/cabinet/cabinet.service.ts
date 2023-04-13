@@ -37,7 +37,7 @@ export class CabinetService {
   }
 
   async get(id: string): Promise<Cabinet | null> {
-    return this.cabinetRepository.findOne({ where: { id } });
+    return this.cabinetRepository.findOne({ where: [{ id }, { cabinetNumber: id }] });
   }
 
   async getAll() {

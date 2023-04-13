@@ -42,12 +42,12 @@ export class AuthService {
     };
   }
 
-  async updateRefreshToken(userId: number, token: string) {
+  async updateRefreshToken(userId: string, token: string) {
     const hashedToken = await argon2.hash(token);
     await this.userService.update(userId, { refreshToken: hashedToken });
   }
 
-  async refreshTokens(userId: number, refreshToken: string) {
+  async refreshTokens(userId: string, refreshToken: string) {
     const user = await this.userService.get(null, userId);
     if (!user || !refreshToken) throw new ForbiddenException(AuthErrors.access_denied, `Пользователь не найден, либо не указан refresh-токен`);
     const refreshTokenMatch = await argon2.verify(user.refreshToken, refreshToken);
@@ -57,7 +57,7 @@ export class AuthService {
     return tokens;
   }
 
-  async logout(userId: number) {
+  async logout(userId: string) {
     return this.userService.update(userId, { refreshToken: null });
   }
 }
