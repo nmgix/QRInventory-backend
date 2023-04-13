@@ -20,7 +20,7 @@ export class ItemService {
   }
 
   async create(item: CreateItemDTO) {
-    const createdItem = await this.itemRepository.create({ ...item });
+    const createdItem = await this.itemRepository.save(item);
     return this.itemRepository.save(createdItem);
   }
 

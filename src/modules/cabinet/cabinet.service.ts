@@ -29,11 +29,7 @@ export class CabinetService {
       const items = await this.itemRepository.findBy({ id: In(dto.items) });
       cabinet.items = items;
     }
-
-    const createdCabinet = await this.cabinetRepository.create(cabinet);
-    await this.cabinetRepository.save(createdCabinet);
-
-    return this.get(createdCabinet.id);
+    return this.cabinetRepository.save(cabinet);
   }
 
   async get(id: string): Promise<Cabinet | null> {

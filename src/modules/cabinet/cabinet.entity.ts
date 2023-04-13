@@ -1,6 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Exclude } from "class-transformer";
 import { IsNotEmpty, IsNumber, IsString } from "class-validator";
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Institution } from "../../institution/institution.entity";
 import { Item } from "../item/item.entity";
 import { User } from "../user/user.entity";
 import { CabinetErrors } from "./cabinet.i18n";
@@ -26,6 +28,11 @@ export class Cabinet {
   @ManyToMany(() => Item, item => item.id, { cascade: true, eager: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
   @JoinTable()
   items: Item[];
+
+  @Exclude()
+  @ApiProperty({ type: () => Institution, uniqueItems: true })
+  @ManyToOne(() => Institution, institution => institution.cabinets)
+  institution: Institution;
 }
 
 export class AddTeachersDTO {

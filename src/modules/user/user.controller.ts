@@ -37,7 +37,7 @@ export class UserController {
     return this.userService.get(null, id);
   }
 
-  @Roles(UserRoles.TEACHER)
+  @Roles(UserRoles.TEACHER, UserRoles.ADMIN)
   // @Csrf()
   @Get()
   // @SerializeOptions({
@@ -47,7 +47,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: "Учитель, найденный в БД (либо null)", type: User })
   @HttpCode(200)
   async getMe(@Req() req: AuthedRequest) {
-    return this.userService.get(null, req.user.id);
+    return this.userService.get(null, req.user.id, req.user.role === UserRoles.ADMIN);
   }
 
   @Roles(UserRoles.ADMIN)

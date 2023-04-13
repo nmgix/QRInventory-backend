@@ -36,12 +36,12 @@ POSTGRES_TEST_PORT=5437 POSTGRES_TEST_USER=postgres POSTGRES_TEST_PASSWORD=any P
 
 1. `psql -d default_back -U postgres -p 5437`
 2. `select * from public.user;`
-3. `INSERT INTO public.user ("id", "fullName", "role", "password", "refreshToken", "email") VALUES (0, '{"surname":"Фамилия","name":"Имя","patronymic":"Отчество"}', 'admin', '$argon2id$v=19$m=65536,t=3,p=4$USXvM0Gx1hAnsazvNNQkXA$py/zN5qguEElCxEoP+nLMkaaB1NiRFX+BnRZBvyOoS4', '$argon2id$v=19$m=65536,t=3,p=4$TQdGNricgWcDhwNrpZIQmQ$FCnImpZM/Z7j+OurlfcegctyXiVObOXHSI/d+fUh+EE', 'test@mail.com');`
+3. `INSERT INTO public.user ("id", "fullName", "role", "password", "refreshToken", "email") VALUES ('8b7c86bc-b8d8-4a7d-8805-89f956fb25d8', '{"surname":"Фамилия","name":"Имя","patronymic":"Отчество"}', 'admin', '$argon2id$v=19$m=65536,t=3,p=4$USXvM0Gx1hAnsazvNNQkXA$py/zN5qguEElCxEoP+nLMkaaB1NiRFX+BnRZBvyOoS4', '$argon2id$v=19$m=65536,t=3,p=4$TQdGNricgWcDhwNrpZIQmQ$FCnImpZM/Z7j+OurlfcegctyXiVObOXHSI/d+fUh+EE', 'test@mail.com');`
    > P.S. почта `test@mail.com`, пароль - `any-password`
 
 ## Что необходимо выполнить
 
-1. [x] Роуты
+1. [ ] Роуты
    1. [x] Роут авторизации учителей/админов (jwt)
       1. [x] авторизация посредствам почты и пароля
          1. [x] access и refresh токены
@@ -52,6 +52,7 @@ POSTGRES_TEST_PORT=5437 POSTGRES_TEST_USER=postgres POSTGRES_TEST_PASSWORD=any P
       4. [x] редактирование любой комнаты админом
       5. [x] удаление комнаты назначенным учителем
       6. [x] удаление комнаты админом
+      7. [x] получение данных о себе (у админа ещё поле `institutions`)
    3. [x] Роут комнат
       1. [x] добавление / удаление из них предметов
       2. [x] добавление / удаление из них учителей админом
@@ -59,6 +60,10 @@ POSTGRES_TEST_PORT=5437 POSTGRES_TEST_USER=postgres POSTGRES_TEST_PASSWORD=any P
    4. [x] Роут предметов
       1. [x] создание / удаление каскадом (из всех комнат) предмета
       2. [x] поиск предмета по артикулу
+   5. [ ] Роут учереждений (админ)
+      1. [ ] создание / удаление учереждений
+      2. [x] НЕ удаление учереждений при удалении админа
+      3. [ ] изменение учереждения
 2. [ ] Остальные технические решения
    1. [x] DB (Postgres)
    2. [ ] Поиск (ElasticSearch)?

@@ -14,8 +14,12 @@ export class UserService {
     return this.userRepository.find({ where: { role: UserRoles.TEACHER } });
   }
 
-  get(email?: string, id?: string) {
-    return this.userRepository.findOne({ where: { email, id } });
+  async get(email?: string, id?: string, admin?: boolean) {
+    if (admin) {
+      return this.userRepository.createQueryBuilder("user").where("user.id = :id OR user.email = :email", { id, email }).innerJoinAndSelect("user.institutions", "institutions").getOneOrFail();
+    } else {
+      return this.userRepository.findOne({ where: { email, id } });
+    }
   }
 
   async create(user: Partial<User>) {

@@ -8,20 +8,19 @@ import { InstitutionErrors } from "./institution.i18n";
 @Entity()
 export class Institution {
   @ApiProperty()
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @ApiProperty()
   @Column()
   name: string;
 
   @ApiProperty({ type: () => [Cabinet], uniqueItems: true, description: "Все кабинеты этого колледжа" })
-  @OneToMany(() => Cabinet, cabinet => cabinet.id, { cascade: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
-  @JoinColumn()
+  @OneToMany(() => Cabinet, cabinet => cabinet.institution, { cascade: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
   cabinets: Cabinet[];
 
   @ApiProperty({ type: () => [User], description: "Все админы, относящиеся к этому колледжу" })
-  @ManyToOne(() => User, user => user.id, { cascade: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
+  @ManyToOne(() => User, user => user.institutions, { cascade: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
   admin: User;
 }
 

@@ -1,8 +1,9 @@
 import { Exclude, Expose, Type } from "class-transformer";
 import { IsEmail, IsNotEmpty, IsString, ValidateNested } from "class-validator";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UserErrors } from "./user.i18n";
 import { ApiProperty } from "@nestjs/swagger";
+import { Institution } from "../../institution/institution.entity";
 
 export enum UserRoles {
   ADMIN = "admin",
@@ -57,6 +58,9 @@ export class User {
   @Expose({ groups: ["expose"] })
   @Column({ nullable: true, default: null })
   refreshToken: string;
+
+  @OneToMany(() => Institution, institution => institution.admin)
+  institutions: Institution[];
 }
 
 export class CreateUserDTO {
