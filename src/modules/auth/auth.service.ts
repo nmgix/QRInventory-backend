@@ -1,7 +1,7 @@
-import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { CreateUserDTO, User } from "../user/user.entity";
+import { CreateUserDTO, InternalUpdateUserDTO, UpdateUserDTO, User } from "../user/user.entity";
 import { UserService } from "../user/user.service";
 import * as argon2 from "argon2";
 import { AuthLoginDTO } from "./auth.dto";
@@ -9,7 +9,12 @@ import { AuthErrors } from "./auth.i18n";
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService, private jwtService: JwtService, private configService: ConfigService) {}
+  constructor(
+    @Inject(forwardRef(() => UserService))
+    private userService: UserService,
+    private jwtService: JwtService,
+    private configService: ConfigService
+  ) {}
 
   async register(dto: Partial<User>) {
     const hashedPassword = await argon2.hash(dto.password);
@@ -28,6 +33,21 @@ export class AuthService {
     const tokens = await this.createTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     return { user, tokens };
+  }
+
+  async updatePassword(dto: InternalUpdateUserDTO) {
+    console.log(dto);
+    let user = await this.userService.get(undefined, dto.id);
+    if (!user) throw new BadRequestException(AuthErrors.user_not_found);
+    const passwordMatch = await argon2.verify(user.password, dto.oldPassword);
+    if (!passwordMatch) throw new BadRequestException(AuthErrors.password_mismatch);
+    // думаю что argon и сам поймёт что это undefined, но лучше перестрахуюсь
+    if (!dto.newPassword) throw new BadRequestException(AuthErrors.password_empty);
+    const hashedPassword = await argon2.hash(dto.newPassword);
+    await this.userService.update(user.id, { password: hashedPassword });
+    const tokens = await this.createTokens(user);
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+    return true;
   }
 
   async createTokens(user: User) {

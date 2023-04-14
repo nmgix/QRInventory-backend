@@ -3,7 +3,7 @@ import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/GlobalException";
 import { Roles } from "../roles/roles.decorator";
 import { UserSwagger } from "../../documentation/user.docs";
-import { CreateUserDTO, User, UserRoles } from "./user.entity";
+import { CreateUserDTO, UpdateUserDTO, User, UserRoles } from "./user.entity";
 import { UserErrors } from "./user.i18n";
 import { UserService } from "./user.service";
 // import { Csrf } from "ncsrf";
@@ -58,27 +58,25 @@ export class UserController {
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
   @Post("edit")
-  @ApiOperation({ summary: "Изменение учителя" })
-  @ApiQuery({ name: "id", description: "Id учителя, передавать этот параметр только при авторизации от имени администратора", required: false, type: String })
-  @ApiResponse({ status: 200, description: "Статус удален ли учитель или не найден", type: User })
+  @ApiOperation({ summary: "Изменение пользователя" })
+  @ApiQuery({ name: "id", description: "Id пользователя, передавать этот параметр только при авторизации от имени администратора", required: false, type: String })
+  @ApiResponse({ status: 200, description: "Статус удален ли пользователь или не найден", type: User })
   @HttpCode(200)
-  async updateTeacher(@Req() req: AuthedRequest, @Body() dto: Partial<CreateUserDTO>, @Query("id") id?: string) {
-    if (req.user.role === UserRoles.TEACHER) {
-      return this.userService.update(req.user.id, dto);
-    } else if (req.user.role === UserRoles.ADMIN) {
-      if (id) {
-        return this.userService.update(id, dto);
-      } else throw new BadRequestException(UserErrors.id_empty);
-    } else throw new ForbiddenException(AuthErrors.access_denied);
+  async updateUser(@Req() req: AuthedRequest, @Body() dto: UpdateUserDTO, @Query("id") id?: string) {
+    if (id !== undefined && req.user.role === UserRoles.ADMIN) {
+      return this.userService.updateUser(id, { ...dto, id });
+    } else {
+      return this.userService.updateUser(req.user.id, { ...dto, id: req.user.id });
+    }
   }
 
   @Roles(UserRoles.ADMIN)
   // @Csrf()
   @Delete(":id")
-  @ApiOperation({ summary: "Удаление учителя" })
-  @ApiResponse({ status: 200, description: "Статус удален ли учитель или не найден" })
+  @ApiOperation({ summary: "Удаление пользователя" })
+  @ApiResponse({ status: 200, description: "Статус удален ли пользователь или не найден" })
   @HttpCode(200)
-  async deleteTeacher(@Param("id") id: string) {
+  async deleteUser(@Param("id") id: string) {
     const deleteResult = await this.userService.delete(id);
 
     return {

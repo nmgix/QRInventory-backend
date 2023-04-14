@@ -52,7 +52,7 @@ export class CabinetController {
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
   // @Csrf()
   @Post("edit")
-  @ApiOperation({ summary: "Изменение кабинета" })
+  @ApiOperation({ summary: "Изменение кабинета, учителя передавать в массиве учителей не надо" })
   @ApiResponse({ status: 200, description: "Изменённый кабинет", type: Cabinet })
   @HttpCode(200)
   async editCabinet(@Req() req: AuthedRequest, @Body() dto: EditCabinetDTO) {
@@ -62,7 +62,16 @@ export class CabinetController {
 
     // сырая имплементация, лучше потом уберу роли и оставлю про по правам изменения, #PoliciesGuard https://docs-nestjs.netlify.app/security/authorization
     if ((req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) || req.user.role === UserRoles.ADMIN) {
-      return this.cabinetService.update(req.user.id, dto);
+      if (req.user.role === UserRoles.TEACHER) {
+        const userInTeachers = dto.teachers?.find(teacherId => teacherId === req.user.id);
+        const teachers = dto.teachers ? (userInTeachers ? dto.teachers : [...dto.teachers, req.user.id]) : undefined;
+        return this.cabinetService.update(req.user.id, { ...dto, teachers });
+      } else if (req.user.role === UserRoles.ADMIN) {
+        const teachers = dto.teachers?.filter(teacherId => teacherId !== req.user.id);
+        return this.cabinetService.update(req.user.id, { ...dto, teachers });
+      } else {
+        throw new ForbiddenException(AuthErrors.access_denied);
+      }
     } else {
       throw new ForbiddenException(AuthErrors.access_denied);
     }

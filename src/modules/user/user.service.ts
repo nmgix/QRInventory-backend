@@ -1,14 +1,16 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { CreateUserDTO, User, UserRoles } from "./user.entity";
-import { UserErrors } from "./user.i18n";
+import { AuthService } from "../auth/auth.service";
+import { CreateUserDTO, InternalUpdateUserDTO, UpdateUserDTO, User, UserRoles } from "./user.entity";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>
+    private userRepository: Repository<User>,
+    @Inject(forwardRef(() => AuthService))
+    private authService: AuthService
   ) {}
 
   getAllTeachers() {
@@ -16,7 +18,7 @@ export class UserService {
   }
 
   async get(email?: string, id?: string, admin?: boolean) {
-    return this.userRepository.findOne({ where: { email, id }, relations: admin ? ["institutions"] : [] });
+    return this.userRepository.findOne({ where: [{ email }, { id }], relations: admin ? ["institutions"] : [] });
   }
 
   async create(user: Partial<User>) {
@@ -24,7 +26,26 @@ export class UserService {
     return this.userRepository.save(createdUser);
   }
 
+  async updateUser(userId: string, data: InternalUpdateUserDTO) {
+    if (data.newPassword) {
+      await this.authService.updatePassword(data);
+    }
+
+    delete data.id;
+    delete data.oldPassword;
+    delete data.newPassword;
+    Object.keys(data).forEach(key => data[key] === undefined && delete data[key]);
+
+    if (Object.keys(data).length > 0) {
+      return this.update(userId, data);
+    } else {
+      return this.get(undefined, userId);
+    }
+  }
+
   async update(userId: string, data: Partial<User>) {
+    // console.log("data");
+    // console.log(data);
     return this.userRepository.update({ id: userId }, data);
   }
 

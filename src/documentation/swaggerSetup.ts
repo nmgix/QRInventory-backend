@@ -36,7 +36,7 @@ export default function swaggerSetup(app: INestApplication) {
     customSiteTitle: SwaggerData.swagger_title,
     swaggerOptions: {
       docExpansion: "none",
-      operationSorter: "alpha",
+      operationsSorter: "alpha",
       tagsSorter: "alpha",
       showExtensions: true,
       defaultModelsExpandDepth: 3,

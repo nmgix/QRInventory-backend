@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { IsEmail, IsNotEmpty, IsString, ValidateNested } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
 import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UserErrors } from "./user.i18n";
 import { ApiProperty } from "@nestjs/swagger";
@@ -79,3 +79,30 @@ export class CreateUserDTO {
   @IsString({ message: UserErrors.password_string })
   password: string;
 }
+
+export class UpdateUserDTO {
+  @ApiProperty({ description: "Фамилия - Имя - Отчество" })
+  @IsOptional()
+  @IsNotEmpty({ message: UserErrors.fullname_empty })
+  @ValidateNested({ each: true })
+  @Type(() => FullName)
+  fullName?: FullName;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsNotEmpty({ message: UserErrors.email_empty })
+  @IsEmail({}, { message: UserErrors.email_not_email })
+  email?: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString({ message: UserErrors.password_string })
+  oldPassword?: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString({ message: UserErrors.password_string })
+  newPassword?: string;
+}
+
+export type InternalUpdateUserDTO = UpdateUserDTO & { id: string };
