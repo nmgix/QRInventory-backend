@@ -1,7 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateUserDTO, User, UserRoles } from "./user.entity";
+import { UserErrors } from "./user.i18n";
 
 @Injectable()
 export class UserService {
@@ -15,11 +16,7 @@ export class UserService {
   }
 
   async get(email?: string, id?: string, admin?: boolean) {
-    if (admin) {
-      return this.userRepository.createQueryBuilder("user").where("user.id = :id OR user.email = :email", { id, email }).innerJoinAndSelect("user.institutions", "institutions").getOneOrFail();
-    } else {
-      return this.userRepository.findOne({ where: { email, id } });
-    }
+    return this.userRepository.findOne({ where: { email, id }, relations: admin ? ["institutions"] : [] });
   }
 
   async create(user: Partial<User>) {

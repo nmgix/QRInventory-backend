@@ -1,4 +1,4 @@
-import { Controller, Body, Post, ClassSerializerInterceptor, UseInterceptors, Get, Param, Delete, HttpCode, UseFilters, Req, SerializeOptions, UseGuards, Query, ForbiddenException, BadRequestException } from "@nestjs/common";
+import { Controller, Body, Post, Get, Param, Delete, HttpCode, UseFilters, Req, Query, ForbiddenException, BadRequestException } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/GlobalException";
 import { Roles } from "../roles/roles.decorator";
@@ -13,8 +13,7 @@ import { AuthErrors } from "../auth/auth.i18n";
 
 @ApiTags(UserSwagger.tag)
 @Controller("user")
-@UseFilters(new GlobalException(UserErrors.user_data_input_error, UserErrors.user_data_input_error))
-@UseInterceptors(ClassSerializerInterceptor)
+@UseFilters(new GlobalException(UserErrors.user_data_input_error, UserErrors.user_data_input_error, UserErrors.user_not_found))
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -40,14 +39,11 @@ export class UserController {
   @Roles(UserRoles.TEACHER, UserRoles.ADMIN)
   // @Csrf()
   @Get()
-  // @SerializeOptions({
-  //   groups: ["role:teacher", "role:admin"]
-  // })
-  @ApiOperation({ summary: "Получение себя (учителя) по id" })
-  @ApiResponse({ status: 200, description: "Учитель, найденный в БД (либо null)", type: User })
+  @ApiOperation({ summary: "Получение себя" })
+  @ApiResponse({ status: 200, description: "Учитель или админ с привязанными учереждениями", type: User })
   @HttpCode(200)
   async getMe(@Req() req: AuthedRequest) {
-    return this.userService.get(null, req.user.id, req.user.role === UserRoles.ADMIN);
+    return this.userService.get(undefined, req.user.id, req.user.role === UserRoles.ADMIN);
   }
 
   @Roles(UserRoles.ADMIN)

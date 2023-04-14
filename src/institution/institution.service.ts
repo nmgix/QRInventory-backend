@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "../modules/user/user.entity";
-import { CreateInstitutionDTO, Institution } from "./institution.entity";
+import { CreateInstitutionDTO, EditInstitutionDTO, Institution } from "./institution.entity";
 
 @Injectable()
 export class InstitutionService {
@@ -25,5 +25,17 @@ export class InstitutionService {
     const admin = await this.userRepository.findOne({ where: { id } });
     const institution = await this.institutionRepository.create({ ...dto, admin });
     return this.institutionRepository.save(institution);
+  }
+
+  async editInstitution(id: string, dto: EditInstitutionDTO) {
+    return this.institutionRepository.update({ id: dto.id, admin: { id } }, dto);
+  }
+
+  async deleteInstitution(id: string, institutionId: string) {
+    return this.institutionRepository.delete({ id: institutionId, admin: { id } });
+  }
+
+  async clearTable() {
+    return this.institutionRepository.delete({});
   }
 }

@@ -12,8 +12,7 @@ import { CreateItemDTO, EditItemDTO, Item } from "./item.entity";
 
 @ApiTags(ItemSwagger.tag)
 @Controller("item")
-@UseFilters(new GlobalException(ItemErrors.item_query_fail, ItemErrors.item_query_fail))
-@UseInterceptors(ClassSerializerInterceptor)
+@UseFilters(new GlobalException(ItemErrors.item_query_fail, ItemErrors.item_query_fail, ItemErrors.item_not_found))
 export class ItemController {
   constructor(private itemService: ItemService) {}
 

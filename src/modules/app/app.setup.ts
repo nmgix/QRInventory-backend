@@ -9,6 +9,7 @@ import { RolesGuard } from "../roles/roles.guard";
 import { JwtService } from "@nestjs/jwt";
 import { Reflector } from "@nestjs/core";
 import { AuthService } from "../auth/auth.service";
+import { ClassSerializerInterceptor } from "@nestjs/common";
 
 export default async function appSetup(app: NestExpressApplication) {
   const configService: ConfigService = app.get(ConfigService);
@@ -19,6 +20,7 @@ export default async function appSetup(app: NestExpressApplication) {
   app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
   app.use(cookieParser(configService.get("JWT_COOKIE")));
   app.useGlobalPipes(formatErrorPipe);
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
   app.useGlobalGuards(new AuthGuard(jwtService, configService, reflector, authService), new RolesGuard(reflector));
   // app.use(nestCsrf({ signed: true }));
   // app.useGlobalFilters(new CsrfFilter()); // вот это исправить, там есть два exception'а, https://www.skypack.dev/view/ncsrf, их можно обработать кастомным pipe со своими текстами ошибок

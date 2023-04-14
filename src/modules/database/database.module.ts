@@ -24,7 +24,9 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
       password: configService.get("POSTGRES_TEST_PASSWORD"),
       database: configService.get("POSTGRES_TEST_DB"),
       entities,
-      synchronize: true
+      synchronize: true,
+      retryAttempts: 5,
+      logging: true
     },
     development: {
       type: "postgres",
@@ -35,7 +37,8 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
       database: configService.get("POSTGRES_TEST_DB"),
       entities,
       synchronize: true,
-      retryAttempts: 10
+      retryAttempts: 5,
+      logging: true
     },
     production: {
       type: "postgres",

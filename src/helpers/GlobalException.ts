@@ -1,9 +1,9 @@
 import { ArgumentsHost, BadRequestException, ExceptionFilter, HttpStatus, InternalServerErrorException, Logger } from "@nestjs/common";
 import { Response } from "express";
-import { QueryFailedError } from "typeorm";
+import { EntityNotFoundError, QueryFailedError } from "typeorm";
 
 export class GlobalException implements ExceptionFilter {
-  constructor(public queryFail: string, public badRequest: string) {}
+  constructor(public queryFail: string, public badRequest: string, public entityNotFound: string) {}
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -34,6 +34,10 @@ export class GlobalException implements ExceptionFilter {
         message = this.badRequest;
         status = HttpStatus.UNPROCESSABLE_ENTITY;
         description = (exception as any)?.response?.message;
+      }
+      case EntityNotFoundError: {
+        message = this.entityNotFound;
+        status = HttpStatus.OK;
       }
     }
 

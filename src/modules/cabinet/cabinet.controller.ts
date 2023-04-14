@@ -2,7 +2,7 @@ import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Dele
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/GlobalException";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
-import { CabinetErrors } from "./cabinet.i18n";
+import { CabinetErrors, CabinetMessages } from "./cabinet.i18n";
 import { CabinetService } from "./cabinet.service";
 import { CabinetSwagger } from "../../documentation/cabinet.docs";
 import { Roles } from "../roles/roles.decorator";
@@ -14,8 +14,7 @@ import { AuthErrors } from "../auth/auth.i18n";
 
 @ApiTags(CabinetSwagger.tag)
 @Controller("cabinet")
-@UseInterceptors(ClassSerializerInterceptor)
-@UseFilters(new GlobalException(CabinetErrors.cabinet_input_data_error, CabinetErrors.cabinet_input_data_error))
+@UseFilters(new GlobalException(CabinetErrors.cabinet_input_data_error, CabinetErrors.cabinet_input_data_error, CabinetErrors.cabinet_not_found))
 export class CabinetController {
   constructor(private cabinetService: CabinetService) {}
 
@@ -45,7 +44,7 @@ export class CabinetController {
   @ApiResponse({ status: 201, description: "Созданный кабинет (со всеми найденными в БД учителями и предметами)", type: Cabinet })
   @HttpCode(201)
   async createCabinet(@Req() req: AuthedRequest, @Body() dto: CreateCabinetDTO) {
-    const cabinet = await this.cabinetService.create({ ...dto, teachers: req.user.role !== UserRoles.ADMIN ? [String(req.user.id)] : [] });
+    const cabinet = await this.cabinetService.create(req.user.id, { ...dto, teachers: req.user.role !== UserRoles.ADMIN ? [String(req.user.id)] : [] });
     return this.cabinetService.get(cabinet.id);
   }
 
@@ -63,7 +62,7 @@ export class CabinetController {
 
     // сырая имплементация, лучше потом уберу роли и оставлю про по правам изменения, #PoliciesGuard https://docs-nestjs.netlify.app/security/authorization
     if ((req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) || req.user.role === UserRoles.ADMIN) {
-      return this.cabinetService.update(dto);
+      return this.cabinetService.update(req.user.id, dto);
     } else {
       throw new ForbiddenException(AuthErrors.access_denied);
     }
@@ -81,7 +80,7 @@ export class CabinetController {
     if ((req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) || req.user.role === UserRoles.ADMIN) {
       const result = await this.cabinetService.delete(id);
       return {
-        message: CabinetErrors[result.affected > 0 ? "cabinet_deleted" : "cabinet_not_found"]
+        message: result.affected > 0 ? CabinetMessages.cabinet_deleted : CabinetErrors.cabinet_not_found
       };
     } else {
       throw new ForbiddenException(AuthErrors.access_denied);

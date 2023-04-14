@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
+import { Institution } from "../../institution/institution.entity";
 import { Item } from "../item/item.entity";
 import { User } from "../user/user.entity";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
@@ -14,11 +15,14 @@ export class CabinetService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @InjectRepository(Item)
-    public itemRepository: Repository<Item>
+    private itemRepository: Repository<Item>,
+    @InjectRepository(Institution)
+    private institutionRepository: Repository<Institution>
   ) {}
 
-  async create(dto: CreateCabinetDTO) {
-    let cabinet: Cabinet = { ...dto } as unknown as Cabinet;
+  async create(id: string, dto: CreateCabinetDTO) {
+    let institution = await this.institutionRepository.findOne({ where: { id: dto.institution, admin: { id } } });
+    let cabinet = await this.cabinetRepository.create({ cabinetNumber: dto.cabinetNumber, institution });
 
     if (dto.teachers) {
       const teachers = await this.userRepository.findBy({ id: In(dto.teachers) });
@@ -40,9 +44,14 @@ export class CabinetService {
     return this.cabinetRepository.find();
   }
 
-  async update(dto: EditCabinetDTO): Promise<Cabinet | null> {
+  async update(id: string, dto: EditCabinetDTO): Promise<Cabinet | null> {
     const cabinet = await this.cabinetRepository.findOne({ where: { id: dto.id } });
     if (!cabinet) throw new Error(CabinetErrors.cabinet_not_found);
+
+    if (dto.institution) {
+      let institution = await this.institutionRepository.findOne({ where: { id: dto.institution, admin: { id } } });
+      cabinet.institution = institution;
+    }
 
     if (dto.cabinetNumber !== undefined) cabinet.cabinetNumber = dto.cabinetNumber;
     if (dto.teachers !== undefined) {

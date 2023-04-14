@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsString } from "class-validator";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { IsArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 import { Cabinet } from "../modules/cabinet/cabinet.entity";
 import { User } from "../modules/user/user.entity";
@@ -16,11 +16,11 @@ export class Institution {
   name: string;
 
   @ApiProperty({ type: () => [Cabinet], uniqueItems: true, description: "Все кабинеты этого колледжа" })
-  @OneToMany(() => Cabinet, cabinet => cabinet.institution, { cascade: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
+  @OneToMany(() => Cabinet, cabinet => cabinet.institution)
   cabinets: Cabinet[];
 
   @ApiProperty({ type: () => [User], description: "Все админы, относящиеся к этому колледжу" })
-  @ManyToOne(() => User, user => user.institutions, { cascade: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
+  @ManyToOne(() => User, user => user.institutions)
   admin: User;
 }
 
@@ -28,4 +28,14 @@ export class CreateInstitutionDTO {
   @IsNotEmpty({ message: InstitutionErrors.name_empty })
   @IsString({ message: InstitutionErrors.name_string })
   name: string;
+}
+
+export class EditInstitutionDTO {
+  @IsString()
+  id: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString({ message: InstitutionErrors.name_string })
+  name?: string;
 }

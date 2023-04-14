@@ -11,10 +11,10 @@ import { AuthSwagger } from "../../documentation/auth.docs";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/GlobalException";
 import { AuthErrors, AuthMessages } from "./auth.i18n";
+import { UserErrors } from "../user/user.i18n";
 
 @ApiTags(AuthSwagger.tag)
-@UseInterceptors(ClassSerializerInterceptor)
-@UseFilters(new GlobalException(AuthErrors.query_fail, AuthErrors.bad_request))
+@UseFilters(new GlobalException(AuthErrors.query_fail, AuthErrors.bad_request, UserErrors.user_not_found))
 @Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
