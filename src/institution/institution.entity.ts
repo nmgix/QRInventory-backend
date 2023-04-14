@@ -25,12 +25,14 @@ export class Institution {
 }
 
 export class CreateInstitutionDTO {
+  @ApiProperty()
   @IsNotEmpty({ message: InstitutionErrors.name_empty })
   @IsString({ message: InstitutionErrors.name_string })
   name: string;
 }
 
 export class EditInstitutionDTO {
+  @ApiProperty()
   @IsString()
   id: string;
 

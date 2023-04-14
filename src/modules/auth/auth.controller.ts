@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Get, HttpCode, Post, Query, Req, Res, UseFilters, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Post, Req, Res, UseFilters } from "@nestjs/common";
 import { Roles } from "../roles/roles.decorator";
 import { CreateUserDTO, User, UserRoles } from "../user/user.entity";
 import { AuthLoginDTO } from "./auth.dto";

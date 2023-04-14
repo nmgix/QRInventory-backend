@@ -1,11 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
+import { In, QueryFailedError, Repository } from "typeorm";
 import { Institution } from "../../institution/institution.entity";
 import { Item } from "../item/item.entity";
 import { User } from "../user/user.entity";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
-import { CabinetErrors } from "./cabinet.i18n";
+import { CabinetErrors, CabinetMessages } from "./cabinet.i18n";
 
 @Injectable()
 export class CabinetService {
@@ -21,8 +21,11 @@ export class CabinetService {
   ) {}
 
   async create(id: string, dto: CreateCabinetDTO) {
-    let institution = await this.institutionRepository.findOne({ where: { id: dto.institution, admin: { id } } });
+    let institution = await this.institutionRepository.findOneOrFail({ where: { id: dto.institution, admin: { id } }, relations: ["cabinets"] });
+
     let cabinet = await this.cabinetRepository.create({ cabinetNumber: dto.cabinetNumber, institution });
+
+    if (institution.cabinets.find(instCab => instCab.cabinetNumber === cabinet.cabinetNumber)) throw new BadRequestException(CabinetErrors.cabinet_exists);
 
     if (dto.teachers) {
       const teachers = await this.userRepository.findBy({ id: In(dto.teachers) });

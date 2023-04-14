@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
 import { IsArray, isArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { Institution } from "../../institution/institution.entity";
 import { Item } from "../item/item.entity";
 import { User } from "../user/user.entity";
@@ -16,7 +16,7 @@ export class Cabinet {
   @ApiProperty()
   @IsNotEmpty({ message: CabinetErrors.cabinet_number_empty })
   @IsString({ message: CabinetErrors.cabinet_number_string })
-  @Column({ unique: true })
+  @Column()
   cabinetNumber: string;
 
   @ApiProperty({ type: [User], uniqueItems: true })

@@ -6,7 +6,9 @@ import appSetup from "./modules/app/app.setup";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  swaggerSetup(app);
+  if (process.env.NODE_ENV !== "production") {
+    swaggerSetup(app);
+  }
   await appSetup(app);
 }
 bootstrap();

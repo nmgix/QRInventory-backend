@@ -35,9 +35,8 @@ export class CreateItemDTO {
 
   @ApiProperty()
   @IsOptional()
-  @IsNotEmpty({ message: ItemErrors.image_string })
   @IsString({ message: ItemErrors.name_string })
-  image: string;
+  image?: string;
 }
 
 export class EditItemDTO {

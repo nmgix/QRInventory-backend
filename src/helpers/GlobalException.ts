@@ -18,26 +18,31 @@ export class GlobalException implements ExceptionFilter {
     switch (exception.constructor) {
       case Error: {
         status = HttpStatus.UNPROCESSABLE_ENTITY;
+        break;
       }
       case QueryFailedError: {
         message = this.queryFail;
         status = HttpStatus.UNPROCESSABLE_ENTITY;
         developerDescription = (exception as any).message;
+        break;
       }
       case TypeError:
       case InternalServerErrorException: {
         message = this.badRequest;
         status = HttpStatus.UNPROCESSABLE_ENTITY;
         developerDescription = (exception as any).message;
+        break;
       }
       case BadRequestException: {
         message = this.badRequest;
         status = HttpStatus.UNPROCESSABLE_ENTITY;
         description = (exception as any)?.response?.message;
+        break;
       }
       case EntityNotFoundError: {
         message = this.entityNotFound;
         status = HttpStatus.OK;
+        break;
       }
     }
 

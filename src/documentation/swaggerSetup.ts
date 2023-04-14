@@ -4,6 +4,7 @@ import { Tokens } from "../modules/auth/types";
 
 import { AuthSwagger } from "./auth.docs";
 import { CabinetSwagger } from "./cabinet.docs";
+import { InstitutionSwagger } from "./institution.docs";
 import { ItemSwagger } from "./item.docs";
 import { UserSwagger } from "./user.docs";
 
@@ -22,6 +23,7 @@ const config = new DocumentBuilder()
   .addTag(UserSwagger.tag, UserSwagger.description)
   .addTag(CabinetSwagger.tag, CabinetSwagger.description)
   .addTag(ItemSwagger.tag, ItemSwagger.description)
+  .addTag(InstitutionSwagger.tag, InstitutionSwagger.description)
   .addCookieAuth(Tokens.access_token, { type: "apiKey", name: "Основной токен доступа", description: `Живёт 30 минут, после чего кука удаляется` }, Tokens.access_token)
   .addCookieAuth(Tokens.refresh_token, { type: "apiKey", name: "Рефреш токен доступа", description: `Живёт 7 дней, после чего кука удаляется. Если кука не удалилась, используется для получения новой пары токенов в любом запросе` }, Tokens.refresh_token)
   .addServer(`http://localhost:${process.env.APP_PORT}`)
@@ -31,6 +33,14 @@ const config = new DocumentBuilder()
 export default function swaggerSetup(app: INestApplication) {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document, {
-    customSiteTitle: SwaggerData.swagger_title
+    customSiteTitle: SwaggerData.swagger_title,
+    swaggerOptions: {
+      docExpansion: "none",
+      operationSorter: "alpha",
+      tagsSorter: "alpha",
+      showExtensions: true,
+      defaultModelsExpandDepth: 3,
+      defaultModelExpandDepth: 3
+    }
   });
 }

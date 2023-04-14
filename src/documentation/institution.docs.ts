@@ -1,4 +1,4 @@
 export enum InstitutionSwagger {
-  tag = "Учереждения",
+  tag = "Учреждения",
   description = "Все роуты, относящиеся к учереждениям (админ)"
 }

@@ -76,7 +76,7 @@ export class UserController {
   // @Csrf()
   @Delete(":id")
   @ApiOperation({ summary: "Удаление учителя" })
-  @ApiResponse({ status: 200, description: "Статус удален ли учитель или не найден", type: User })
+  @ApiResponse({ status: 200, description: "Статус удален ли учитель или не найден" })
   @HttpCode(200)
   async deleteTeacher(@Param("id") id: string) {
     const deleteResult = await this.userService.delete(id);
