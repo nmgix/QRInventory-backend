@@ -26,7 +26,8 @@ export class AuthService {
   }
 
   async login(dto: AuthLoginDTO) {
-    const user = await this.userService.get(dto.email);
+    console.log(dto.email);
+    const user = await this.userService.get(dto.email, undefined, undefined, true);
     if (!user) throw new BadRequestException(AuthErrors.user_not_found);
     const passwordMatch = await argon2.verify(user.password, dto.password);
     if (!passwordMatch) throw new BadRequestException(AuthErrors.password_mismatch);
@@ -37,7 +38,7 @@ export class AuthService {
 
   async updatePassword(dto: InternalUpdateUserDTO) {
     console.log(dto);
-    let user = await this.userService.get(undefined, dto.id);
+    let user = await this.userService.get(undefined, dto.id, undefined, true);
     if (!user) throw new BadRequestException(AuthErrors.user_not_found);
     const passwordMatch = await argon2.verify(user.password, dto.oldPassword);
     if (!passwordMatch) throw new BadRequestException(AuthErrors.password_mismatch);
@@ -68,7 +69,7 @@ export class AuthService {
   }
 
   async refreshTokens(userId: string, refreshToken: string) {
-    const user = await this.userService.get(null, userId);
+    const user = await this.userService.get(null, userId, undefined, true);
     if (!user || !refreshToken) throw new ForbiddenException(AuthErrors.access_denied, `Пользователь не найден, либо не указан refresh-токен`);
     const refreshTokenMatch = await argon2.verify(user.refreshToken, refreshToken);
     if (!refreshTokenMatch) throw new ForbiddenException(AuthErrors.access_denied, `Refresh-токены не сходятся`);
@@ -78,7 +79,7 @@ export class AuthService {
   }
 
   async validatePassword(userId: string, inputPassword: string) {
-    const user = await this.userService.get(null, userId);
+    const user = await this.userService.get(null, userId, undefined, true);
     if (!user) throw new ForbiddenException(AuthErrors.access_denied, `Пользователь не найден`);
     return argon2.verify(user.password, inputPassword);
   }

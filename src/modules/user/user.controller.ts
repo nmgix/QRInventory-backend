@@ -28,12 +28,15 @@ export class UserController {
   }
 
   @Public()
-  @Get(":id")
-  @ApiOperation({ summary: "Получение учителя по id" })
+  @Get("search")
+  @ApiOperation({ summary: "Получение учителя по id, либо fio" })
   @ApiResponse({ status: 200, description: "Учитель, найденный в БД (либо null)", type: User })
+  @ApiQuery({ name: "fio", required: false, description: "Для запроса другого пользователя по fio" })
+  @ApiQuery({ name: "id", required: false, description: "Для запроса другого пользователя по id" })
+  @ApiQuery({ name: "email", required: false, description: "Для запроса другого пользователя по email" })
   @HttpCode(200)
-  async getTeacher(@Param("id") id: string) {
-    return this.userService.get(null, id);
+  async getTeacher(@Query("fio") fio?: string, @Query("id") id?: string, @Query("email") email?: string) {
+    return this.userService.get(email, id, fio, false);
   }
 
   @Roles(UserRoles.TEACHER, UserRoles.ADMIN)
@@ -42,8 +45,8 @@ export class UserController {
   @ApiOperation({ summary: "Получение себя" })
   @ApiResponse({ status: 200, description: "Учитель или админ с привязанными учереждениями", type: User })
   @HttpCode(200)
-  async getMe(@Req() req: AuthedRequest) {
-    return this.userService.get(undefined, req.user.id, req.user.role === UserRoles.ADMIN);
+  async getUser(@Req() req: AuthedRequest) {
+    return this.userService.get(undefined, req.user.id, undefined, req.user.role === UserRoles.ADMIN);
   }
 
   @Roles(UserRoles.ADMIN)

@@ -1,8 +1,10 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
+import { BadRequestException } from "@nestjs/common/exceptions";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Equal, Like, Not, Repository } from "typeorm";
 import { AuthService } from "../auth/auth.service";
 import { CreateUserDTO, InternalUpdateUserDTO, UpdateUserDTO, User, UserRoles } from "./user.entity";
+import { UserErrors } from "./user.i18n";
 
 @Injectable()
 export class UserService {
@@ -17,8 +19,51 @@ export class UserService {
     return this.userRepository.find({ where: { role: UserRoles.TEACHER } });
   }
 
-  async get(email?: string, id?: string, admin?: boolean) {
-    return this.userRepository.findOne({ where: [{ email }, { id }], relations: admin ? ["institutions"] : [] });
+  async get(email?: string, id?: string, fio?: string, admin?: boolean) {
+    // https://github.com/typeorm/typeorm/issues/2500
+    // https://stackoverflow.com/questions/71003990/excluding-undefined-field-values-in-mariadb-typeorm-queries
+
+    if (admin) {
+      if (email) {
+        return this.userRepository.findOne({
+          where: { email },
+          relations: ["institutions"]
+        });
+      }
+      if (id) {
+        return this.userRepository.findOne({
+          where: { id },
+          relations: ["institutions"]
+        });
+      }
+      if (fio) {
+        return this.userRepository.findOne({
+          where: { fullName: Like(`%${fio}%`) },
+          relations: ["institutions"]
+        });
+      }
+      throw new BadRequestException(UserErrors.user_not_found);
+    } else {
+      if (email) {
+        return this.userRepository.findOne({
+          where: { email, role: Not(UserRoles.ADMIN) },
+          relations: []
+        });
+      }
+      if (id) {
+        return this.userRepository.findOne({
+          where: { id, role: Not(UserRoles.ADMIN) },
+          relations: []
+        });
+      }
+      if (fio) {
+        return this.userRepository.findOne({
+          where: { fullName: Like(`%${fio}%`), role: Not(UserRoles.ADMIN) },
+          relations: []
+        });
+      }
+      throw new BadRequestException(UserErrors.user_not_found);
+    }
   }
 
   async create(user: Partial<User>) {
