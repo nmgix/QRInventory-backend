@@ -31,12 +31,12 @@ export class UserService {
     let item = values[0];
 
     if (admin) {
-      return this.userRepository.findOne({
+      return this.userRepository.findOneOrFail({
         where: { [item.name]: item.alias },
         relations: ["institutions"]
       });
     } else {
-      return this.userRepository.findOne({
+      return this.userRepository.findOneOrFail({
         where: { [item.name]: item.alias, role: Not(UserRoles.ADMIN) },
         relations: []
       });
