@@ -22,47 +22,24 @@ export class UserService {
   async get(email?: string, id?: string, fio?: string, admin?: boolean) {
     // https://github.com/typeorm/typeorm/issues/2500
     // https://stackoverflow.com/questions/71003990/excluding-undefined-field-values-in-mariadb-typeorm-queries
+    const values = [
+      { name: "email", value: email, alias: email },
+      { name: "id", value: id, alias: id },
+      { name: "fio", value: fio, alias: Like(`%${fio}%`) }
+    ].filter(item => item.value !== undefined);
+
+    let item = values[0];
 
     if (admin) {
-      if (email) {
-        return this.userRepository.findOne({
-          where: { email },
-          relations: ["institutions"]
-        });
-      }
-      if (id) {
-        return this.userRepository.findOne({
-          where: { id },
-          relations: ["institutions"]
-        });
-      }
-      if (fio) {
-        return this.userRepository.findOne({
-          where: { fullName: Like(`%${fio}%`) },
-          relations: ["institutions"]
-        });
-      }
-      throw new BadRequestException(UserErrors.user_not_found);
+      return this.userRepository.findOne({
+        where: { [item.name]: item.alias },
+        relations: ["institutions"]
+      });
     } else {
-      if (email) {
-        return this.userRepository.findOne({
-          where: { email, role: Not(UserRoles.ADMIN) },
-          relations: []
-        });
-      }
-      if (id) {
-        return this.userRepository.findOne({
-          where: { id, role: Not(UserRoles.ADMIN) },
-          relations: []
-        });
-      }
-      if (fio) {
-        return this.userRepository.findOne({
-          where: { fullName: Like(`%${fio}%`), role: Not(UserRoles.ADMIN) },
-          relations: []
-        });
-      }
-      throw new BadRequestException(UserErrors.user_not_found);
+      return this.userRepository.findOne({
+        where: { [item.name]: item.alias, role: Not(UserRoles.ADMIN) },
+        relations: []
+      });
     }
   }
 
