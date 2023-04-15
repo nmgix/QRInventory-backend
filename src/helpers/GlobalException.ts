@@ -44,6 +44,9 @@ export class GlobalException implements ExceptionFilter {
         status = HttpStatus.OK;
         break;
       }
+      default: {
+        status = HttpStatus.INTERNAL_SERVER_ERROR;
+      }
     }
 
     if (process.env.NODE_ENV === "development") {

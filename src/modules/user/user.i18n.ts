@@ -18,6 +18,7 @@ export enum UserErrors {
   password_weak = "Пароль слишком слабый",
 
   fullname_empty = "Отсутствует ФИО",
+  fullname_string = "ФИО должно быть строчкой",
   role_empty = "Должна быть установлена роль",
 
   user_not_found = "Пользователь не найден",

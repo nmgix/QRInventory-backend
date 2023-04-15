@@ -22,7 +22,7 @@ describe("Авторизация и получение пользователя"
 
   const testUser: CreateUserDTO = {
     email: "randomUser@mail.com",
-    fullName: { name: "test-name", patronymic: "test-patronymic", surname: "test-surname" },
+    fullName: "test-fio",
     password: "any-password"
   };
 

@@ -10,21 +10,6 @@ export enum UserRoles {
   TEACHER = "teacher"
 }
 
-export class FullName {
-  @ApiProperty()
-  @IsNotEmpty({ message: UserErrors.surname_empty })
-  @IsString({ message: UserErrors.surname_string })
-  surname: string;
-  @ApiProperty()
-  @IsNotEmpty({ message: UserErrors.name_empty })
-  @IsString({ message: UserErrors.name_string })
-  name: string;
-  @ApiProperty()
-  @IsNotEmpty({ message: UserErrors.patronymic_empty })
-  @IsString({ message: UserErrors.patronymic_string })
-  patronymic: string;
-}
-
 @Entity()
 export class User {
   @ApiProperty()
@@ -36,9 +21,9 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @ApiProperty({ type: () => FullName, description: "Фамилия - Имя - Отчество" })
-  @Column("simple-json")
-  fullName: FullName;
+  @ApiProperty()
+  @Column()
+  fullName: string;
 
   @ApiProperty({ enum: UserRoles, default: UserRoles.TEACHER })
   @Column({
@@ -64,11 +49,10 @@ export class User {
 }
 
 export class CreateUserDTO {
-  @ApiProperty({ description: "Фамилия - Имя - Отчество" })
+  @ApiProperty({ description: "ФИО" })
   @IsNotEmpty({ message: UserErrors.fullname_empty })
-  @ValidateNested({ each: true })
-  @Type(() => FullName)
-  fullName: FullName;
+  @IsString({ message: UserErrors.fullname_string })
+  fullName: string;
 
   @ApiProperty()
   @IsNotEmpty({ message: UserErrors.email_empty })
@@ -81,12 +65,11 @@ export class CreateUserDTO {
 }
 
 export class UpdateUserDTO {
-  @ApiProperty({ description: "Фамилия - Имя - Отчество" })
+  @ApiProperty({ description: "ФИО" })
   @IsOptional()
   @IsNotEmpty({ message: UserErrors.fullname_empty })
-  @ValidateNested({ each: true })
-  @Type(() => FullName)
-  fullName?: FullName;
+  @IsString({ message: UserErrors.fullname_string })
+  fullName?: string;
 
   @ApiProperty()
   @IsOptional()

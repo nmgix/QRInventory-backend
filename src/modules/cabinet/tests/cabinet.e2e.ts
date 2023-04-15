@@ -29,13 +29,13 @@ describe("E2E кабинетов", () => {
 
   const adminUser: CreateUserDTO = {
     email: "adminUser@mail.com",
-    fullName: { name: "test-name", patronymic: "test-patronymic", surname: "test-surname" },
+    fullName: "test-fio",
     password: "any-password"
   };
 
   const testUser: CreateUserDTO = {
     email: "randomUser@mail.com",
-    fullName: { name: "test-name", patronymic: "test-patronymic", surname: "test-surname" },
+    fullName: "test-fio",
     password: "any-password"
   };
 
