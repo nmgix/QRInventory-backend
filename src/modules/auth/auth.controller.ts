@@ -69,4 +69,13 @@ export class AuthController {
     dto.tokens.map(token => res.clearCookie(token));
     return { message: AuthMessages.user_cookies_cleaned };
   }
+
+  @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
+  @Post("validate-password")
+  @ApiOperation({ summary: "Проверка пароля (для подтверждения действия)" })
+  @ApiResponse({ status: 200 })
+  @HttpCode(200)
+  async validatePassword(@Req() req: AuthedRequest, @Body() dto: { inputPassword: string }) {
+    return this.authService.validatePassword(req.user.id, dto.inputPassword);
+  }
 }

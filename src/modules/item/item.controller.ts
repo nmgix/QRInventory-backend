@@ -16,7 +16,7 @@ import { CreateItemDTO, EditItemDTO, Item } from "./item.entity";
 export class ItemController {
   constructor(private itemService: ItemService) {}
 
-  @Public()
+  @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
   @Get("all")
   @ApiOperation({ summary: "Получение всех предметов" })
   @ApiResponse({ status: 200, description: "Найденые предметы", type: [Item] })

@@ -77,6 +77,12 @@ export class AuthService {
     return tokens;
   }
 
+  async validatePassword(userId: string, inputPassword: string) {
+    const user = await this.userService.get(null, userId);
+    if (!user) throw new ForbiddenException(AuthErrors.access_denied, `Пользователь не найден`);
+    return argon2.verify(user.password, inputPassword);
+  }
+
   async logout(userId: string) {
     return this.userService.update(userId, { refreshToken: null });
   }
