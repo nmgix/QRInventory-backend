@@ -27,7 +27,7 @@ export class UserService {
     const values = [
       { name: "email", value: email, alias: email },
       { name: "id", value: id, alias: id },
-      { name: "fio", value: fio, alias: Like(`%${fio}%`) }
+      { name: "fullName", value: fio, alias: Like(`%${fio}%`) }
     ].filter(item => item.value !== undefined);
 
     let item = values[0];
