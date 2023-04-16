@@ -48,7 +48,7 @@ export class User {
   @OneToMany(() => Institution, institution => institution.admin)
   institutions: Institution[];
 
-  @OneToOne(() => DatabaseFile, { nullable: true })
+  @OneToOne(() => DatabaseFile, { nullable: true, onDelete: "CASCADE" })
   @JoinColumn({ name: "avatarId" })
   avatar: DatabaseFile;
 

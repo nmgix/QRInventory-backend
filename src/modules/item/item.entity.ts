@@ -18,7 +18,7 @@ export class Item {
   @ApiProperty({ description: "Название предмета", example: "Стул обыкновенный" })
   name: string;
 
-  @OneToOne(() => DatabaseFile, { nullable: true })
+  @OneToOne(() => DatabaseFile, { nullable: true, onDelete: "CASCADE" })
   @JoinColumn({ name: "imageId" })
   image: DatabaseFile;
 
