@@ -8,11 +8,7 @@ describe("Сервис учителей / администраторов", () =>
   let service: UserService;
 
   const teacherMockup: CreateUserDTO = {
-    fullName: {
-      surname: "Фамилия",
-      name: "Имя",
-      patronymic: "Отчество"
-    },
+    fullName: "test-fio",
     email: "test2@mail.com",
     password: "any-password"
   };

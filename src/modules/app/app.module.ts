@@ -5,7 +5,7 @@ import { DatabaseModule } from "../../modules/database/database.module";
 import { CabinetModule } from "../cabinet/cabinet.module";
 import { ItemModule } from "../item/item.module";
 import { AuthModule } from "../auth/auth.module";
-import { InstitutionModule } from "../../institution/institution.module";
+import { InstitutionModule } from "../institution/institution.module";
 
 @Module({
   imports: [ConfigModule.forRoot({ envFilePath: [".env"], isGlobal: true }), AuthModule, DatabaseModule, UserModule, CabinetModule, ItemModule, InstitutionModule],

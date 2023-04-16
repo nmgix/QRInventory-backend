@@ -1,8 +1,8 @@
 import { IsArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
-import { Cabinet } from "../modules/cabinet/cabinet.entity";
-import { User } from "../modules/user/user.entity";
+import { Cabinet } from "../cabinet/cabinet.entity";
+import { User } from "../user/user.entity";
 import { InstitutionErrors } from "./institution.i18n";
 
 @Entity()

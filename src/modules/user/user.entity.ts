@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UserErrors } from "./user.i18n";
 import { ApiProperty } from "@nestjs/swagger";
-import { Institution } from "../../institution/institution.entity";
+import { Institution } from "../institution/institution.entity";
 import DatabaseFile from "../database/database.file.entity";
 
 export enum UserRoles {

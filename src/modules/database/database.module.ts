@@ -1,7 +1,7 @@
 import { Logger, Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
-import { Institution } from "../../institution/institution.entity";
+import { Institution } from "../institution/institution.entity";
 import { User } from "../../modules/user/user.entity";
 import { Cabinet } from "../cabinet/cabinet.entity";
 import { Item } from "../item/item.entity";

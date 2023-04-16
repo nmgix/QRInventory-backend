@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, QueryFailedError, Repository } from "typeorm";
-import { Institution } from "../../institution/institution.entity";
+import { Institution } from "../institution/institution.entity";
 import { Item } from "../item/item.entity";
 import { User } from "../user/user.entity";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";

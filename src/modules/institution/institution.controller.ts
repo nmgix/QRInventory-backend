@@ -1,11 +1,11 @@
 import { Body, ClassSerializerInterceptor, Controller, Delete, Get, HttpCode, Param, Post, Query, Req, UseFilters, UseInterceptors } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { InstitutionSwagger } from "../documentation/institution.docs";
-import { GlobalException } from "../helpers/GlobalException";
-import { Public } from "../modules/auth/auth.decorator";
-import { AuthedRequest } from "../modules/auth/types";
-import { Roles } from "../modules/roles/roles.decorator";
-import { UserRoles } from "../modules/user/user.entity";
+import { InstitutionSwagger } from "../../documentation/institution.docs";
+import { GlobalException } from "../../helpers/GlobalException";
+import { Public } from "../auth/auth.decorator";
+import { AuthedRequest } from "../auth/types";
+import { Roles } from "../roles/roles.decorator";
+import { UserRoles } from "../user/user.entity";
 import { CreateInstitutionDTO, Institution } from "./institution.entity";
 import { InstitutionErrors, InstitutionMessages } from "./institution.i18n";
 import { InstitutionService } from "./institution.service";
