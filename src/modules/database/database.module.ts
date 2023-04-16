@@ -52,6 +52,7 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
       synchronize: false
     }
   };
+  Logger.warn(configs);
   Logger.warn(`Подключение к ${mode} БД`);
 
   return configs[mode];

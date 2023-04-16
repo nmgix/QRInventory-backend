@@ -1,6 +1,6 @@
 services:
-  api:
-    container_name: nest_api
+  qr-inventory-api:
+    container_name: qr-inventory-api
     build:
       dockerfile: Dockerfile
       context: .
@@ -12,6 +12,12 @@ services:
     command: npm run start:prod
     ports:
       - "${GLOBAL_PORT}:${APP_PORT}"
+    depends_on:
+      - postgres
+      - postgres_test
+    networks:
+      - qr-inventory-proxy
+      - api
   postgres:
     image: postgres
     restart: always
@@ -23,6 +29,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    networks:
+      - api
   postgres_test:
     image: postgres
     restart: always
@@ -34,5 +42,12 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD}
     ports:
       - "${POSTGRES_TEST_PORT}:${POSTGRES_TEST_PORT}"
+    networks:
+      - api
 volumes:
   docker-nest-invetorying:
+networks:
+  api:
+    name: api
+  qr-inventory-proxy:
+    name: qr-inventory
