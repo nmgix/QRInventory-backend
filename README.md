@@ -34,7 +34,7 @@ POSTGRES_TEST_PORT=5437 POSTGRES_TEST_USER=postgres POSTGRES_TEST_PASSWORD=any P
 
 ## Shorthand-команды для БД
 
-1. `psql -d default_back -U postgres -p 5437`
+1. `psql -d default_back -U postgres -p 5437;`
 2. `select * from public.user;`
 3. `INSERT INTO public.user ("id", "fullName", "role", "password", "refreshToken", "email") VALUES ('8b7c86bc-b8d8-4a7d-8805-89f956fb25d8', 'Фамилия Имя Отчество', 'admin', '$argon2id$v=19$m=65536,t=3,p=4$USXvM0Gx1hAnsazvNNQkXA$py/zN5qguEElCxEoP+nLMkaaB1NiRFX+BnRZBvyOoS4', '$argon2id$v=19$m=65536,t=3,p=4$TQdGNricgWcDhwNrpZIQmQ$FCnImpZM/Z7j+OurlfcegctyXiVObOXHSI/d+fUh+EE', 'test@mail.com');`
    > P.S. почта `test@mail.com`, пароль - `any-password`
@@ -72,16 +72,10 @@ POSTGRES_TEST_PORT=5437 POSTGRES_TEST_USER=postgres POSTGRES_TEST_PASSWORD=any P
    5. [ ] Метрики и логи?
       1. [ ] Метрики (prometheus + grafana)
       2. [ ] Логи (gray log + kibana)
-   6. [ ] Документация
-      1. [ ] Swagger настроить
-         1. [ ] Разобраться с куками для логина и использования API внутри GUI
-   7. [ ] Авторизация на уровнях
-      1. [ ] Учитель
-         1. [ ] Редактирование классов
-      2. [ ] Админ
-         1. [ ] Создание / удаление / редактирование классов
-         2. [ ] Добавление / удаление предметов из реестра
-   8. [ ] Безопасность
+   6. [x] Документация
+      1. [x] Swagger настроить
+         1. [-] Разобраться с куками для логина и использования API внутри GUI
+   7. [ ] Безопасность
       1. [ ] Поставить `secure` в куки () когда будет фронт писаться (если всё же в не том-же `docker compose`) (`auth.controller.ts`)
       2. [ ] включить (`appSetup.ts`, все контроллеры) и разобраться с CSRF (`ncsrf` и `@Csrf` декоратором), понять когда создавать токен безопасности
       3. [ ] решить что делать с CORS и `same-site` у кук (если всё-же фронт будет не в том-же `docker compose`)
@@ -94,3 +88,4 @@ POSTGRES_TEST_PORT=5437 POSTGRES_TEST_USER=postgres POSTGRES_TEST_PASSWORD=any P
 
 1. При использовании декоратора `@Patch` не приходит `@Body`,
 2. Сырая имплементация создания новой пары токенов после `expire'а` `access` токена
+3. Нет миграций, в проде используется `synchronize: true`

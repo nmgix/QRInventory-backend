@@ -1,5 +1,5 @@
-import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Put, Req, UseFilters, UseInterceptors } from "@nestjs/common";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Put, Query, Req, UseFilters, UseInterceptors } from "@nestjs/common";
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/GlobalException";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
 import { CabinetErrors, CabinetMessages } from "./cabinet.i18n";
@@ -24,17 +24,19 @@ export class CabinetController {
   @ApiOperation({ summary: "Получение всех кабинетов" })
   @ApiResponse({ status: 200, description: "Найденные кабинеты (со всеми найденными в БД учителями и предметами)", type: [Cabinet] })
   @HttpCode(200)
-  async getAllCabinets() {
-    return this.cabinetService.getAll();
+  async getAllCabinets(@Req() req: AuthedRequest) {
+    return this.cabinetService.getAll(req.user.id);
   }
 
   @Public()
-  @Get(":id")
+  @Get()
   @ApiOperation({ summary: "Поиск кабинета по id" })
+  @ApiQuery({ name: "id", description: "Id кабинета", required: false })
+  @ApiQuery({ name: "cabinet", description: "Номер кабинета", required: false, type: String })
   @ApiResponse({ status: 200, description: "Найденный кабинет (со всеми найденными в БД учителями и предметами)", type: Cabinet })
   @HttpCode(200)
-  async getCabinetData(@Param("id") id: string) {
-    return this.cabinetService.get(id);
+  async getCabinetData(@Query("id") id?: string, @Query("cabinet") cabinet?: string) {
+    return this.cabinetService.get(id, cabinet);
   }
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)

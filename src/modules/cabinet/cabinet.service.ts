@@ -1,9 +1,11 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, QueryFailedError, Repository } from "typeorm";
+import { AuthErrors } from "../auth/auth.i18n";
 import { Institution } from "../institution/institution.entity";
 import { Item } from "../item/item.entity";
 import { User } from "../user/user.entity";
+import { UserErrors } from "../user/user.i18n";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
 import { CabinetErrors, CabinetMessages } from "./cabinet.i18n";
 
@@ -39,12 +41,24 @@ export class CabinetService {
     return this.cabinetRepository.save(cabinet);
   }
 
-  async get(id: string): Promise<Cabinet | null> {
-    return this.cabinetRepository.findOne({ where: [{ id }, { cabinetNumber: id }] });
+  async get(id?: string, cabinet?: string): Promise<Cabinet | null> {
+    const values = [
+      { name: "id", value: id, alias: id },
+      { name: "cabinet", value: cabinet, cabinet }
+    ].filter(item => item.value !== undefined);
+
+    let item = values[0];
+
+    return this.cabinetRepository.findOneOrFail({
+      where: { [item.name]: item.alias }
+    });
   }
 
-  async getAll() {
-    return this.cabinetRepository.find();
+  async getAll(userId: string) {
+    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ["institutions"] });
+    if (!user) throw new ForbiddenException(AuthErrors.access_denied);
+    const institutionsIds = user.institutions.map(i => i.id);
+    return this.cabinetRepository.find({ where: { institution: In(institutionsIds) } });
   }
 
   async update(id: string, dto: EditCabinetDTO): Promise<Cabinet | null> {

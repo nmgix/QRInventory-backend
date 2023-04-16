@@ -9,7 +9,7 @@ import { DatabaseFileController } from "./database.file.controller";
 import DatabaseFile from "./database.file.entity";
 import { DatabaseFileService } from "./database.file.service";
 
-const entities = [User, Cabinet, Item, Institution, DatabaseFile];
+export const entities = [User, Cabinet, Item, Institution, DatabaseFile];
 
 const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions => {
   const mode = configService.get("NODE_ENV");
@@ -49,10 +49,11 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
       password: configService.get("POSTGRES_PASSWORD"),
       database: configService.get("POSTGRES_DB"),
       entities,
-      synchronize: false
+      // synchronize: false,
+      synchronize: true
+      // migrations: ["src/modules/database/migrations/*.ts"]
     }
   };
-  Logger.warn(configs);
   Logger.warn(`Подключение к ${mode} БД`);
 
   return configs[mode];
