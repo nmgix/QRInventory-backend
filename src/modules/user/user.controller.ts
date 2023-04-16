@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Get, Param, Delete, HttpCode, UseFilters, Req, Query, ForbiddenException, BadRequestException } from "@nestjs/common";
+import { Controller, Body, Post, Get, Param, Delete, HttpCode, UseFilters, Req, Query, ForbiddenException, BadRequestException, UseInterceptors, UploadedFile } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/GlobalException";
 import { Roles } from "../roles/roles.decorator";
@@ -10,6 +10,9 @@ import { UserService } from "./user.service";
 import { Public } from "../auth/auth.decorator";
 import { AuthedRequest } from "../auth/types";
 import { AuthErrors } from "../auth/auth.i18n";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import FilesInterceptor from "../../helpers/files.interceptor";
 
 @ApiTags(UserSwagger.tag)
 @Controller("user")
@@ -55,8 +58,21 @@ export class UserController {
   @ApiOperation({ summary: "Создание учителя" })
   @ApiResponse({ status: 201, description: "Созданный учитель в БД", type: User })
   @HttpCode(201)
-  async createTeacher(@Body() dto: CreateUserDTO) {
+  async createTeacher(@Body() dto: CreateUserDTO, @UploadedFile() file: Express.Multer.File) {
     return this.userService.create(dto);
+  }
+
+  @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
+  @Post("avatar")
+  @ApiOperation({ summary: "Загрузка фотографии пользователя" })
+  @ApiResponse({ status: 201, description: "Сообщение об успешной загрузке фотографии" })
+  @UseInterceptors(FileInterceptor("file"))
+  @HttpCode(201)
+  async addAvatar(@Req() req: AuthedRequest, @UploadedFile() file: Express.Multer.File) {
+    const result = await this.userService.addAvatar(req.user.id, file.buffer, file.originalname);
+    return {
+      message: `Фотография загружена, id: ${result.id}`
+    };
   }
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)

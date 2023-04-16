@@ -1,9 +1,10 @@
 import { Exclude, Expose, Type } from "class-transformer";
 import { IsEmail, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
-import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UserErrors } from "./user.i18n";
 import { ApiProperty } from "@nestjs/swagger";
 import { Institution } from "../../institution/institution.entity";
+import DatabaseFile from "../database/database.file.entity";
 
 export enum UserRoles {
   ADMIN = "admin",
@@ -46,6 +47,13 @@ export class User {
 
   @OneToMany(() => Institution, institution => institution.admin)
   institutions: Institution[];
+
+  @OneToOne(() => DatabaseFile, { nullable: true })
+  @JoinColumn({ name: "avatarId" })
+  avatar: DatabaseFile;
+
+  @Column({ nullable: true })
+  avatarId?: number;
 }
 
 export class CreateUserDTO {

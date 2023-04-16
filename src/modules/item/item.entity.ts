@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import DatabaseFile from "../database/database.file.entity";
 import { ItemErrors } from "./item.i18n";
 
 @Entity()
@@ -17,9 +18,12 @@ export class Item {
   @ApiProperty({ description: "Название предмета", example: "Стул обыкновенный" })
   name: string;
 
-  @Column({ nullable: true, default: null })
-  @ApiProperty({ description: "Ссылка на фотографию", required: false })
-  image: string;
+  @OneToOne(() => DatabaseFile, { nullable: true })
+  @JoinColumn({ name: "imageId" })
+  image: DatabaseFile;
+
+  @Column({ nullable: true })
+  imageId?: number;
 }
 
 export class CreateItemDTO {
@@ -32,11 +36,6 @@ export class CreateItemDTO {
   @IsNotEmpty({ message: ItemErrors.name_empty })
   @IsString({ message: ItemErrors.name_string })
   name: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString({ message: ItemErrors.name_string })
-  image?: string;
 }
 
 export class EditItemDTO {
@@ -50,8 +49,4 @@ export class EditItemDTO {
   @ApiProperty({ required: false })
   @IsString({ message: ItemErrors.name_string })
   name: string;
-
-  @ApiProperty({ required: false })
-  @IsString({ message: ItemErrors.name_string })
-  image: string;
 }

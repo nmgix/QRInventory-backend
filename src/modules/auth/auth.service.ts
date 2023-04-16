@@ -26,7 +26,6 @@ export class AuthService {
   }
 
   async login(dto: AuthLoginDTO) {
-    console.log(dto.email);
     const user = await this.userService.get(dto.email, undefined, undefined, true);
     if (!user) throw new BadRequestException(AuthErrors.user_not_found);
     const passwordMatch = await argon2.verify(user.password, dto.password);
@@ -37,7 +36,6 @@ export class AuthService {
   }
 
   async updatePassword(dto: InternalUpdateUserDTO) {
-    console.log(dto);
     let user = await this.userService.get(undefined, dto.id, undefined, true);
     if (!user) throw new BadRequestException(AuthErrors.user_not_found);
     const passwordMatch = await argon2.verify(user.password, dto.oldPassword);

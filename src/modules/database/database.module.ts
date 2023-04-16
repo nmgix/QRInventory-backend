@@ -5,8 +5,11 @@ import { Institution } from "../../institution/institution.entity";
 import { User } from "../../modules/user/user.entity";
 import { Cabinet } from "../cabinet/cabinet.entity";
 import { Item } from "../item/item.entity";
+import { DatabaseFileController } from "./database.file.controller";
+import DatabaseFile from "./database.file.entity";
+import { DatabaseFileService } from "./database.file.service";
 
-const entities = [User, Cabinet, Item, Institution];
+const entities = [User, Cabinet, Item, Institution, DatabaseFile];
 
 const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions => {
   const mode = configService.get("NODE_ENV");
@@ -25,8 +28,7 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
       database: configService.get("POSTGRES_TEST_DB"),
       entities,
       synchronize: true,
-      retryAttempts: 5,
-      logging: true
+      retryAttempts: 5
     },
     development: {
       type: "postgres",
@@ -37,8 +39,7 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
       database: configService.get("POSTGRES_TEST_DB"),
       entities,
       synchronize: true,
-      retryAttempts: 5,
-      logging: true
+      retryAttempts: 5
     },
     production: {
       type: "postgres",
@@ -62,9 +63,13 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => getDatabaseConfig(configService)
-    })
-  ]
+    }),
+    TypeOrmModule.forFeature(entities)
+  ],
+  providers: [DatabaseFileService],
+  controllers: [DatabaseFileController],
+  exports: [DatabaseFileService]
 })
 export class DatabaseModule {}
 
-export const TypeOrmTestingModule = () => [ConfigModule.forRoot({ envFilePath: [".env"], isGlobal: true }), DatabaseModule, TypeOrmModule.forFeature(entities)];
+export const TypeOrmTestingModule = () => [ConfigModule.forRoot({ envFilePath: [".env"], isGlobal: true }), DatabaseModule];

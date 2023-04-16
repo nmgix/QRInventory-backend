@@ -5,6 +5,7 @@ import { Equal, Like, Not, Repository } from "typeorm";
 import { AuthService } from "../auth/auth.service";
 import { CreateUserDTO, InternalUpdateUserDTO, UpdateUserDTO, User, UserRoles } from "./user.entity";
 import { UserErrors } from "./user.i18n";
+import { DatabaseFileService } from "../database/database.file.service";
 
 @Injectable()
 export class UserService {
@@ -12,7 +13,8 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @Inject(forwardRef(() => AuthService))
-    private authService: AuthService
+    private authService: AuthService,
+    private databaseFileService: DatabaseFileService
   ) {}
 
   getAllTeachers() {
@@ -81,5 +83,21 @@ export class UserService {
 
   async createAdmin(user: CreateUserDTO) {
     await this.userRepository.create({ ...user, role: UserRoles.ADMIN, refreshToken: null });
+  }
+
+  async addAvatar(userId: string, imageBuffer: Buffer, filename: string) {
+    const user = await this.get(undefined, userId, undefined, true);
+    const avatar = await this.databaseFileService.uploadDatabaseFile(imageBuffer, filename);
+    await this.userRepository.update(userId, { avatarId: avatar.id });
+
+    try {
+      if (user.avatarId) {
+        await this.databaseFileService.deteleFileById(user.avatarId);
+      }
+    } catch (error) {
+      await this.userRepository.update(userId, { avatarId: null });
+    }
+
+    return avatar;
   }
 }

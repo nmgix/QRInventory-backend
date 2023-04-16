@@ -1,5 +1,5 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, Get, HttpCode, Param, Patch, Post, UseFilters, UseInterceptors } from "@nestjs/common";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Body, ClassSerializerInterceptor, Controller, Delete, Get, HttpCode, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UseFilters, UseInterceptors } from "@nestjs/common";
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Roles } from "../roles/roles.decorator";
 import { UserRoles } from "../user/user.entity";
 import { ItemSwagger } from "../../documentation/item.docs";
@@ -9,6 +9,7 @@ import { GlobalException } from "../../helpers/GlobalException";
 import { ItemErrors } from "./item.i18n";
 import { ItemService } from "./item.service";
 import { CreateItemDTO, EditItemDTO, Item } from "./item.entity";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @ApiTags(ItemSwagger.tag)
 @Controller("item")
@@ -26,12 +27,14 @@ export class ItemController {
   }
 
   @Public()
-  @Get(":searchString")
+  @Get()
   @ApiOperation({ summary: "Получение предмета по айди либо артикулу" })
   @ApiResponse({ status: 200, description: "Найденый предмет", type: Item })
+  @ApiQuery({ name: "id", description: "id получаемого предмета", required: false })
+  @ApiQuery({ name: "article", description: "article получаемого предмета", required: false })
   @HttpCode(200)
-  async getById(@Param() searchString: string) {
-    return this.itemService.getBy(searchString);
+  async getById(@Query("id") id?: string, @Query("article") article?: string) {
+    return this.itemService.getBy(id, article);
   }
 
   @Roles(UserRoles.ADMIN)
@@ -50,6 +53,20 @@ export class ItemController {
   @HttpCode(200)
   async editItem(@Body() dto: EditItemDTO) {
     return this.itemService.update(dto);
+  }
+
+  @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
+  @Post("image")
+  @ApiOperation({ summary: "Загрузка фотографии предмета" })
+  @ApiQuery({ name: "id", description: "Id предмета" })
+  @ApiResponse({ status: 201, description: "Сообщение об успешной загрузке фотографии" })
+  @UseInterceptors(FileInterceptor("file"))
+  @HttpCode(201)
+  async addImage(@Query("id") id: string, @UploadedFile() file: Express.Multer.File) {
+    const result = await this.itemService.addImage(id, file.buffer, file.originalname);
+    return {
+      message: `Фотография загружена, id: ${result.id}`
+    };
   }
 
   @Roles(UserRoles.ADMIN)
