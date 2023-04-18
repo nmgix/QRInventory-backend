@@ -79,9 +79,7 @@ POSTGRES_TEST_PORT=5437 POSTGRES_TEST_USER=postgres POSTGRES_TEST_PASSWORD=any P
       1. [ ] Поставить `secure` в куки () когда будет фронт писаться (если всё же в не том-же `docker compose`) (`auth.controller.ts`)
       2. [ ] включить (`appSetup.ts`, все контроллеры) и разобраться с CSRF (`ncsrf` и `@Csrf` декоратором), понять когда создавать токен безопасности
       3. [ ] решить что делать с CORS и `same-site` у кук (если всё-же фронт будет не в том-же `docker compose`)
-3. [ ] Связь с внешним миром
-   1. [ ] Nginx
-4. [x] Системная сторона
+3. [x] Системная сторона
    1. [x] Docker
 
 ## Проблемы
