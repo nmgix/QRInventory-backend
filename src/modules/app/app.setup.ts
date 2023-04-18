@@ -3,7 +3,6 @@ import { formatErrorPipe } from "../../helpers/formatErrors";
 import * as cookieParser from "cookie-parser";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { ConfigService } from "@nestjs/config";
-import { nestCsrf, CsrfFilter } from "ncsrf";
 import { AuthGuard } from "../auth/auth.guard";
 import { RolesGuard } from "../roles/roles.guard";
 import { JwtService } from "@nestjs/jwt";
@@ -22,8 +21,5 @@ export default async function appSetup(app: NestExpressApplication) {
   app.useGlobalPipes(formatErrorPipe);
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
   app.useGlobalGuards(new AuthGuard(jwtService, configService, reflector, authService), new RolesGuard(reflector));
-  // app.use(nestCsrf({ signed: true }));
-  // app.useGlobalFilters(new CsrfFilter()); // вот это исправить, там есть два exception'а, https://www.skypack.dev/view/ncsrf, их можно обработать кастомным pipe со своими текстами ошибок
-  // app.set("trust proxy", 1);
   await app.listen(configService.get("APP_PORT"));
 }

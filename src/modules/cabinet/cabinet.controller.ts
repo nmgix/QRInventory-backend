@@ -7,7 +7,6 @@ import { CabinetService } from "./cabinet.service";
 import { CabinetSwagger } from "../../documentation/cabinet.docs";
 import { Roles } from "../roles/roles.decorator";
 import { UserRoles } from "../user/user.entity";
-// import { Csrf } from "ncsrf";
 import { AuthedRequest } from "../auth/types";
 import { Public } from "../auth/auth.decorator";
 import { AuthErrors } from "../auth/auth.i18n";
@@ -19,7 +18,6 @@ export class CabinetController {
   constructor(private cabinetService: CabinetService) {}
 
   @Roles(UserRoles.ADMIN)
-  // @Csrf()
   @Get("all")
   @ApiOperation({ summary: "Получение всех кабинетов" })
   @ApiResponse({ status: 200, description: "Найденные кабинеты (со всеми найденными в БД учителями и предметами)", type: [Cabinet] })
@@ -40,7 +38,6 @@ export class CabinetController {
   }
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
-  // @Csrf()
   @Post("create")
   @ApiOperation({ summary: "Создание кабинета, необходим номер кабинета, опционально предметы и учителя" })
   @ApiResponse({ status: 201, description: "Созданный кабинет (со всеми найденными в БД учителями и предметами)", type: Cabinet })
@@ -52,7 +49,6 @@ export class CabinetController {
 
   // администратор или только учитель относящийся к своему кабинету
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
-  // @Csrf()
   @Post("edit")
   @ApiOperation({ summary: "Изменение кабинета, учителя передавать в массиве учителей не надо" })
   @ApiResponse({ status: 200, description: "Изменённый кабинет", type: Cabinet })
@@ -81,7 +77,6 @@ export class CabinetController {
 
   // администратор или только учитель относящийся к своему кабинету
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
-  // @Csrf()
   @Delete(":id")
   @ApiOperation({ summary: "Удаление кабинета по id" })
   @ApiResponse({ status: 200, description: "Статус удален ли кабинет или не найден" })

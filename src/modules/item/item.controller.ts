@@ -3,7 +3,6 @@ import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Roles } from "../roles/roles.decorator";
 import { UserRoles } from "../user/user.entity";
 import { ItemSwagger } from "../../documentation/item.docs";
-// import { Csrf } from "ncsrf";
 import { Public } from "../auth/auth.decorator";
 import { GlobalException } from "../../helpers/GlobalException";
 import { ItemErrors } from "./item.i18n";

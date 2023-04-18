@@ -3,7 +3,6 @@ import { Roles } from "../roles/roles.decorator";
 import { CreateUserDTO, User, UserRoles } from "../user/user.entity";
 import { AuthLoginDTO } from "./auth.dto";
 import { AuthService } from "./auth.service";
-// import { Csrf } from "ncsrf";
 import { AuthedRequest, Tokens } from "./types";
 import { Response } from "express";
 import { Public } from "./auth.decorator";
@@ -22,7 +21,6 @@ export class AuthController {
   // регистрировать только учителей, админ создаётся вручную в докере
   @Public()
   // @Roles(UserRoles.ADMIN)
-  //   @Csrf()
   @ApiOperation({ summary: "Регистрация учителя (доступна админу)" })
   @ApiResponse({ status: 200, description: "Учитель" })
   @Post("register")
@@ -47,7 +45,6 @@ export class AuthController {
   }
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
-  //   @Csrf()
   @Get("logout")
   @ApiOperation({ summary: "Выход из пользователя" })
   @ApiResponse({ status: 200 })

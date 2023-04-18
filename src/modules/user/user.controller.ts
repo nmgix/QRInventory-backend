@@ -6,13 +6,9 @@ import { UserSwagger } from "../../documentation/user.docs";
 import { CreateUserDTO, UpdateUserDTO, User, UserRoles } from "./user.entity";
 import { UserErrors } from "./user.i18n";
 import { UserService } from "./user.service";
-// import { Csrf } from "ncsrf";
 import { Public } from "../auth/auth.decorator";
 import { AuthedRequest } from "../auth/types";
-import { AuthErrors } from "../auth/auth.i18n";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { diskStorage } from "multer";
-import FilesInterceptor from "../../helpers/files.interceptor";
 
 @ApiTags(UserSwagger.tag)
 @Controller("user")
@@ -21,7 +17,6 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Roles(UserRoles.ADMIN)
-  // @Csrf()
   @Get("all")
   @ApiOperation({ summary: "Получение всех учителей" })
   @ApiResponse({ status: 200, description: "Все учителя", type: [User] })
@@ -43,7 +38,6 @@ export class UserController {
   }
 
   @Roles(UserRoles.TEACHER, UserRoles.ADMIN)
-  // @Csrf()
   @Get()
   @ApiOperation({ summary: "Получение себя" })
   @ApiResponse({ status: 200, description: "Учитель или админ с привязанными учереждениями", type: User })
@@ -53,7 +47,6 @@ export class UserController {
   }
 
   @Roles(UserRoles.ADMIN)
-  // @Csrf()
   @Post("create")
   @ApiOperation({ summary: "Создание учителя" })
   @ApiResponse({ status: 201, description: "Созданный учитель в БД", type: User })
@@ -90,7 +83,6 @@ export class UserController {
   }
 
   @Roles(UserRoles.ADMIN)
-  // @Csrf()
   @Delete(":id")
   @ApiOperation({ summary: "Удаление пользователя" })
   @ApiResponse({ status: 200, description: "Статус удален ли пользователь или не найден" })
