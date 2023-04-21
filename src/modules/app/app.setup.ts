@@ -15,7 +15,7 @@ export default async function appSetup(app: NestExpressApplication) {
   const jwtService: JwtService = app.get(JwtService);
   const authService: AuthService = app.get(AuthService);
   const reflector = new Reflector();
-  app.enableCors();
+  app.enableCors({ credentials: true, origin: true, methods: "GET, POST, DELETE, HEAD, OPTIONS" });
   app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
   app.use(cookieParser(configService.get("JWT_COOKIE")));
   app.useGlobalPipes(formatErrorPipe);
