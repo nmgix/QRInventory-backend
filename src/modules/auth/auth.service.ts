@@ -67,7 +67,7 @@ export class AuthService {
   }
 
   async refreshTokens(userId: string, refreshToken: string) {
-    const user = await this.userService.get(null, userId, undefined, true);
+    const user = await this.userService.get(undefined, userId, undefined, true);
     if (!user || !refreshToken) throw new ForbiddenException(AuthErrors.access_denied, `Пользователь не найден, либо не указан refresh-токен`);
     const refreshTokenMatch = await argon2.verify(user.refreshToken, refreshToken);
     if (!refreshTokenMatch) throw new ForbiddenException(AuthErrors.access_denied, `Refresh-токены не сходятся`);
