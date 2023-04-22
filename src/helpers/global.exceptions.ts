@@ -6,10 +6,12 @@ export class GlobalException implements ExceptionFilter {
   constructor(public queryFail: string, public badRequest: string, public entityNotFound: string) {}
 
   catch(exception: unknown, host: ArgumentsHost) {
+    console.log(exception);
+
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     let message = (exception as any).message;
-    let status = HttpStatus.INTERNAL_SERVER_ERROR;
+    let status = (exception as any).status ?? HttpStatus.INTERNAL_SERVER_ERROR;
     let description = null;
     let developerDescription = (exception as any)?.response?.error ?? "";
 
@@ -43,9 +45,6 @@ export class GlobalException implements ExceptionFilter {
         message = this.entityNotFound;
         status = HttpStatus.OK;
         break;
-      }
-      default: {
-        status = HttpStatus.INTERNAL_SERVER_ERROR;
       }
     }
 

@@ -1,6 +1,6 @@
 import { Controller, Body, Post, Get, Param, Delete, HttpCode, UseFilters, Req, Query, ForbiddenException, BadRequestException, UseInterceptors, UploadedFile } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { GlobalException } from "../../helpers/GlobalException";
+import { GlobalException } from "../../helpers/global.exceptions";
 import { Roles } from "../roles/roles.decorator";
 import { UserSwagger } from "../../documentation/user.docs";
 import { CreateUserDTO, UpdateUserDTO, User, UserRoles } from "./user.entity";

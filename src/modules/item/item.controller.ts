@@ -4,7 +4,7 @@ import { Roles } from "../roles/roles.decorator";
 import { UserRoles } from "../user/user.entity";
 import { ItemSwagger } from "../../documentation/item.docs";
 import { Public } from "../auth/auth.decorator";
-import { GlobalException } from "../../helpers/GlobalException";
+import { GlobalException } from "../../helpers/global.exceptions";
 import { ItemErrors } from "./item.i18n";
 import { ItemService } from "./item.service";
 import { CreateItemDTO, EditItemDTO, Item } from "./item.entity";

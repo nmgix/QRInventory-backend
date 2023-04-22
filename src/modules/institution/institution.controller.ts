@@ -1,7 +1,7 @@
 import { Body, ClassSerializerInterceptor, Controller, Delete, Get, HttpCode, Param, Post, Query, Req, UseFilters, UseInterceptors } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { InstitutionSwagger } from "../../documentation/institution.docs";
-import { GlobalException } from "../../helpers/GlobalException";
+import { GlobalException } from "../../helpers/global.exceptions";
 import { Public } from "../auth/auth.decorator";
 import { AuthedRequest } from "../auth/types";
 import { Roles } from "../roles/roles.decorator";

@@ -1,6 +1,6 @@
 import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Put, Query, Req, UseFilters, UseInterceptors } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { GlobalException } from "../../helpers/GlobalException";
+import { GlobalException } from "../../helpers/global.exceptions";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
 import { CabinetErrors, CabinetMessages } from "./cabinet.i18n";
 import { CabinetService } from "./cabinet.service";

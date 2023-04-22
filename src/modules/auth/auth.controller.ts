@@ -8,7 +8,7 @@ import { Response } from "express";
 import { Public } from "./auth.decorator";
 import { AuthSwagger } from "../../documentation/auth.docs";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { GlobalException } from "../../helpers/GlobalException";
+import { GlobalException } from "../../helpers/global.exceptions";
 import { AuthErrors, AuthMessages } from "./auth.i18n";
 import { UserErrors } from "../user/user.i18n";
 
