@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Get, Param, Delete, HttpCode, UseFilters, Req, Query, ForbiddenException, BadRequestException, UseInterceptors, UploadedFile } from "@nestjs/common";
+import { Controller, Body, Post, Get, Param, Delete, HttpCode, UseFilters, Req, Query, ForbiddenException, BadRequestException, UseInterceptors, UploadedFile, Patch, UsePipes, ClassSerializerInterceptor } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/global.exceptions";
 import { Roles } from "../roles/roles.decorator";
@@ -69,16 +69,18 @@ export class UserController {
   }
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
-  @Post("edit")
+  @Patch("edit")
   @ApiOperation({ summary: "Изменение пользователя" })
   @ApiQuery({ name: "id", description: "Id пользователя, передавать этот параметр только при авторизации от имени администратора", required: false, type: String })
   @ApiResponse({ status: 200, description: "Статус удален ли пользователь или не найден", type: User })
   @HttpCode(200)
   async updateUser(@Req() req: AuthedRequest, @Body() dto: UpdateUserDTO, @Query("id") id?: string) {
+    console.log(req.body);
     if (id !== undefined && req.user.role === UserRoles.ADMIN) {
-      return this.userService.updateUser(id, { ...dto, id });
+      // другим только учителям (не админам)
+      return this.userService.updateUser(id, { ...dto, id }, false);
     } else {
-      return this.userService.updateUser(req.user.id, { ...dto, id: req.user.id });
+      return this.userService.updateUser(req.user.id, { ...dto, id: req.user.id }, true);
     }
   }
 

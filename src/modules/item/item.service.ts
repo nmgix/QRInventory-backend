@@ -36,7 +36,7 @@ export class ItemService {
   }
 
   async update(item: EditItemDTO) {
-    return this.itemRepository.update({ id: item.id }, item);
+    return this.itemRepository.update({ id: item.id }, item as unknown as Partial<Item>);
   }
 
   async deleteBy(searchString: string) {

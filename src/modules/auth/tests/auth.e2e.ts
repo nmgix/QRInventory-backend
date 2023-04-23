@@ -9,6 +9,7 @@ import { UserService } from "../../user/user.service";
 import { AuthController } from "../auth.controller";
 import { Tokens } from "../types";
 import { AuthService } from "../auth.service";
+import { NodeENV } from "../../../helpers/types";
 
 describe("Авторизация и получение пользователя", () => {
   let app: INestApplication;
@@ -40,7 +41,7 @@ describe("Авторизация и получение пользователя"
     userService = module.get<UserService>(UserService);
     authService = module.get<AuthService>(AuthService);
 
-    apiUrl = `http://localhost:${configService.get("NODE_ENV") !== "production" ? configService.get("APP_PORT") : configService.get("GLOBAL_PORT")}`;
+    apiUrl = `http://localhost:${configService.get("NODE_ENV") !== NodeENV.prod ? configService.get("APP_PORT") : configService.get("GLOBAL_PORT")}`;
     agent = request.agent(apiUrl);
 
     await userService.clearTable();

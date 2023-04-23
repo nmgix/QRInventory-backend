@@ -40,7 +40,6 @@ export class AuthService {
     if (!user) throw new BadRequestException(AuthErrors.user_not_found);
     const passwordMatch = await argon2.verify(user.password, dto.oldPassword);
     if (!passwordMatch) throw new BadRequestException(AuthErrors.password_mismatch);
-    // думаю что argon и сам поймёт что это undefined, но лучше перестрахуюсь
     if (!dto.newPassword) throw new BadRequestException(AuthErrors.password_empty);
     const hashedPassword = await argon2.hash(dto.newPassword);
     await this.userService.update(user.id, { password: hashedPassword });

@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Equals, IsArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 import { Cabinet } from "../cabinet/cabinet.entity";
@@ -40,4 +40,9 @@ export class EditInstitutionDTO {
   @IsOptional()
   @IsString({ message: InstitutionErrors.name_string })
   name?: string;
+
+  @Equals(undefined, { message: InstitutionErrors.cant_pass_admin })
+  admin: string;
+  @Equals(undefined, { message: InstitutionErrors.cant_pass_cabinets })
+  cabinets: any[];
 }

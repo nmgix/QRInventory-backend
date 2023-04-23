@@ -7,6 +7,7 @@ import { ItemModule } from "../item/item.module";
 import { AuthModule } from "../auth/auth.module";
 import { InstitutionModule } from "../institution/institution.module";
 import { AppLoggerMiddleware } from "../../helpers/requests.logger";
+import { NodeENV } from "../../helpers/types";
 
 @Module({
   imports: [ConfigModule.forRoot({ envFilePath: [".env"], isGlobal: true }), AuthModule, DatabaseModule, UserModule, CabinetModule, ItemModule, InstitutionModule],
@@ -15,6 +16,6 @@ import { AppLoggerMiddleware } from "../../helpers/requests.logger";
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer): void {
-    if (process.env.NODE_ENV !== "production") consumer.apply(AppLoggerMiddleware).forRoutes("*");
+    if (process.env.NODE_ENV !== NodeENV.prod) consumer.apply(AppLoggerMiddleware).forRoutes("*");
   }
 }

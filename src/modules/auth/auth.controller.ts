@@ -11,6 +11,7 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/global.exceptions";
 import { AuthErrors, AuthMessages } from "./auth.i18n";
 import { UserErrors } from "../user/user.i18n";
+import { NodeENV } from "../../helpers/types";
 
 @ApiTags(AuthSwagger.tag)
 @UseFilters(new GlobalException(AuthErrors.query_fail, AuthErrors.bad_request, UserErrors.user_not_found))
@@ -18,9 +19,7 @@ import { UserErrors } from "../user/user.i18n";
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  // регистрировать только учителей, админ создаётся вручную в докере
-  @Public()
-  // @Roles(UserRoles.ADMIN)
+  @Roles(UserRoles.ADMIN)
   @ApiOperation({ summary: "Регистрация учителя (доступна админу)" })
   @ApiResponse({ status: 200, description: "Учитель" })
   @Post("register")
@@ -38,9 +37,8 @@ export class AuthController {
   @HttpCode(200)
   async login(@Body() dto: AuthLoginDTO, @Res({ passthrough: true }) res: Response) {
     const { user, tokens } = await this.authService.login(dto);
-    // возможно поставить same site есть смысл
-    res.cookie(Tokens.access_token, tokens.accessToken, { signed: true, httpOnly: true, maxAge: +process.env.ACCESS_TIMEOUT * 1000 });
-    res.cookie(Tokens.refresh_token, tokens.refreshToken, { signed: true, httpOnly: true, maxAge: +process.env.REFRESH_TIMEOUT * 1000 });
+    res.cookie(Tokens.access_token, tokens.accessToken, { signed: true, httpOnly: true, maxAge: +process.env.ACCESS_TIMEOUT * 1000, sameSite: process.env.NODE_ENV === NodeENV.prod ? "strict" : "lax", secure: process.env.NODE_ENV === NodeENV.prod });
+    res.cookie(Tokens.refresh_token, tokens.refreshToken, { signed: true, httpOnly: true, maxAge: +process.env.REFRESH_TIMEOUT * 1000, sameSite: process.env.NODE_ENV === NodeENV.prod ? "strict" : "lax", secure: process.env.NODE_ENV === NodeENV.prod });
     return user;
   }
 

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Equals, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import DatabaseFile from "../database/database.file.entity";
 import { ItemErrors } from "./item.i18n";
@@ -48,5 +48,10 @@ export class EditItemDTO {
 
   @ApiProperty({ required: false })
   @IsString({ message: ItemErrors.name_string })
-  name: string;
+  name?: string;
+
+  @Equals(undefined, { message: ItemErrors.cant_pass_imageId })
+  imageId?: number;
+  @Equals(undefined, { message: ItemErrors.cant_pass_image })
+  image?: string;
 }

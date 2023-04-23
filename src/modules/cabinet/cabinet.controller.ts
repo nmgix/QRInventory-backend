@@ -49,7 +49,7 @@ export class CabinetController {
 
   // администратор или только учитель относящийся к своему кабинету
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
-  @Post("edit")
+  @Patch("edit")
   @ApiOperation({ summary: "Изменение кабинета, учителя передавать в массиве учителей не надо" })
   @ApiResponse({ status: 200, description: "Изменённый кабинет", type: Cabinet })
   @HttpCode(200)

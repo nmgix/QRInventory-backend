@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from "class-transformer";
-import { IsEmail, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
+import { Equals, IsEmail, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UserErrors } from "./user.i18n";
 import { ApiProperty } from "@nestjs/swagger";
@@ -73,27 +73,36 @@ export class CreateUserDTO {
 }
 
 export class UpdateUserDTO {
-  @ApiProperty({ description: "ФИО" })
+  @ApiProperty({ description: "ФИО", required: false })
   @IsOptional()
   @IsNotEmpty({ message: UserErrors.fullname_empty })
   @IsString({ message: UserErrors.fullname_string })
   fullName?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsNotEmpty({ message: UserErrors.email_empty })
   @IsEmail({}, { message: UserErrors.email_not_email })
   email?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString({ message: UserErrors.password_string })
   oldPassword?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString({ message: UserErrors.password_string })
   newPassword?: string;
+
+  @Equals(undefined, { message: UserErrors.cant_pass_avatarId })
+  avatarId: number;
+  @Equals(undefined, { message: UserErrors.cant_pass_avatar })
+  avatar: string;
+  @Equals(undefined, { message: UserErrors.cant_pass_institutions })
+  institutions: any[];
+  @Equals(undefined, { message: UserErrors.cant_pass_refreshToken })
+  refreshToken: string;
 }
 
 export type InternalUpdateUserDTO = UpdateUserDTO & { id: string };

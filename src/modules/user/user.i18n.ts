@@ -24,5 +24,10 @@ export enum UserErrors {
   user_not_found = "Пользователь не найден",
   user_deleted = "Пользователь удалён",
 
-  user_data_input_error = "Ошибка ввода пользовательских данных"
+  user_data_input_error = "Ошибка ввода пользовательских данных",
+
+  cant_pass_avatarId = "Нельзя изменить avatarId данным методом",
+  cant_pass_avatar = "Нельзя изменить аватар данным методом",
+  cant_pass_institutions = "Нельзя изменить учреждения данным методом",
+  cant_pass_refreshToken = "Нельзя изменить refresh-токен данным методом"
 }

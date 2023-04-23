@@ -1,6 +1,7 @@
 import { ArgumentsHost, BadRequestException, ExceptionFilter, HttpStatus, InternalServerErrorException, Logger } from "@nestjs/common";
 import { Response } from "express";
 import { EntityNotFoundError, QueryFailedError } from "typeorm";
+import { NodeENV } from "./types";
 
 export class GlobalException implements ExceptionFilter {
   constructor(public queryFail: string, public badRequest: string, public entityNotFound: string) {}
@@ -15,7 +16,7 @@ export class GlobalException implements ExceptionFilter {
     let description = null;
     let developerDescription = (exception as any)?.response?.error ?? "";
 
-    if (process.env.NODE_ENV !== "production") Logger.error(message, (exception as any).stack);
+    if (process.env.NODE_ENV !== NodeENV.prod) Logger.error(message, (exception as any).stack);
 
     switch (exception.constructor) {
       case Error: {
@@ -48,7 +49,7 @@ export class GlobalException implements ExceptionFilter {
       }
     }
 
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === NodeENV.dev) {
       return response.status(status).json({ message, description, developerDescription });
     } else {
       return response.status(status).json({ message, description });

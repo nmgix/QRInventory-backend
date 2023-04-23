@@ -46,7 +46,7 @@ export class ItemController {
   }
 
   @Roles(UserRoles.ADMIN)
-  @Post("edit")
+  @Patch("edit")
   @ApiOperation({ summary: "Изменение предмета в БД" })
   @ApiResponse({ status: 200, description: "Созданный предмет", type: Item })
   @HttpCode(200)

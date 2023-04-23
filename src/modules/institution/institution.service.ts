@@ -28,7 +28,7 @@ export class InstitutionService {
   }
 
   async editInstitution(id: string, dto: EditInstitutionDTO) {
-    return this.institutionRepository.update({ id: dto.id, admin: { id } }, dto);
+    return this.institutionRepository.update({ id: dto.id, admin: { id } }, dto as unknown as Partial<Institution>);
   }
 
   async deleteInstitution(id: string, institutionId: string) {

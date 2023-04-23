@@ -50,20 +50,23 @@ export class UserService {
     return this.userRepository.save(createdUser);
   }
 
-  async updateUser(userId: string, data: InternalUpdateUserDTO) {
+  async updateUser(userId: string, data: InternalUpdateUserDTO, admin: boolean) {
     if (data.newPassword) {
       await this.authService.updatePassword(data);
     }
 
+    console.log(data);
+
     delete data.id;
     delete data.oldPassword;
     delete data.newPassword;
+
     Object.keys(data).forEach(key => data[key] === undefined && delete data[key]);
 
     if (Object.keys(data).length > 0) {
-      return this.update(userId, data);
+      return this.update(userId, data as unknown as Partial<User>);
     } else {
-      return this.get(undefined, userId);
+      return this.get(undefined, userId, undefined, admin);
     }
   }
 

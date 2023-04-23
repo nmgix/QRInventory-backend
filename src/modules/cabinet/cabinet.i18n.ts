@@ -7,7 +7,11 @@ export enum CabinetErrors {
   cabinet_institution_empty = "Отсутствует id учереждения",
   cabinet_institution_string = "Id учереждения должен быть строчкой",
 
-  cabinet_input_data_error = "Ошибка ввода данных кабинета"
+  cabinet_input_data_error = "Ошибка ввода данных кабинета",
+
+  cabinet_teachers = "Id учителей должны быть представлены массивом строчек id",
+  cabinet_items = "Id предметов должны быть представлены массивом строчек id",
+  cabinet_field_array = "Поле должно быть представлено массивом"
 }
 
 export enum CabinetMessages {

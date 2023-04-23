@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, Get, HttpCode, Param, Post, Query, Req, UseFilters, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query, Req, UseFilters, UseInterceptors } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { InstitutionSwagger } from "../../documentation/institution.docs";
 import { GlobalException } from "../../helpers/global.exceptions";
@@ -6,7 +6,7 @@ import { Public } from "../auth/auth.decorator";
 import { AuthedRequest } from "../auth/types";
 import { Roles } from "../roles/roles.decorator";
 import { UserRoles } from "../user/user.entity";
-import { CreateInstitutionDTO, Institution } from "./institution.entity";
+import { CreateInstitutionDTO, EditInstitutionDTO, Institution } from "./institution.entity";
 import { InstitutionErrors, InstitutionMessages } from "./institution.i18n";
 import { InstitutionService } from "./institution.service";
 
@@ -40,6 +40,13 @@ export class InstitutionController {
   @Post("create")
   async createInstitution(@Req() req: AuthedRequest, @Body() dto: CreateInstitutionDTO) {
     return this.institutionService.createInstitution(req.user.id, dto);
+  }
+
+  @ApiOperation({ summary: "Изменение учреждения" })
+  @ApiResponse({ status: 200, description: "Изменённый кабинет", type: Institution })
+  @Patch("edit")
+  async editInstitution(@Req() req: AuthedRequest, @Body() dto: EditInstitutionDTO) {
+    return this.institutionService.editInstitution(req.user.id, dto);
   }
 
   @ApiOperation({ summary: "Удаление учреждения по id" })

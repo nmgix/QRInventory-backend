@@ -8,6 +8,7 @@ import { Item } from "../item/item.entity";
 import { DatabaseFileController } from "./database.file.controller";
 import DatabaseFile from "./database.file.entity";
 import { DatabaseFileService } from "./database.file.service";
+import { NodeENV } from "../../helpers/types";
 
 export const entities = [User, Cabinet, Item, Institution, DatabaseFile];
 
@@ -21,7 +22,7 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
   } = {
     test: {
       type: "postgres",
-      host: configService.get("NODE_ENV") !== "production" ? "localhost" : configService.get("POSTGRES_TEST_HOST"),
+      host: configService.get("NODE_ENV") !== NodeENV.prod ? "localhost" : configService.get("POSTGRES_TEST_HOST"),
       port: configService.get("POSTGRES_TEST_PORT"),
       username: configService.get("POSTGRES_TEST_USER"),
       password: configService.get("POSTGRES_TEST_PASSWORD"),
@@ -32,7 +33,7 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
     },
     development: {
       type: "postgres",
-      host: configService.get("NODE_ENV") !== "production" ? "localhost" : configService.get("POSTGRES_TEST_HOST"),
+      host: configService.get("NODE_ENV") !== NodeENV.prod ? "localhost" : configService.get("POSTGRES_TEST_HOST"),
       port: configService.get("POSTGRES_TEST_PORT"),
       username: configService.get("POSTGRES_TEST_USER"),
       password: configService.get("POSTGRES_TEST_PASSWORD"),
@@ -43,7 +44,7 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
     },
     production: {
       type: "postgres",
-      host: configService.get("NODE_ENV") !== "production" ? "localhost" : configService.get("POSTGRES_HOST"),
+      host: configService.get("NODE_ENV") !== NodeENV.prod ? "localhost" : configService.get("POSTGRES_HOST"),
       port: configService.get("POSTGRES_PORT"),
       username: configService.get("POSTGRES_USER"),
       password: configService.get("POSTGRES_PASSWORD"),

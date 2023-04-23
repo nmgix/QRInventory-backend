@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
-import { IsArray, isArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Equals, IsArray, isArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { Institution } from "../institution/institution.entity";
 import { Item } from "../item/item.entity";
@@ -46,7 +46,7 @@ export class EditCabinetDTO {
   @ApiProperty()
   id: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString({ message: CabinetErrors.cabinet_institution_string })
   institution?: string;
@@ -58,14 +58,14 @@ export class EditCabinetDTO {
 
   @ApiProperty({ type: [String], required: false, uniqueItems: true })
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsArray({ message: CabinetErrors.cabinet_field_array })
+  @IsString({ message: CabinetErrors.cabinet_teachers, each: true })
   teachers?: string[];
 
   @ApiProperty({ type: [String], required: false })
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsArray({ message: CabinetErrors.cabinet_field_array })
+  @IsString({ message: CabinetErrors.cabinet_items, each: true })
   items?: string[];
 }
 
