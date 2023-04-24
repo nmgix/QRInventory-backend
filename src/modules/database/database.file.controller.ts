@@ -3,13 +3,13 @@ import { Readable } from "typeorm/platform/PlatformTools";
 import { DatabaseFileService } from "./database.file.service";
 import { Response } from "express";
 import { Public } from "../auth/auth.decorator";
-import { ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { DocumentFileSwagger } from "documentation/document.file.docs";
 
 // https://wanago.io/2021/11/01/api-nestjs-storing-files-postgresql-database/
 
-// @ApiTags(CabinetSwagger.tag)
+@ApiTags(DocumentFileSwagger.tag)
 @Controller("database-file")
-// @UseFilters(new GlobalException(CabinetErrors.cabinet_input_data_error, CabinetErrors.cabinet_input_data_error, CabinetErrors.cabinet_not_found))
 export class DatabaseFileController {
   constructor(private readonly databaseFileService: DatabaseFileService) {}
 

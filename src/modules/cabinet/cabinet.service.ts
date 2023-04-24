@@ -44,13 +44,11 @@ export class CabinetService {
   async get(id?: string, cabinet?: string): Promise<Cabinet | null> {
     const values = [
       { name: "id", value: id, alias: id },
-      { name: "cabinetNumber", value: cabinet, cabinet }
+      { name: "cabinetNumber", value: cabinet, alias: cabinet }
     ].filter(item => item.value !== undefined);
 
-    let item = values[0];
-
     return this.cabinetRepository.findOneOrFail({
-      where: { [item.name]: item.alias }
+      where: [...values.map(v => ({ [v.name]: v.alias }))]
     });
   }
 

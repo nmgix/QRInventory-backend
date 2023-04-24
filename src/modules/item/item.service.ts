@@ -23,10 +23,8 @@ export class ItemService {
       { name: "article", value: article, alias: article }
     ].filter(item => item.value !== undefined);
 
-    let item = values[0];
-
     return this.itemRepository.findOneOrFail({
-      where: { [item.name]: item.alias }
+      where: [...values.map(v => ({ [v.name]: v.alias }))]
     });
   }
 

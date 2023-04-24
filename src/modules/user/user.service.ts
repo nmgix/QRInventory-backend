@@ -30,16 +30,14 @@ export class UserService {
       { name: "fullName", value: fio, alias: Like(`%${fio}%`) }
     ].filter(item => item.value !== undefined);
 
-    let item = values[0];
-
     if (admin) {
       return this.userRepository.findOneOrFail({
-        where: { [item.name]: item.alias },
+        where: [...values.map(v => ({ [v.name]: v.alias }))],
         relations: ["institutions"]
       });
     } else {
       return this.userRepository.findOneOrFail({
-        where: { [item.name]: item.alias, role: Not(UserRoles.ADMIN) },
+        where: [...values.map(v => ({ [v.name]: v.alias, role: Not(UserRoles.ADMIN) }))],
         relations: []
       });
     }
