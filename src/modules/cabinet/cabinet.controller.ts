@@ -17,13 +17,17 @@ import { AuthErrors } from "../auth/auth.i18n";
 export class CabinetController {
   constructor(private cabinetService: CabinetService) {}
 
-  @Roles(UserRoles.ADMIN)
+  @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
   @Get("all")
   @ApiOperation({ summary: "Получение всех кабинетов" })
   @ApiResponse({ status: 200, description: "Найденные кабинеты (со всеми найденными в БД учителями и предметами)", type: [Cabinet] })
   @HttpCode(200)
   async getAllCabinets(@Req() req: AuthedRequest) {
-    return this.cabinetService.getAll(req.user.id);
+    if (req.user.role === UserRoles.ADMIN) {
+      return this.cabinetService.getAll(req.user.id);
+    } else {
+      return this.cabinetService.getTeacherAll(req.user.id);
+    }
   }
 
   @Public()

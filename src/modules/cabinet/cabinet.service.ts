@@ -57,9 +57,12 @@ export class CabinetService {
 
   async getAll(userId: string) {
     const user = await this.userRepository.findOne({ where: { id: userId }, relations: ["institutions"] });
-    if (!user) throw new ForbiddenException(AuthErrors.access_denied);
     const institutionsIds = user.institutions.map(i => i.id);
     return this.cabinetRepository.find({ where: { institution: In(institutionsIds) } });
+  }
+
+  async getTeacherAll(userId: string) {
+    return this.cabinetRepository.find({ where: { teachers: { id: userId } } });
   }
 
   async update(id: string, dto: EditCabinetDTO): Promise<Cabinet | null> {
