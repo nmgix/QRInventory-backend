@@ -4,6 +4,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Cabinet } from "../cabinet/cabinet.entity";
 import { User } from "../user/user.entity";
 import { InstitutionErrors } from "./institution.i18n";
+import { Item } from "modules/item/item.entity";
 
 @Entity()
 export class Institution {
@@ -19,8 +20,16 @@ export class Institution {
   @OneToMany(() => Cabinet, cabinet => cabinet.institution)
   cabinets: Cabinet[];
 
+  @ApiProperty()
+  @OneToMany(() => Item, item => item.institution)
+  items: Item[];
+
+  @ApiProperty()
+  @OneToMany(() => User, user => user.teacherInstitution)
+  teachers: User[];
+
   @ApiProperty({ type: () => [User], description: "Все админы, относящиеся к этому колледжу" })
-  @ManyToOne(() => User, user => user.institutions)
+  @ManyToOne(() => User, user => user.institutions, { onDelete: "NO ACTION" })
   admin: User;
 }
 
@@ -35,6 +44,18 @@ export class EditInstitutionDTO {
   @ApiProperty()
   @IsString()
   id: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  items: string[];
+
+  @ApiProperty()
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  teachers: string[];
 
   @ApiProperty()
   @IsOptional()

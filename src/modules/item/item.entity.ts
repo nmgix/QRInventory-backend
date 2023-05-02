@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Equals, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Institution } from "modules/institution/institution.entity";
+import { Column, Entity, JoinColumn, JoinTable, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import DatabaseFile from "../database/database.file.entity";
 import { ItemErrors } from "./item.i18n";
 
@@ -10,18 +11,26 @@ export class Item {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
+  @ApiProperty()
   @Column({ unique: true })
   @ApiProperty({ description: "Артикул предмета", example: "Ш-508" })
   article: string;
 
+  @ApiProperty()
   @Column()
   @ApiProperty({ description: "Название предмета", example: "Стул обыкновенный" })
   name: string;
 
+  @ApiProperty()
   @OneToOne(() => DatabaseFile, { nullable: true, onDelete: "CASCADE" })
   @JoinColumn({ name: "imageId" })
   image: DatabaseFile;
 
+  @ApiProperty({ type: () => Institution })
+  @ManyToOne(() => Institution, insitution => insitution.items)
+  institution: Institution;
+
+  @ApiProperty()
   @Column({ nullable: true })
   imageId?: number;
 }
@@ -49,6 +58,7 @@ export class EditItemDTO {
   @ApiProperty({ required: false })
   @IsString({ message: ItemErrors.name_string })
   name?: string;
+  // institution: Institution;
 
   @Equals(undefined, { message: ItemErrors.cant_pass_imageId })
   imageId?: number;

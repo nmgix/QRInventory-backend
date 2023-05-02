@@ -16,7 +16,7 @@ export class AuthService {
     private configService: ConfigService
   ) {}
 
-  async register(dto: Partial<User>) {
+  async register(dto: CreateUserDTO) {
     const hashedPassword = await argon2.hash(dto.password);
     const user = await this.userService.create({ ...dto, password: hashedPassword });
 

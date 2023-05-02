@@ -2,6 +2,8 @@ export enum UserErrors {
   email_empty = "Почта не может быть пустой",
   email_not_email = "Предоставленное значение не является почтой",
 
+  insitution_string = "Должен быть указан id учреждения",
+
   id_empty = "Не указан id",
 
   surname_empty = "Фамилия не может быть пустой",

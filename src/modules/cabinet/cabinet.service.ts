@@ -1,10 +1,11 @@
 import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { InstitutionErrors } from "modules/institution/institution.i18n";
 import { In, QueryFailedError, Repository } from "typeorm";
 import { AuthErrors } from "../auth/auth.i18n";
 import { Institution } from "../institution/institution.entity";
 import { Item } from "../item/item.entity";
-import { User } from "../user/user.entity";
+import { User, UserRoles } from "../user/user.entity";
 import { UserErrors } from "../user/user.i18n";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
 import { CabinetErrors, CabinetMessages } from "./cabinet.i18n";
@@ -23,12 +24,14 @@ export class CabinetService {
   ) {}
 
   async create(id: string, dto: CreateCabinetDTO) {
-    let institution = await this.institutionRepository.findOneOrFail({ where: { id: dto.institution, admin: { id } }, relations: ["cabinets"] });
+    let user = await this.userRepository.findOne({ where: { id } });
+    let institution = await this.institutionRepository.findOne({ where: { id: dto.institution }, relations: ["cabinets"] });
+    if (!institution) throw new Error(InstitutionErrors.institution_not_found);
 
     let cabinet = await this.cabinetRepository.create({ cabinetNumber: dto.cabinetNumber, institution });
-
     if (institution.cabinets.find(instCab => instCab.cabinetNumber === cabinet.cabinetNumber)) throw new BadRequestException(CabinetErrors.cabinet_exists);
 
+    if (user.role === UserRoles.TEACHER) dto.teachers.length > 0 ? dto.teachers.push(id) : (dto.teachers = [id]);
     if (dto.teachers) {
       const teachers = await this.userRepository.findBy({ id: In(dto.teachers) });
       cabinet.teachers = teachers;

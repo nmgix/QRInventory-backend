@@ -1,6 +1,6 @@
-import { Exclude, Expose, Type } from "class-transformer";
-import { Equals, IsEmail, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Exclude, Expose } from "class-transformer";
+import { Equals, IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UserErrors } from "./user.i18n";
 import { ApiProperty } from "@nestjs/swagger";
 import { Institution } from "../institution/institution.entity";
@@ -45,8 +45,13 @@ export class User {
   @Column({ nullable: true, default: null })
   refreshToken: string;
 
+  @ApiProperty()
   @OneToMany(() => Institution, institution => institution.admin)
   institutions: Institution[];
+
+  @ApiProperty({ type: () => Institution })
+  @ManyToOne(() => Institution, institution => institution.teachers, { nullable: true })
+  teacherInstitution: Institution;
 
   @OneToOne(() => DatabaseFile, { nullable: true, onDelete: "CASCADE" })
   @JoinColumn({ name: "avatarId" })
@@ -70,6 +75,10 @@ export class CreateUserDTO {
   @ApiProperty()
   @IsString({ message: UserErrors.password_string })
   password: string;
+
+  @ApiProperty()
+  @IsString({ message: UserErrors.insitution_string })
+  teacherInstitution: string;
 }
 
 export class UpdateUserDTO {
@@ -103,6 +112,7 @@ export class UpdateUserDTO {
   institutions: any[];
   @Equals(undefined, { message: UserErrors.cant_pass_refreshToken })
   refreshToken: string;
+  // teacherInstitution: Institution;
 }
 
 export type InternalUpdateUserDTO = UpdateUserDTO & { id: string };

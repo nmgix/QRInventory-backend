@@ -6,10 +6,14 @@ import { AuthService } from "../auth/auth.service";
 import { CreateUserDTO, InternalUpdateUserDTO, UpdateUserDTO, User, UserRoles } from "./user.entity";
 import { UserErrors } from "./user.i18n";
 import { DatabaseFileService } from "../database/database.file.service";
+import { Institution } from "modules/institution/institution.entity";
+import { InstitutionErrors } from "modules/institution/institution.i18n";
 
 @Injectable()
 export class UserService {
   constructor(
+    @InjectRepository(Institution)
+    private institutionRepository: Repository<Institution>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @Inject(forwardRef(() => AuthService))
@@ -31,10 +35,12 @@ export class UserService {
     ].filter(item => item.value !== undefined);
 
     if (admin) {
-      return this.userRepository.findOneOrFail({
+      let user = await this.userRepository.findOneOrFail({
         where: [...values.map(v => ({ [v.name]: v.alias }))],
-        relations: ["institutions"]
+        relations: ["institutions", "teacherInstitution"]
       });
+      if (user.role !== UserRoles.ADMIN) delete user.institutions;
+      return user;
     } else {
       return this.userRepository.findOneOrFail({
         where: [...values.map(v => ({ [v.name]: v.alias, role: Not(UserRoles.ADMIN) }))],
@@ -43,8 +49,11 @@ export class UserService {
     }
   }
 
-  async create(user: Partial<User>) {
-    const createdUser = await this.userRepository.create({ ...user, role: user.role ?? UserRoles.TEACHER, refreshToken: null });
+  async create(user: CreateUserDTO) {
+    let institution = await this.institutionRepository.findOne({ where: { id: user.teacherInstitution } });
+    if (!institution) throw new Error(InstitutionErrors.institution_not_found);
+    const createdUser = await this.userRepository.create({ ...user, teacherInstitution: institution, refreshToken: null });
+
     return this.userRepository.save(createdUser);
   }
 
@@ -83,7 +92,10 @@ export class UserService {
   }
 
   async createAdmin(user: CreateUserDTO) {
-    await this.userRepository.create({ ...user, role: UserRoles.ADMIN, refreshToken: null });
+    let institution = await this.institutionRepository.findOne({ where: { id: user.teacherInstitution } });
+    if (!institution) throw new Error(InstitutionErrors.institution_not_found);
+
+    await this.userRepository.create({ ...user, teacherInstitution: institution, role: UserRoles.ADMIN, refreshToken: null });
   }
 
   async addAvatar(userId: string, imageBuffer: Buffer, filename: string) {
