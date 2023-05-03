@@ -4,7 +4,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGene
 import { UserErrors } from "./user.i18n";
 import { ApiProperty } from "@nestjs/swagger";
 import { Institution } from "../institution/institution.entity";
-import DatabaseFile from "../database/database.file.entity";
+import Image from "../database/image.entity";
 
 export enum UserRoles {
   ADMIN = "admin",
@@ -53,9 +53,9 @@ export class User {
   @ManyToOne(() => Institution, institution => institution.teachers, { nullable: true })
   teacherInstitution: Institution;
 
-  @OneToOne(() => DatabaseFile, { nullable: true, onDelete: "CASCADE" })
+  @OneToOne(() => Image, { nullable: true, onDelete: "CASCADE" })
   @JoinColumn({ name: "avatarId" })
-  avatar: DatabaseFile;
+  avatar: Image;
 
   @Column({ nullable: true })
   avatarId?: number;

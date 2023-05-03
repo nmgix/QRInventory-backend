@@ -5,12 +5,12 @@ import { Institution } from "../institution/institution.entity";
 import { User } from "../../modules/user/user.entity";
 import { Cabinet } from "../cabinet/cabinet.entity";
 import { Item } from "../item/item.entity";
-import { DatabaseFileController } from "./database.file.controller";
-import DatabaseFile from "./database.file.entity";
-import { DatabaseFileService } from "./database.file.service";
+import { ImageController } from "./image.controller";
+import { ImageService } from "./image.service";
+import Image from "./image.entity";
 import { NodeENV } from "../../helpers/types";
 
-export const entities = [User, Cabinet, Item, Institution, DatabaseFile];
+export const entities = [User, Cabinet, Item, Institution, Image];
 
 const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions => {
   const mode = configService.get("NODE_ENV");
@@ -69,9 +69,9 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
     }),
     TypeOrmModule.forFeature(entities)
   ],
-  providers: [DatabaseFileService],
-  controllers: [DatabaseFileController],
-  exports: [DatabaseFileService]
+  providers: [ImageService],
+  controllers: [ImageController],
+  exports: [ImageService]
 })
 export class DatabaseModule {}
 

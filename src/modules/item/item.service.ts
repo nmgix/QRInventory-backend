@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { DatabaseFileService } from "../database/database.file.service";
+import { ImageService } from "../database/image.service";
 import { CreateItemDTO, EditItemDTO, Item } from "./item.entity";
 import { ItemErrors } from "./item.i18n";
 
@@ -10,7 +10,7 @@ export class ItemService {
   constructor(
     @InjectRepository(Item)
     private itemRepository: Repository<Item>,
-    private databaseFileService: DatabaseFileService
+    private imageService: ImageService
   ) {}
 
   async getAll() {
@@ -52,12 +52,12 @@ export class ItemService {
 
   async addImage(itemId: string, imageBuffer: Buffer, filename: string) {
     const item = await this.getBy(itemId);
-    const itemImage = await this.databaseFileService.uploadDatabaseFile(imageBuffer, filename);
+    const itemImage = await this.imageService.uploadImage(imageBuffer, filename);
     await this.itemRepository.update(itemId, { imageId: itemImage.id });
 
     try {
       if (item.imageId) {
-        await this.databaseFileService.deteleFileById(item.imageId);
+        await this.imageService.deteleImageById(item.imageId);
       }
     } catch (error) {
       await this.itemRepository.update(itemId, { imageId: null });

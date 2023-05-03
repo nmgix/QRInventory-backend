@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Equals, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Institution } from "modules/institution/institution.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import DatabaseFile from "../database/database.file.entity";
+import Image from "../database/image.entity";
 import { ItemErrors } from "./item.i18n";
 
 @Entity()
@@ -22,9 +22,9 @@ export class Item {
   name: string;
 
   @ApiProperty()
-  @OneToOne(() => DatabaseFile, { nullable: true, onDelete: "CASCADE" })
+  @OneToOne(() => Image, { nullable: true, onDelete: "CASCADE" })
   @JoinColumn({ name: "imageId" })
-  image: DatabaseFile;
+  image: Image;
 
   @ApiProperty({ type: () => Institution })
   @ManyToOne(() => Institution, insitution => insitution.items)

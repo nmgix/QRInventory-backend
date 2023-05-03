@@ -1,11 +1,9 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { BadRequestException } from "@nestjs/common/exceptions";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Equal, Like, Not, Repository } from "typeorm";
+import { Like, Not, Repository } from "typeorm";
 import { AuthService } from "../auth/auth.service";
-import { CreateUserDTO, InternalUpdateUserDTO, UpdateUserDTO, User, UserRoles } from "./user.entity";
-import { UserErrors } from "./user.i18n";
-import { DatabaseFileService } from "../database/database.file.service";
+import { CreateUserDTO, InternalUpdateUserDTO, User, UserRoles } from "./user.entity";
+import { ImageService } from "../database/image.service";
 import { Institution } from "modules/institution/institution.entity";
 import { InstitutionErrors } from "modules/institution/institution.i18n";
 
@@ -18,7 +16,7 @@ export class UserService {
     private userRepository: Repository<User>,
     @Inject(forwardRef(() => AuthService))
     private authService: AuthService,
-    private databaseFileService: DatabaseFileService
+    private imageService: ImageService
   ) {}
 
   getAllTeachers() {
@@ -100,12 +98,12 @@ export class UserService {
 
   async addAvatar(userId: string, imageBuffer: Buffer, filename: string) {
     const user = await this.get(undefined, userId, undefined, true);
-    const avatar = await this.databaseFileService.uploadDatabaseFile(imageBuffer, filename);
+    const avatar = await this.imageService.uploadImage(imageBuffer, filename);
     await this.userRepository.update(userId, { avatarId: avatar.id });
 
     try {
       if (user.avatarId) {
-        await this.databaseFileService.deteleFileById(user.avatarId);
+        await this.imageService.deteleImageById(user.avatarId);
       }
     } catch (error) {
       await this.userRepository.update(userId, { avatarId: null });

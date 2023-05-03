@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-class DatabaseFile {
+class ImageFile {
   @PrimaryGeneratedColumn()
   public id: number;
 
@@ -14,4 +14,4 @@ class DatabaseFile {
   data: Uint8Array;
 }
 
-export default DatabaseFile;
+export default ImageFile;
