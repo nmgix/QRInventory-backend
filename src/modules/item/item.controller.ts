@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, Get, HttpCode, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UseFilters, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, Get, HttpCode, MaxFileSizeValidator, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Query, UploadedFile, UseFilters, UseInterceptors } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Roles } from "../roles/roles.decorator";
 import { UserRoles } from "../user/user.entity";
@@ -61,7 +61,15 @@ export class ItemController {
   @ApiResponse({ status: 201, description: "Сообщение об успешной загрузке фотографии" })
   @UseInterceptors(FileInterceptor("file"))
   @HttpCode(201)
-  async addImage(@Query("id") id: string, @UploadedFile() file: Express.Multer.File) {
+  async addImage(
+    @Query("id") id: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })]
+      })
+    )
+    file: Express.Multer.File
+  ) {
     const result = await this.itemService.addImage(id, file.buffer, file.originalname);
     return {
       message: `Фотография загружена, id: ${result.id}`

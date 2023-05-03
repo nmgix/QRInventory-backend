@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Get, Param, Delete, HttpCode, UseFilters, Req, Query, ForbiddenException, BadRequestException, UseInterceptors, UploadedFile, Patch, UsePipes, ClassSerializerInterceptor } from "@nestjs/common";
+import { Controller, Body, Post, Get, Param, Delete, HttpCode, UseFilters, Req, Query, ForbiddenException, BadRequestException, UseInterceptors, UploadedFile, Patch, UsePipes, ClassSerializerInterceptor, ParseFilePipe, FileTypeValidator, MaxFileSizeValidator } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/global.exceptions";
 import { Roles } from "../roles/roles.decorator";
@@ -61,7 +61,15 @@ export class UserController {
   @ApiResponse({ status: 201, description: "Сообщение об успешной загрузке фотографии" })
   @UseInterceptors(FileInterceptor("file"))
   @HttpCode(201)
-  async addAvatar(@Req() req: AuthedRequest, @UploadedFile() file: Express.Multer.File) {
+  async addAvatar(
+    @Req() req: AuthedRequest,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })]
+      })
+    )
+    file: Express.Multer.File
+  ) {
     const result = await this.userService.addAvatar(req.user.id, file.buffer, file.originalname);
     return {
       message: `Фотография загружена, id: ${result.id}`
