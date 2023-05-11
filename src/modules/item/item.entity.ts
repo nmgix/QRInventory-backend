@@ -45,6 +45,11 @@ export class CreateItemDTO {
   @IsNotEmpty({ message: ItemErrors.name_empty })
   @IsString({ message: ItemErrors.name_string })
   name: string;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: ItemErrors.insitution_exists })
+  @IsString({ message: ItemErrors.institution_string })
+  institution: string;
 }
 
 export class EditItemDTO {
@@ -52,13 +57,19 @@ export class EditItemDTO {
   id: string;
 
   @ApiProperty({ required: false })
+  @IsOptional()
   @IsString({ message: ItemErrors.article_string })
   article?: string;
 
   @ApiProperty({ required: false })
+  @IsOptional()
   @IsString({ message: ItemErrors.name_string })
   name?: string;
-  // institution: Institution;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString({ message: ItemErrors.institution_string })
+  institution?: string;
 
   @Equals(undefined, { message: ItemErrors.cant_pass_imageId })
   imageId?: number;

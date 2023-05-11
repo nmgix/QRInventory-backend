@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, Get, HttpCode, MaxFileSizeValidator, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Query, UploadedFile, UseFilters, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, Get, HttpCode, MaxFileSizeValidator, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseFilters, UseInterceptors } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Roles } from "../roles/roles.decorator";
 import { UserRoles } from "../user/user.entity";
@@ -9,6 +9,7 @@ import { ItemErrors } from "./item.i18n";
 import { ItemService } from "./item.service";
 import { CreateItemDTO, EditItemDTO, Item } from "./item.entity";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { AuthedRequest } from "modules/auth/types";
 
 @ApiTags(ItemSwagger.tag)
 @Controller("item")
@@ -21,8 +22,8 @@ export class ItemController {
   @ApiOperation({ summary: "Получение всех предметов" })
   @ApiResponse({ status: 200, description: "Найденые предметы", type: [Item] })
   @HttpCode(200)
-  async getAllItems() {
-    return this.itemService.getAll();
+  async getAllItems(@Req() req: AuthedRequest) {
+    return this.itemService.getAll(req.user.id);
   }
 
   @Public()
@@ -36,22 +37,22 @@ export class ItemController {
     return this.itemService.getBy(id, article);
   }
 
-  @Roles(UserRoles.ADMIN)
+  @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
   @Post("create")
   @ApiOperation({ summary: "Создание предмета в БД" })
   @ApiResponse({ status: 201, description: "Созданный предмет", type: Item })
   @HttpCode(201)
-  async createItem(@Body() dto: CreateItemDTO) {
-    return this.itemService.create(dto);
+  async createItem(@Body() dto: CreateItemDTO, @Req() req: AuthedRequest) {
+    return this.itemService.create(req.user.id, dto);
   }
 
-  @Roles(UserRoles.ADMIN)
+  @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
   @Patch("edit")
   @ApiOperation({ summary: "Изменение предмета в БД" })
   @ApiResponse({ status: 200, description: "Созданный предмет", type: Item })
   @HttpCode(200)
-  async editItem(@Body() dto: EditItemDTO) {
-    return this.itemService.update(dto);
+  async editItem(@Body() dto: EditItemDTO, @Req() req: AuthedRequest) {
+    return this.itemService.update(req.user.id, dto);
   }
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
@@ -68,21 +69,22 @@ export class ItemController {
         validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })]
       })
     )
-    file: Express.Multer.File
+    file: Express.Multer.File,
+    @Req() req: AuthedRequest
   ) {
-    const result = await this.itemService.addImage(id, file.buffer, file.originalname);
+    const result = await this.itemService.addImage(req.user.id, id, file.buffer, file.originalname);
     return {
       message: `Фотография загружена, id: ${result.id}`
     };
   }
 
-  @Roles(UserRoles.ADMIN)
+  @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
   @Delete(":searchString")
   @ApiOperation({ summary: "Удаление предмета по id или артикулу" })
   @ApiResponse({ status: 200, description: "Статус удален ли предмет или не найден" })
   @HttpCode(200)
-  async deleteItem(@Param("searchString") searchString: string) {
-    const result = await this.itemService.deleteBy(searchString);
+  async deleteItem(@Param("searchString") searchString: string, @Req() req: AuthedRequest) {
+    const result = await this.itemService.deleteBy(req.user.id, searchString);
     return {
       message: ItemErrors[result.affected > 0 ? "item_deleted" : "item_not_found"]
     };

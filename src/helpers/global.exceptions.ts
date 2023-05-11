@@ -26,6 +26,7 @@ export class GlobalException implements ExceptionFilter {
       case QueryFailedError: {
         message = this.queryFail;
         status = HttpStatus.UNPROCESSABLE_ENTITY;
+        description = ((exception as any).message as string).includes("duplicate key value") ? "Запись уже существует" : null;
         developerDescription = (exception as any).message;
         break;
       }
