@@ -16,13 +16,13 @@ const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions =
   const mode = configService.get("NODE_ENV");
 
   const configs: {
+    developmentdocker: TypeOrmModuleOptions;
     development: TypeOrmModuleOptions;
-    test: TypeOrmModuleOptions;
     production: TypeOrmModuleOptions;
   } = {
-    test: {
+    developmentdocker: {
       type: "postgres",
-      host: configService.get("NODE_ENV") !== NodeENV.prod ? "localhost" : configService.get("POSTGRES_TEST_HOST"),
+      host: configService.get("POSTGRES_TEST_HOST"),
       port: configService.get("POSTGRES_TEST_PORT"),
       username: configService.get("POSTGRES_TEST_USER"),
       password: configService.get("POSTGRES_TEST_PASSWORD"),

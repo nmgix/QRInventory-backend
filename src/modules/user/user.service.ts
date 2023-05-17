@@ -42,7 +42,7 @@ export class UserService {
     } else {
       return this.userRepository.findOneOrFail({
         where: [...values.map(v => ({ [v.name]: v.alias, role: Not(UserRoles.ADMIN) }))],
-        relations: []
+        relations: ["teacherInstitution"]
       });
     }
   }
