@@ -24,10 +24,8 @@ export class AuthController {
   @ApiResponse({ status: 200, description: "Учитель" })
   @Post("register")
   async register(@Body() dto: CreateUserDTO) {
-    await this.authService.register(dto);
-    return {
-      message: AuthMessages.user_created
-    };
+    let { user } = await this.authService.register(dto);
+    return user;
   }
 
   @Public()

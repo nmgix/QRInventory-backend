@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { InstitutionErrors } from "modules/institution/institution.i18n";
-import { In, QueryFailedError, Repository } from "typeorm";
+import { In, Like, QueryFailedError, Repository } from "typeorm";
 import { AuthErrors } from "../auth/auth.i18n";
 import { Institution } from "../institution/institution.entity";
 import { Item } from "../item/item.entity";
@@ -44,25 +44,25 @@ export class CabinetService {
     return this.cabinetRepository.save(cabinet);
   }
 
-  async get(id?: string, cabinet?: string): Promise<Cabinet | null> {
-    const values = [
-      { name: "id", value: id, alias: id },
-      { name: "cabinetNumber", value: cabinet, alias: cabinet }
-    ].filter(item => item.value !== undefined);
+  async get(take?: number, skip?: number, id?: string, cabinet?: string) {
+    const values = [{ name: "cabinetNumber", value: cabinet, alias: cabinet }].filter(item => item.value !== undefined);
 
-    return this.cabinetRepository.findOneOrFail({
-      where: [...values.map(v => ({ [v.name]: v.alias }))]
+    return this.cabinetRepository.findAndCount({
+      where: id ? { id } : [...values.map(v => ({ [v.name]: Like("%" + v.alias + "%") }))],
+      take: id ? 1 : take ? take : 10,
+      skip: id ? 0 : skip ? skip : 0,
+      order: { id: "ASC" }
     });
   }
 
-  async getAll(userId: string) {
+  async getAdminAll(userId: string, take: number = 10, skip: number = 0) {
     const user = await this.userRepository.findOne({ where: { id: userId }, relations: ["institutions"] });
     const institutionsIds = user.institutions.map(i => i.id);
-    return this.cabinetRepository.find({ where: { institution: In(institutionsIds) } });
+    return this.cabinetRepository.findAndCount({ where: { institution: { id: In(institutionsIds) } }, take, skip });
   }
 
-  async getTeacherAll(userId: string) {
-    return this.cabinetRepository.find({ where: { teachers: { id: userId } } });
+  async getTeacherAll(userId: string, take: number = 10, skip: number = 0) {
+    return this.cabinetRepository.findAndCount({ where: { teachers: { id: userId } }, take, skip });
   }
 
   async update(id: string, dto: EditCabinetDTO): Promise<Cabinet | null> {

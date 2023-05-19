@@ -1,5 +1,6 @@
-import { forwardRef, Module } from "@nestjs/common";
+import { forwardRef, MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { PaginationMiddleware } from "helpers/pagination.middleware";
 import { Institution } from "modules/institution/institution.entity";
 import { AuthModule } from "../auth/auth.module";
 import { CabinetModule } from "../cabinet/cabinet.module";

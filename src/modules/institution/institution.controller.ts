@@ -19,11 +19,17 @@ export class InstitutionController {
 
   @ApiOperation({ summary: "Получение всех привязанных учреждений" })
   @ApiResponse({ status: 200, description: "Привязанные учреждения", type: [Institution] })
-  @ApiQuery({ required: false, name: "full", description: "Подгрузить все данные по учреждению (все кабинеты)", type: Boolean })
+  // @ApiQuery({ required: false, name: "full", description: "Подгрузить все данные по учреждению (все кабинеты)", type: Boolean })
   @Get("all")
   @HttpCode(200)
-  async getInstitutions(@Req() req: AuthedRequest, @Query("full") full: string) {
-    return this.institutionService.getAdminInstitutions(req.user.id, Boolean(full));
+  // @Query("full") full: string
+  async getInstitutions(@Req() req: AuthedRequest, @Query() { take, skip }) {
+    // Boolean(full)
+    const [data, total] = await this.institutionService.getAdminInstitutions(req.user.id, take, skip);
+    return {
+      institutions: data,
+      total
+    };
   }
 
   @ApiOperation({ summary: "Получение привязанного учреждения по id" })

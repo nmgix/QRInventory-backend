@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Institution } from "modules/institution/institution.entity";
 import { InstitutionErrors } from "modules/institution/institution.i18n";
-import { In, Repository } from "typeorm";
+import { In, Like, Repository } from "typeorm";
 import { ImageService } from "../database/image.service";
 import { CreateItemDTO, EditItemDTO, Item } from "./item.entity";
 import { ItemErrors, ItemMessages } from "./item.i18n";
@@ -17,24 +17,27 @@ export class ItemService {
     private institutionRepository: Repository<Institution>
   ) {}
 
-  async getAll(userId: string) {
+  async getAll(userId: string, take: number = 10, skip: number = 0) {
     let foundInstitution = await this.institutionRepository.findOne({
       where: [{ admin: { id: userId } }, { teachers: { id: userId } }]
     });
     if (!foundInstitution) throw new BadRequestException(InstitutionErrors.institution_not_found);
 
-    return this.itemRepository.find({ where: { institution: { id: foundInstitution.id } } });
+    return this.itemRepository.findAndCount({ where: { institution: { id: foundInstitution.id } }, take, skip });
   }
 
-  async getBy(institutionId: string, id?: string, article?: string) {
+  async findMatching(take?: number, skip?: number, id?: string, article?: string) {
     const values = [
-      { name: "id", value: id, alias: id },
-      { name: "article", value: article, alias: article },
-      { name: "institution", value: institutionId, alias: institutionId }
+      { name: "article", value: article, alias: article }
+      // { name: "institution", value: institutionId, alias: institutionId }
     ].filter(item => item.value !== undefined);
 
-    return this.itemRepository.findOneOrFail({
-      where: [...values.map(v => ({ [v.name]: v.alias }))]
+    return this.itemRepository.findAndCount({
+      where: id ? { id } : [...values.map(v => ({ [v.name]: Like("%" + v.alias + "%") }))],
+      take: id ? 1 : take ? take : 10,
+      skip: id ? 1 : skip ? skip : 0,
+      relations: ["institution"],
+      order: { name: "ASC" }
     });
   }
 
@@ -91,7 +94,7 @@ export class ItemService {
     });
     if (!foundInstitution) throw new BadRequestException(InstitutionErrors.institution_not_found);
 
-    const item = await this.getBy(itemId);
+    const item = await this.findMatching(undefined, undefined, itemId)[0];
     const itemImage = await this.imageService.uploadImage(imageBuffer, filename);
     await this.itemRepository.update(itemId, { imageId: itemImage.id });
 

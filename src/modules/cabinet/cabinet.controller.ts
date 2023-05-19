@@ -22,12 +22,13 @@ export class CabinetController {
   @ApiOperation({ summary: "Получение всех кабинетов" })
   @ApiResponse({ status: 200, description: "Найденные кабинеты (со всеми найденными в БД учителями и предметами)", type: [Cabinet] })
   @HttpCode(200)
-  async getAllCabinets(@Req() req: AuthedRequest) {
-    if (req.user.role === UserRoles.ADMIN) {
-      return this.cabinetService.getAll(req.user.id);
-    } else {
-      return this.cabinetService.getTeacherAll(req.user.id);
-    }
+  async getAllCabinets(@Req() req: AuthedRequest, @Query() { take, skip }) {
+    const [data, total] = req.user.role === UserRoles.ADMIN ? await this.cabinetService.getAdminAll(req.user.id, take, skip) : await this.cabinetService.getTeacherAll(req.user.id, take, skip);
+
+    return {
+      cabinets: data,
+      total
+    };
   }
 
   @Public()
@@ -37,8 +38,17 @@ export class CabinetController {
   @ApiQuery({ name: "cabinet", description: "Номер кабинета", required: false, type: String })
   @ApiResponse({ status: 200, description: "Найденный кабинет (со всеми найденными в БД учителями и предметами)", type: Cabinet })
   @HttpCode(200)
-  async getCabinetData(@Query("id") id?: string, @Query("cabinet") cabinet?: string) {
-    return this.cabinetService.get(id, cabinet);
+  async findCabinets(@Query() { take, skip }, @Query("id") id?: string, @Query("cabinet") cabinet?: string) {
+    const [data, total] = await this.cabinetService.get(take, skip, id, cabinet);
+
+    if (id) {
+      return data[0];
+    } else {
+      return {
+        cabinets: data,
+        total
+      };
+    }
   }
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
@@ -48,7 +58,7 @@ export class CabinetController {
   @HttpCode(201)
   async createCabinet(@Req() req: AuthedRequest, @Body() dto: CreateCabinetDTO) {
     const cabinet = await this.cabinetService.create(req.user.id, { ...dto, teachers: req.user.role !== UserRoles.ADMIN ? [String(req.user.id)] : [] });
-    return this.cabinetService.get(cabinet.id);
+    return this.cabinetService.get(undefined, undefined, cabinet.id);
   }
 
   // администратор или только учитель относящийся к своему кабинету
@@ -58,7 +68,7 @@ export class CabinetController {
   @ApiResponse({ status: 200, description: "Изменённый кабинет", type: Cabinet })
   @HttpCode(200)
   async editCabinet(@Req() req: AuthedRequest, @Body() dto: EditCabinetDTO) {
-    const cabinet = await this.cabinetService.get(dto.id);
+    const cabinet = await this.cabinetService.get(undefined, undefined, dto.id)[0];
     // console.log(cabinet);
     if (!cabinet) throw new BadRequestException(CabinetErrors.cabinet_not_found);
 
@@ -86,7 +96,7 @@ export class CabinetController {
   @ApiResponse({ status: 200, description: "Статус удален ли кабинет или не найден" })
   @HttpCode(200)
   async deleteCabinet(@Req() req: AuthedRequest, @Param("id") id: string) {
-    const cabinet = await this.cabinetService.get(id);
+    const cabinet = await this.cabinetService.get(undefined, undefined, id)[0];
     if ((req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) || req.user.role === UserRoles.ADMIN) {
       const result = await this.cabinetService.delete(id);
       return {

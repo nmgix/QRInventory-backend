@@ -17,8 +17,8 @@ export class InstitutionService {
     private userRepository: Repository<User>
   ) {}
 
-  getAdminInstitutions(id: string, full?: boolean) {
-    return this.institutionRepository.find({ where: { admin: { id } }, relations: full === true ? ["admin", "cabinets", "items", "teachers"] : [] });
+  getAdminInstitutions(id: string, take: number = 10, skip: number = 0, full?: boolean) {
+    return this.institutionRepository.findAndCount({ where: { admin: { id } }, relations: full === true ? ["admin", "cabinets", "items", "teachers"] : [], take, skip });
   }
 
   getInstitutionById(id: string, institutionId: string, full?: boolean) {

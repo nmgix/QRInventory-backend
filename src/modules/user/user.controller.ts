@@ -21,8 +21,12 @@ export class UserController {
   @ApiOperation({ summary: "Получение всех учителей" })
   @ApiResponse({ status: 200, description: "Все учителя", type: [User] })
   @HttpCode(200)
-  async getAllTeachers() {
-    return this.userService.getAllTeachers();
+  async getAllTeachers(@Query() { take, skip }) {
+    const [data, total] = await this.userService.getAllTeachers(take, skip);
+    return {
+      users: data,
+      total
+    };
   }
 
   @Public()
@@ -33,8 +37,18 @@ export class UserController {
   @ApiQuery({ name: "id", required: false, description: "Для запроса другого пользователя по id" })
   @ApiQuery({ name: "email", required: false, description: "Для запроса другого пользователя по email" })
   @HttpCode(200)
-  async getTeacher(@Query("fio") fio?: string, @Query("id") id?: string, @Query("email") email?: string) {
-    return this.userService.get(email, id, fio, false);
+  async getTeacher(@Query() { take, skip }, @Query("fio") fio?: string, @Query("id") id?: string, @Query("email") email?: string) {
+    const [data, total] = await this.userService.get(take, skip, email, id, fio, false);
+
+    if (id) {
+      return data[0];
+    } else {
+      return {
+        users: data,
+
+        total
+      };
+    }
   }
 
   @Roles(UserRoles.TEACHER, UserRoles.ADMIN)
@@ -43,7 +57,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: "Учитель или админ с привязанными учереждениями", type: User })
   @HttpCode(200)
   async getUser(@Req() req: AuthedRequest) {
-    return this.userService.get(undefined, req.user.id, undefined, req.user.role === UserRoles.ADMIN);
+    return this.userService.getById(req.user.id, req.user.role === UserRoles.ADMIN);
   }
 
   @Roles(UserRoles.ADMIN)

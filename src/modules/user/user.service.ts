@@ -19,29 +19,58 @@ export class UserService {
     private imageService: ImageService
   ) {}
 
-  getAllTeachers() {
-    return this.userRepository.find({ where: { role: UserRoles.TEACHER } });
+  getAllTeachers(take: number = 10, skip: number = 0) {
+    return this.userRepository.findAndCount({ where: { role: UserRoles.TEACHER }, take, skip });
   }
 
-  async get(email?: string, id?: string, fio?: string, admin?: boolean) {
+  async get(take?: number, skip?: number, email?: string, id?: string, fio?: string, admin?: boolean) {
     // https://github.com/typeorm/typeorm/issues/2500
     // https://stackoverflow.com/questions/71003990/excluding-undefined-field-values-in-mariadb-typeorm-queries
     const values = [
       { name: "email", value: email, alias: email },
-      { name: "id", value: id, alias: id },
       { name: "fullName", value: fio, alias: Like(`%${fio}%`) }
     ].filter(item => item.value !== undefined);
 
     if (admin) {
+      let result = await this.userRepository.findAndCount({
+        where: id ? { id } : [...values.map(v => ({ [v.name]: Like("%" + v.alias + "%") }))],
+        relations: ["institutions", "teacherInstitution"],
+        take: id ? 1 : take ? take : 10,
+        skip: id ? 0 : skip ? skip : 0
+      });
+      return [
+        result[0].map(u => {
+          if (u.role !== UserRoles.ADMIN) delete u.institutions;
+          return u;
+        }),
+        result[1]
+      ];
+    } else {
+      return this.userRepository.findAndCount({
+        where: [...values.map(v => ({ [v.name]: Like("%" + v.alias + "%"), role: Not(UserRoles.ADMIN) }))],
+        order: { fullName: "ASC" },
+        relations: ["teacherInstitution"],
+        take: id ? 1 : take ? take : 10,
+        skip: id ? 0 : skip ? skip : 0
+      });
+    }
+  }
+
+  async getById(id: string, admin?: boolean) {
+    // return this.userRepository.findOneOrFail({
+    //   where: { id: id },
+    //   relations: ["institutions", "teacherInstitution"]
+    // });
+    if (admin) {
       let user = await this.userRepository.findOneOrFail({
-        where: [...values.map(v => ({ [v.name]: v.alias }))],
+        where: { id: id },
         relations: ["institutions", "teacherInstitution"]
       });
       if (user.role !== UserRoles.ADMIN) delete user.institutions;
       return user;
     } else {
       return this.userRepository.findOneOrFail({
-        where: [...values.map(v => ({ [v.name]: v.alias, role: Not(UserRoles.ADMIN) }))],
+        where: { id: id, role: Not(UserRoles.ADMIN) },
         relations: ["teacherInstitution"]
       });
     }
@@ -71,7 +100,7 @@ export class UserService {
     if (Object.keys(data).length > 0) {
       return this.update(userId, data as unknown as Partial<User>);
     } else {
-      return this.get(undefined, userId, undefined, admin);
+      return this.getById(userId, admin);
     }
   }
 
@@ -97,7 +126,7 @@ export class UserService {
   }
 
   async addAvatar(userId: string, imageBuffer: Buffer, filename: string) {
-    const user = await this.get(undefined, userId, undefined, true);
+    const user = await this.getById(userId, true);
     const avatar = await this.imageService.uploadImage(imageBuffer, filename);
     await this.userRepository.update(userId, { avatarId: avatar.id });
 

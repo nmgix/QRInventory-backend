@@ -22,19 +22,32 @@ export class ItemController {
   @ApiOperation({ summary: "Получение всех предметов" })
   @ApiResponse({ status: 200, description: "Найденые предметы", type: [Item] })
   @HttpCode(200)
-  async getAllItems(@Req() req: AuthedRequest) {
-    return this.itemService.getAll(req.user.id);
+  async getAllItems(@Req() req: AuthedRequest, @Query() { take, skip }) {
+    const [data, total] = await this.itemService.getAll(req.user.id, take, skip);
+    return {
+      items: data,
+      total
+    };
   }
 
   @Public()
   @Get()
-  @ApiOperation({ summary: "Получение предмета по айди либо артикулу" })
-  @ApiResponse({ status: 200, description: "Найденый предмет", type: Item })
+  @ApiOperation({ summary: "Получение всех подходящих предметов по айди либо артикулу" })
+  @ApiResponse({ status: 200, description: "Найденые предметы", type: Item })
   @ApiQuery({ name: "id", description: "id получаемого предмета", required: false })
   @ApiQuery({ name: "article", description: "article получаемого предмета", required: false })
   @HttpCode(200)
-  async getById(@Query("id") id?: string, @Query("article") article?: string) {
-    return this.itemService.getBy(id, article);
+  async findItems(@Query() { take, skip }, @Query("id") id?: string, @Query("article") article?: string) {
+    const [data, total] = await this.itemService.findMatching(take, skip, id, article);
+
+    if (id) {
+      return data[0];
+    } else {
+      return {
+        items: data,
+        total
+      };
+    }
   }
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
