@@ -82,22 +82,24 @@ export class CabinetService {
       ]
     });
     if (!cabinet) throw new Error(CabinetErrors.cabinet_not_found);
+    let currentInstitution = await this.institutionRepository.findOne({ where: [{ admin: { id: userId } }, { teachers: { id: userId } }] });
+    let futureInstitution: Institution;
 
     if (dto.institution) {
-      let institution = await this.institutionRepository.findOne({ where: { id: dto.institution, admin: { id } } });
-      cabinet.institution = institution;
+      futureInstitution = await this.institutionRepository.findOne({ where: { id: dto.institution, admin: { id } } });
+      cabinet.institution = futureInstitution;
     }
 
     if (dto.cabinetNumber !== undefined) cabinet.cabinetNumber = dto.cabinetNumber;
     if (dto.teachers !== undefined) {
       // разобраться как можно передавать учителей и предметы без этих костылей
-      const teachers = await this.userRepository.findBy({ id: In(dto.teachers) });
+      const teachers = await this.userRepository.findBy({ id: In(dto.teachers), teacherInstitution: { id: futureInstitution ? futureInstitution.id : currentInstitution.id } });
       // и начать пользоваться repository.update({ id }, dto)
       cabinet.teachers = teachers;
     }
 
     if (dto.items !== undefined) {
-      const items = await this.itemRepository.findBy({ id: In(dto.items) });
+      const items = await this.itemRepository.findBy({ id: In(dto.items), institution: { id: futureInstitution ? futureInstitution.id : currentInstitution.id } });
       cabinet.items = items;
     }
 
