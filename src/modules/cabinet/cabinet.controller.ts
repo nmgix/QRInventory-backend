@@ -21,9 +21,11 @@ export class CabinetController {
   @Get("all")
   @ApiOperation({ summary: "Получение всех кабинетов" })
   @ApiResponse({ status: 200, description: "Найденные кабинеты (со всеми найденными в БД учителями и предметами)", type: [Cabinet] })
+  @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
+  @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
   @HttpCode(200)
-  async getAllCabinets(@Req() req: AuthedRequest, @Query() { take, skip }) {
-    const [data, total] = req.user.role === UserRoles.ADMIN ? await this.cabinetService.getAdminAll(req.user.id, take, skip) : await this.cabinetService.getTeacherAll(req.user.id, take, skip);
+  async getAllCabinets(@Req() req: AuthedRequest, @Query() { take, skip }, @Query("institution") institution: string) {
+    const [data, total] = req.user.role === UserRoles.ADMIN ? await this.cabinetService.getAdminAll(req.user.id, institution, take, skip) : await this.cabinetService.getTeacherAll(req.user.id, take, skip);
 
     return {
       cabinets: data,
@@ -36,6 +38,8 @@ export class CabinetController {
   @ApiOperation({ summary: "Поиск кабинета по id" })
   @ApiQuery({ name: "id", description: "Id кабинета", required: false })
   @ApiQuery({ name: "cabinet", description: "Номер кабинета", required: false, type: String })
+  @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
+  @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
   @ApiResponse({ status: 200, description: "Найденный кабинет (со всеми найденными в БД учителями и предметами)", type: Cabinet })
   @HttpCode(200)
   async findCabinets(@Query() { take, skip }, @Query("id") id?: string, @Query("cabinet") cabinet?: string) {
@@ -58,7 +62,8 @@ export class CabinetController {
   @HttpCode(201)
   async createCabinet(@Req() req: AuthedRequest, @Body() dto: CreateCabinetDTO) {
     const cabinet = await this.cabinetService.create(req.user.id, { ...dto, teachers: req.user.role !== UserRoles.ADMIN ? [String(req.user.id)] : [] });
-    return this.cabinetService.get(undefined, undefined, cabinet.id);
+    const createdCabinet = await this.cabinetService.get(undefined, undefined, cabinet.id);
+    return createdCabinet[0][0];
   }
 
   // администратор или только учитель относящийся к своему кабинету

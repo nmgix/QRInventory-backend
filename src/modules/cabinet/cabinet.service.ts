@@ -55,14 +55,14 @@ export class CabinetService {
     });
   }
 
-  async getAdminAll(userId: string, take: number = 10, skip: number = 0) {
-    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ["institutions"] });
-    const institutionsIds = user.institutions.map(i => i.id);
-    return this.cabinetRepository.findAndCount({ where: { institution: { id: In(institutionsIds) } }, take, skip });
+  async getAdminAll(userId: string, institution: string, take: number = 10, skip: number = 0) {
+    if (!institution) throw new BadRequestException(InstitutionErrors.institution_not_stated);
+    return this.cabinetRepository.findAndCount({ where: { institution: { id: institution, admin: { id: userId } } }, take, skip });
   }
 
-  async getTeacherAll(userId: string, take: number = 10, skip: number = 0) {
-    return this.cabinetRepository.findAndCount({ where: { teachers: { id: userId } }, take, skip });
+  async getTeacherAll(userId: string, institution: string, take: number = 10, skip: number = 0) {
+    if (!institution) throw new BadRequestException(InstitutionErrors.institution_not_stated);
+    return this.cabinetRepository.findAndCount({ where: { teachers: { id: userId }, institution: { id: institution } }, take, skip });
   }
 
   async update(id: string, dto: EditCabinetDTO): Promise<Cabinet | null> {

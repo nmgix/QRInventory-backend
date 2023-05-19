@@ -19,11 +19,14 @@ export class ItemController {
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
   @Get("all")
-  @ApiOperation({ summary: "Получение всех предметов" })
-  @ApiResponse({ status: 200, description: "Найденые предметы", type: [Item] })
   @HttpCode(200)
-  async getAllItems(@Req() req: AuthedRequest, @Query() { take, skip }) {
-    const [data, total] = await this.itemService.getAll(req.user.id, take, skip);
+  @ApiOperation({ summary: "Получение всех предметов" })
+  @ApiQuery({ name: "institution", required: true, description: "Учреждение по которому искать (id)" })
+  @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
+  @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
+  @ApiResponse({ status: 200, description: "Найденые предметы", type: [Item] })
+  async getAllItems(@Req() req: AuthedRequest, @Query() { take, skip }, @Query("institution") institution: string) {
+    const [data, total] = await this.itemService.getAll(req.user.id, institution, take, skip);
     return {
       items: data,
       total
@@ -32,11 +35,13 @@ export class ItemController {
 
   @Public()
   @Get()
+  @HttpCode(200)
   @ApiOperation({ summary: "Получение всех подходящих предметов по айди либо артикулу" })
-  @ApiResponse({ status: 200, description: "Найденые предметы", type: Item })
   @ApiQuery({ name: "id", description: "id получаемого предмета", required: false })
   @ApiQuery({ name: "article", description: "article получаемого предмета", required: false })
-  @HttpCode(200)
+  @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
+  @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
+  @ApiResponse({ status: 200, description: "Найденые предметы", type: Item })
   async findItems(@Query() { take, skip }, @Query("id") id?: string, @Query("article") article?: string) {
     const [data, total] = await this.itemService.findMatching(take, skip, id, article);
 

@@ -17,11 +17,13 @@ import { InstitutionService } from "./institution.service";
 export class InstitutionController {
   constructor(private institutionService: InstitutionService) {}
 
-  @ApiOperation({ summary: "Получение всех привязанных учреждений" })
-  @ApiResponse({ status: 200, description: "Привязанные учреждения", type: [Institution] })
-  // @ApiQuery({ required: false, name: "full", description: "Подгрузить все данные по учреждению (все кабинеты)", type: Boolean })
   @Get("all")
   @HttpCode(200)
+  @ApiOperation({ summary: "Получение всех привязанных учреждений" })
+  @ApiResponse({ status: 200, description: "Привязанные учреждения", type: [Institution] })
+  @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
+  @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
+  // @ApiQuery({ required: false, name: "full", description: "Подгрузить все данные по учреждению (все кабинеты)", type: Boolean })
   // @Query("full") full: string
   async getInstitutions(@Req() req: AuthedRequest, @Query() { take, skip }) {
     // Boolean(full)
@@ -32,13 +34,14 @@ export class InstitutionController {
     };
   }
 
-  @ApiOperation({ summary: "Получение привязанного учреждения по id" })
-  @ApiResponse({ status: 200, description: "Привязанное учреждение", type: Institution })
-  @ApiQuery({ required: false, name: "full", description: "Подгрузить все данные по учреждению (все кабинеты)", type: Boolean })
   @Get(":id")
   @HttpCode(200)
-  async getInstitutionById(@Req() req: AuthedRequest, @Param("id") id: string, @Query("full") full: string) {
-    return this.institutionService.getInstitutionById(req.user.id, id, Boolean(full));
+  @ApiOperation({ summary: "Получение привязанного учреждения по id" })
+  @ApiResponse({ status: 200, description: "Привязанное учреждение", type: Institution })
+  // @ApiQuery({ required: false, name: "full", description: "Подгрузить все данные по учреждению (все кабинеты)", type: Boolean })
+  // , @Query("full") full: string
+  async getInstitutionById(@Req() req: AuthedRequest, @Param("id") id: string) {
+    return this.institutionService.getInstitutionById(req.user.id, id);
   }
 
   @ApiOperation({ summary: "Создание нового учреждения" })

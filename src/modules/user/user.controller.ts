@@ -18,11 +18,14 @@ export class UserController {
 
   @Roles(UserRoles.ADMIN)
   @Get("all")
-  @ApiOperation({ summary: "Получение всех учителей" })
-  @ApiResponse({ status: 200, description: "Все учителя", type: [User] })
   @HttpCode(200)
-  async getAllTeachers(@Query() { take, skip }) {
-    const [data, total] = await this.userService.getAllTeachers(take, skip);
+  @ApiOperation({ summary: "Получение всех учителей" })
+  @ApiQuery({ name: "institution", required: true, description: "Учреждение по которому искать (id)" })
+  @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
+  @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
+  @ApiResponse({ status: 200, description: "Все учителя", type: [User] })
+  async getAllTeachers(@Query() { take, skip }, @Query("institution") institution: string) {
+    const [data, total] = await this.userService.getAllTeachers(institution, take, skip);
     return {
       users: data,
       total
@@ -31,12 +34,14 @@ export class UserController {
 
   @Public()
   @Get("search")
+  @HttpCode(200)
   @ApiOperation({ summary: "Получение учителя по id, либо fio" })
-  @ApiResponse({ status: 200, description: "Учитель, найденный в БД (либо null)", type: User })
   @ApiQuery({ name: "fio", required: false, description: "Для запроса другого пользователя по fio" })
   @ApiQuery({ name: "id", required: false, description: "Для запроса другого пользователя по id" })
   @ApiQuery({ name: "email", required: false, description: "Для запроса другого пользователя по email" })
-  @HttpCode(200)
+  @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
+  @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
+  @ApiResponse({ status: 200, description: "Учитель, найденный в БД (либо null)", type: User })
   async getTeacher(@Query() { take, skip }, @Query("fio") fio?: string, @Query("id") id?: string, @Query("email") email?: string) {
     const [data, total] = await this.userService.get(take, skip, email, id, fio, false);
 

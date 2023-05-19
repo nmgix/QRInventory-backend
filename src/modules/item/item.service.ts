@@ -17,9 +17,13 @@ export class ItemService {
     private institutionRepository: Repository<Institution>
   ) {}
 
-  async getAll(userId: string, take: number = 10, skip: number = 0) {
+  async getAll(userId: string, institution: string, take: number = 10, skip: number = 0) {
+    if (!institution) throw new BadRequestException(InstitutionErrors.institution_not_stated);
     let foundInstitution = await this.institutionRepository.findOne({
-      where: [{ admin: { id: userId } }, { teachers: { id: userId } }]
+      where: [
+        { admin: { id: userId }, id: institution },
+        { teachers: { id: userId }, id: institution }
+      ]
     });
     if (!foundInstitution) throw new BadRequestException(InstitutionErrors.institution_not_found);
 

@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Like, Not, Repository } from "typeorm";
 import { AuthService } from "../auth/auth.service";
@@ -19,8 +19,11 @@ export class UserService {
     private imageService: ImageService
   ) {}
 
-  getAllTeachers(take: number = 10, skip: number = 0) {
-    return this.userRepository.findAndCount({ where: { role: UserRoles.TEACHER }, take, skip });
+  async getAllTeachers(teacherInstitution: string, take: number = 10, skip: number = 0) {
+    if (!teacherInstitution) throw new BadRequestException(InstitutionErrors.institution_not_stated);
+    let institution = await this.institutionRepository.findOne({ where: { id: teacherInstitution } });
+    if (!institution) throw new Error(InstitutionErrors.institution_not_found);
+    return this.userRepository.findAndCount({ where: { role: UserRoles.TEACHER, teacherInstitution: { id: institution.id } }, take, skip });
   }
 
   async get(take?: number, skip?: number, email?: string, id?: string, fio?: string, admin?: boolean) {
