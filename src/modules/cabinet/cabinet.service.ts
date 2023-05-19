@@ -33,12 +33,12 @@ export class CabinetService {
 
     if (user.role === UserRoles.TEACHER) dto.teachers.length > 0 ? dto.teachers.push(id) : (dto.teachers = [id]);
     if (dto.teachers) {
-      const teachers = await this.userRepository.findBy({ id: In(dto.teachers) });
+      const teachers = await this.userRepository.findBy({ id: In(dto.teachers), teacherInstitution: { id: institution.id } });
       cabinet.teachers = teachers;
     }
 
     if (dto.items !== undefined) {
-      const items = await this.itemRepository.findBy({ id: In(dto.items) });
+      const items = await this.itemRepository.findBy({ id: In(dto.items), institution: { id: institution.id } });
       cabinet.items = items;
     }
     return this.cabinetRepository.save(cabinet);
