@@ -25,8 +25,7 @@ export class CabinetController {
   @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
   @HttpCode(200)
   async getAllCabinets(@Req() req: AuthedRequest, @Query() { take, skip }, @Query("institution") institution: string) {
-    const [data, total] = req.user.role === UserRoles.ADMIN ? await this.cabinetService.getAdminAll(req.user.id, institution, take, skip) : await this.cabinetService.getTeacherAll(req.user.id, take, skip);
-
+    const [data, total] = req.user.role === UserRoles.ADMIN ? await this.cabinetService.getAdminAll(req.user.id, institution, take, skip) : await this.cabinetService.getTeacherAll(req.user.id, institution, take, skip);
     return {
       cabinets: data,
       total
@@ -44,7 +43,6 @@ export class CabinetController {
   @HttpCode(200)
   async findCabinets(@Query() { take, skip }, @Query("id") id?: string, @Query("cabinet") cabinet?: string) {
     const [data, total] = await this.cabinetService.get(take, skip, id, cabinet);
-
     if (id) {
       return data[0];
     } else {
@@ -61,31 +59,30 @@ export class CabinetController {
   @ApiResponse({ status: 201, description: "Созданный кабинет (со всеми найденными в БД учителями и предметами)", type: Cabinet })
   @HttpCode(201)
   async createCabinet(@Req() req: AuthedRequest, @Body() dto: CreateCabinetDTO) {
+    // здесь привязывать к колледжу
     const cabinet = await this.cabinetService.create(req.user.id, { ...dto, teachers: req.user.role !== UserRoles.ADMIN ? [String(req.user.id)] : [] });
-    const createdCabinet = await this.cabinetService.get(undefined, undefined, cabinet.id);
-    return createdCabinet[0][0];
+    const [data, total] = await this.cabinetService.get(undefined, undefined, cabinet.id);
+    return data[0];
   }
 
-  // администратор или только учитель относящийся к своему кабинету
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
   @Patch("edit")
   @ApiOperation({ summary: "Изменение кабинета, учителя передавать в массиве учителей не надо" })
   @ApiResponse({ status: 200, description: "Изменённый кабинет", type: Cabinet })
   @HttpCode(200)
   async editCabinet(@Req() req: AuthedRequest, @Body() dto: EditCabinetDTO) {
-    const cabinet = await this.cabinetService.get(undefined, undefined, dto.id)[0];
-    // console.log(cabinet);
+    const [data, total] = await this.cabinetService.get(undefined, undefined, dto.id);
+    const cabinet = data[0];
     if (!cabinet) throw new BadRequestException(CabinetErrors.cabinet_not_found);
-
-    // сырая имплементация, лучше потом уберу роли и оставлю про по правам изменения, #PoliciesGuard https://docs-nestjs.netlify.app/security/authorization
+    // здесь проверять что админ/учитель привязан к этому колледжу этого кабинета
     if ((req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) || req.user.role === UserRoles.ADMIN) {
       if (req.user.role === UserRoles.TEACHER) {
         const userInTeachers = dto.teachers?.find(teacherId => teacherId === req.user.id);
         const teachers = dto.teachers ? (userInTeachers ? dto.teachers : [...dto.teachers, req.user.id]) : undefined;
-        return this.cabinetService.update(req.user.id, { ...dto, teachers });
+        return this.cabinetService.update(req.user.id, dto.id, { ...dto, teachers });
       } else if (req.user.role === UserRoles.ADMIN) {
         const teachers = dto.teachers?.filter(teacherId => teacherId !== req.user.id);
-        return this.cabinetService.update(req.user.id, { ...dto, teachers });
+        return this.cabinetService.update(req.user.id, dto.id, { ...dto, teachers });
       } else {
         throw new ForbiddenException(AuthErrors.access_denied);
       }
@@ -101,9 +98,10 @@ export class CabinetController {
   @ApiResponse({ status: 200, description: "Статус удален ли кабинет или не найден" })
   @HttpCode(200)
   async deleteCabinet(@Req() req: AuthedRequest, @Param("id") id: string) {
-    const cabinet = await this.cabinetService.get(undefined, undefined, id)[0];
+    const [data, total] = await this.cabinetService.get(undefined, undefined, id);
+    const cabinet = data[0];
     if ((req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) || req.user.role === UserRoles.ADMIN) {
-      const result = await this.cabinetService.delete(id);
+      const result = await this.cabinetService.delete(req.user.id, id);
       return {
         message: result.affected > 0 ? CabinetMessages.cabinet_deleted : CabinetErrors.cabinet_not_found
       };

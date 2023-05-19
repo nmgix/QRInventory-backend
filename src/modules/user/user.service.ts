@@ -23,24 +23,21 @@ export class UserService {
     if (!teacherInstitution) throw new BadRequestException(InstitutionErrors.institution_not_stated);
     let institution = await this.institutionRepository.findOne({ where: { id: teacherInstitution } });
     if (!institution) throw new Error(InstitutionErrors.institution_not_found);
-    return this.userRepository.findAndCount({ where: { role: UserRoles.TEACHER, teacherInstitution: { id: institution.id } }, take, skip });
+    return this.userRepository.createQueryBuilder("user").leftJoinAndSelect("user.teacherInstitution", "institution").where("user.teacherInstitution.id = :teacherInstitution", { teacherInstitution }).offset(skip).limit(take).getManyAndCount();
   }
 
   async get(take?: number, skip?: number, email?: string, id?: string, fio?: string, admin?: boolean) {
-    // https://github.com/typeorm/typeorm/issues/2500
-    // https://stackoverflow.com/questions/71003990/excluding-undefined-field-values-in-mariadb-typeorm-queries
-    const values = [
-      { name: "email", value: email, alias: email },
-      { name: "fullName", value: fio, alias: Like(`%${fio}%`) }
-    ].filter(item => item.value !== undefined);
-
     if (admin) {
-      let result = await this.userRepository.findAndCount({
-        where: id ? { id } : [...values.map(v => ({ [v.name]: Like("%" + v.alias + "%") }))],
-        relations: ["institutions", "teacherInstitution"],
-        take: id ? 1 : take ? take : 10,
-        skip: id ? 0 : skip ? skip : 0
-      });
+      let result = await this.userRepository
+        .createQueryBuilder("user")
+        .where("user.email LIKE :email OR user.fullName LIKE :fullName OR user.id = :id", { id, email: `%${email}%`, fullName: `%${fio}%` })
+        .leftJoinAndSelect("user.institutions", "institution")
+        .leftJoinAndSelect("user.teacherInstitution", "teacherInstitution")
+        .offset(id ? 1 : skip ? skip : 0)
+        .limit(id ? 1 : take ? take : 10)
+        .orderBy()
+        .getManyAndCount();
+
       return [
         result[0].map(u => {
           if (u.role !== UserRoles.ADMIN) delete u.institutions;
@@ -49,21 +46,18 @@ export class UserService {
         result[1]
       ];
     } else {
-      return this.userRepository.findAndCount({
-        where: [...values.map(v => ({ [v.name]: Like("%" + v.alias + "%"), role: Not(UserRoles.ADMIN) }))],
-        order: { fullName: "ASC" },
-        relations: ["teacherInstitution"],
-        take: id ? 1 : take ? take : 10,
-        skip: id ? 0 : skip ? skip : 0
-      });
+      return this.userRepository
+        .createQueryBuilder("user")
+        .where("(user.email LIKE :email OR user.fullName LIKE :fullName OR user.id = :id) AND user.role != :role", { id, email: `%${email}%`, fullName: `%${fio}%`, role: UserRoles.ADMIN })
+        .leftJoinAndSelect("user.teacherInstitution", "teacherInstitution")
+        .offset(id ? 1 : skip ? skip : 0)
+        .limit(id ? 1 : take ? take : 10)
+        .orderBy()
+        .getManyAndCount();
     }
   }
 
   async getById(id: string, admin?: boolean) {
-    // return this.userRepository.findOneOrFail({
-    //   where: { id: id },
-    //   relations: ["institutions", "teacherInstitution"]
-    // });
     if (admin) {
       let user = await this.userRepository.findOneOrFail({
         where: { id: id },

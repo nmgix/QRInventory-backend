@@ -27,22 +27,18 @@ export class ItemService {
     });
     if (!foundInstitution) throw new BadRequestException(InstitutionErrors.institution_not_found);
 
-    return this.itemRepository.findAndCount({ where: { institution: { id: foundInstitution.id } }, take, skip });
+    return this.itemRepository.createQueryBuilder("item").leftJoinAndSelect("item.institution", "institution").where("item.institution.id = :institution", { institution }).offset(skip).limit(take).getManyAndCount();
   }
 
   async findMatching(take?: number, skip?: number, id?: string, article?: string) {
-    const values = [
-      { name: "article", value: article, alias: article }
-      // { name: "institution", value: institutionId, alias: institutionId }
-    ].filter(item => item.value !== undefined);
-
-    return this.itemRepository.findAndCount({
-      where: id ? { id } : [...values.map(v => ({ [v.name]: Like("%" + v.alias + "%") }))],
-      take: id ? 1 : take ? take : 10,
-      skip: id ? 1 : skip ? skip : 0,
-      relations: ["institution"],
-      order: { name: "ASC" }
-    });
+    return this.itemRepository
+      .createQueryBuilder("item")
+      .where("item.article LIKE :article or item.id = :id", { id, article: `%${article}%` })
+      .leftJoinAndSelect("item.institution", "institution")
+      .offset(id ? 1 : skip ? skip : 0)
+      .limit(id ? 1 : take ? take : 10)
+      .orderBy()
+      .getManyAndCount();
   }
 
   async create(userId: string, item: CreateItemDTO) {

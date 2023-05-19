@@ -45,28 +45,42 @@ export class CabinetService {
   }
 
   async get(take?: number, skip?: number, id?: string, cabinet?: string) {
-    const values = [{ name: "cabinetNumber", value: cabinet, alias: cabinet }].filter(item => item.value !== undefined);
-
-    return this.cabinetRepository.findAndCount({
-      where: id ? { id } : [...values.map(v => ({ [v.name]: Like("%" + v.alias + "%") }))],
-      take: id ? 1 : take ? take : 10,
-      skip: id ? 0 : skip ? skip : 0,
-      order: { id: "ASC" }
-    });
+    return this.cabinetRepository
+      .createQueryBuilder("cabinet")
+      .where("cabinet.cabinetNumber LIKE :cabinetNumber OR cabinet.id = :id", { id, cabinetNumber: `%${cabinet}%` })
+      .offset(id ? 0 : skip ? skip : 0)
+      .limit(id ? 1 : take ? take : 10)
+      .leftJoinAndSelect("cabinet.teachers", "user")
+      .leftJoinAndSelect("cabinet.items", "item")
+      .getManyAndCount();
   }
 
   async getAdminAll(userId: string, institution: string, take: number = 10, skip: number = 0) {
     if (!institution) throw new BadRequestException(InstitutionErrors.institution_not_stated);
-    return this.cabinetRepository.findAndCount({ where: { institution: { id: institution, admin: { id: userId } } }, take, skip });
+    return this.cabinetRepository.createQueryBuilder("cabinet").leftJoinAndSelect("cabinet.institution", "institution").where("institution.id = :institutionId AND institution.admin.id = :adminId", { institutionId: institution, adminId: userId }).offset(skip).limit(take).getManyAndCount();
   }
 
   async getTeacherAll(userId: string, institution: string, take: number = 10, skip: number = 0) {
+    console.log("отрабатываем");
     if (!institution) throw new BadRequestException(InstitutionErrors.institution_not_stated);
-    return this.cabinetRepository.findAndCount({ where: { teachers: { id: userId }, institution: { id: institution } }, take, skip });
+    // return this.cabinetRepository.findAndCount({ where: { teachers: { id: userId }, institution: { id: institution } }, take, skip });
+    return this.cabinetRepository
+      .createQueryBuilder("cabinet")
+      .leftJoinAndSelect("cabinet.institution", "institution")
+      .leftJoin("cabinet.teachers", "teachers")
+      .where("institution.id = :institutionId AND teachers.id = :teacherId", { institutionId: institution, teacherId: userId })
+      .offset(skip)
+      .limit(take)
+      .getManyAndCount();
   }
 
-  async update(id: string, dto: EditCabinetDTO): Promise<Cabinet | null> {
-    const cabinet = await this.cabinetRepository.findOne({ where: { id: dto.id } });
+  async update(userId: string, id: string, dto: EditCabinetDTO): Promise<Cabinet | null> {
+    const cabinet = await this.cabinetRepository.findOne({
+      where: [
+        { id: dto.id, institution: { admin: { id: userId } } },
+        { id: dto.id, teachers: { id: userId } }
+      ]
+    });
     if (!cabinet) throw new Error(CabinetErrors.cabinet_not_found);
 
     if (dto.institution) {
@@ -90,7 +104,14 @@ export class CabinetService {
     return this.cabinetRepository.save(cabinet);
   }
 
-  async delete(id: string) {
+  async delete(userId: string, id: string) {
+    const cabinet = await this.cabinetRepository.findOne({
+      where: [
+        { id, institution: { admin: { id: userId } } },
+        { id, teachers: { id: userId } }
+      ]
+    });
+    if (!cabinet) throw new Error(CabinetErrors.cabinet_not_found);
     return this.cabinetRepository.delete(id);
   }
 

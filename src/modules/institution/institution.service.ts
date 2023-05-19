@@ -17,12 +17,15 @@ export class InstitutionService {
     private userRepository: Repository<User>
   ) {}
 
-  getAdminInstitutions(id: string, take: number = 10, skip: number = 0, full?: boolean) {
-    return this.institutionRepository.findAndCount({ where: { admin: { id } }, relations: full === true ? ["admin", "cabinets", "items", "teachers"] : [], take, skip });
+  getAdminInstitutions(id: string, take: number = 10, skip: number = 0) {
+    // full?: boolean
+    return this.institutionRepository.createQueryBuilder("institution").leftJoin("institution.admin", "user").where("user.id = :admin", { admin: id }).offset(skip).limit(take).getManyAndCount();
   }
 
-  getInstitutionById(id: string, institutionId: string, full?: boolean) {
-    return this.institutionRepository.findOneOrFail({ where: { admin: { id }, id: institutionId }, relations: full === true ? ["admin", "cabinets", "items", "teachers"] : [] });
+  getInstitutionById(id: string, institutionId: string) {
+    // full?: boolean
+    // relations: full === true ? ["admin", "cabinets", "items", "teachers"] : []
+    return this.institutionRepository.findOneOrFail({ where: { admin: { id }, id: institutionId } });
   }
 
   async createInstitution(id: string, dto: CreateInstitutionDTO) {
