@@ -9,6 +9,7 @@ import { JwtService } from "@nestjs/jwt";
 import { Reflector } from "@nestjs/core";
 import { AuthService } from "../auth/auth.service";
 import { ClassSerializerInterceptor } from "@nestjs/common";
+import { NodeENV } from "helpers/types";
 
 export default async function appSetup(app: NestExpressApplication) {
   const configService: ConfigService = app.get(ConfigService);
@@ -16,7 +17,9 @@ export default async function appSetup(app: NestExpressApplication) {
   const authService: AuthService = app.get(AuthService);
   const reflector = new Reflector();
   app.enableCors({ credentials: true, origin: true, methods: "GET, POST, DELETE, HEAD, OPTIONS" });
-  app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+  if (process.env.NODE_ENV === NodeENV.prod) {
+    app.use(rateLimit({ windowMs: 60 * 1000, max: 50 }));
+  }
   app.use(cookieParser(configService.get("JWT_COOKIE")));
   app.useGlobalPipes(formatErrorPipe);
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
