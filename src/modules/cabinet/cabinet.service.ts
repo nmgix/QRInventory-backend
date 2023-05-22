@@ -57,7 +57,15 @@ export class CabinetService {
 
   async getAdminAll(userId: string, institution: string, take: number = 10, skip: number = 0) {
     if (!institution) throw new BadRequestException(InstitutionErrors.institution_not_stated);
-    return this.cabinetRepository.createQueryBuilder("cabinet").leftJoinAndSelect("cabinet.institution", "institution").where("institution.id = :institutionId AND institution.admin.id = :adminId", { institutionId: institution, adminId: userId }).offset(skip).limit(take).getManyAndCount();
+    return this.cabinetRepository
+      .createQueryBuilder("cabinet")
+      .leftJoinAndSelect("cabinet.institution", "institution")
+      .where("institution.id = :institutionId AND institution.admin.id = :adminId", { institutionId: institution, adminId: userId })
+      .leftJoinAndSelect("cabinet.teachers", "teachers")
+      .leftJoinAndSelect("cabinet.items", "items")
+      .offset(skip)
+      .limit(take)
+      .getManyAndCount();
   }
 
   async getTeacherAll(userId: string, institution: string, take: number = 10, skip: number = 0) {
@@ -67,7 +75,8 @@ export class CabinetService {
     return this.cabinetRepository
       .createQueryBuilder("cabinet")
       .leftJoinAndSelect("cabinet.institution", "institution")
-      .leftJoin("cabinet.teachers", "teachers")
+      .leftJoinAndSelect("cabinet.teachers", "teachers")
+      .leftJoinAndSelect("cabinet.items", "items")
       .where("institution.id = :institutionId AND teachers.id = :teacherId", { institutionId: institution, teacherId: userId })
       .offset(skip)
       .limit(take)

@@ -19,7 +19,16 @@ export class InstitutionService {
 
   getAdminInstitutions(id: string, take: number = 10, skip: number = 0) {
     // full?: boolean
-    return this.institutionRepository.createQueryBuilder("institution").leftJoin("institution.admin", "user").where("user.id = :admin", { admin: id }).offset(skip).limit(take).getManyAndCount();
+    return this.institutionRepository
+      .createQueryBuilder("institution")
+      .leftJoin("institution.admin", "user")
+      .loadRelationCountAndMap("institution.teachers", "institution.teachers")
+      .loadRelationCountAndMap("institution.items", "institution.items")
+      .loadRelationCountAndMap("institution.cabinets", "institution.cabinets")
+      .where("user.id = :admin", { admin: id })
+      .offset(skip)
+      .limit(take)
+      .getManyAndCount();
   }
 
   getInstitutionById(id: string, institutionId: string) {
