@@ -45,7 +45,7 @@ export class UserController {
   @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
   @ApiResponse({ status: 200, description: "Учитель, найденный в БД (либо null)", type: User })
   async getTeacher(@Query() { take, skip }, @Query("fio") fio?: string, @Query("institution") institution?: string, @Query("id") id?: string, @Query("email") email?: string) {
-    if (!id && !institution) throw new BadRequestException(ItemErrors.no_id_no_institution);
+    if (!id && !institution) throw new BadRequestException(UserErrors.no_id_no_institution);
     const [data, total] = await this.userService.get(institution, take, skip, email, id, fio, false);
 
     if (id) {

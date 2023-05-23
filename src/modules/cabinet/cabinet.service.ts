@@ -1,6 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { InstitutionErrors } from "modules/institution/institution.i18n";
+import { ItemErrors } from "modules/item/item.i18n";
 import { In, Like, QueryFailedError, Repository } from "typeorm";
 import { AuthErrors } from "../auth/auth.i18n";
 import { Institution } from "../institution/institution.entity";
@@ -44,15 +45,21 @@ export class CabinetService {
     return this.cabinetRepository.save(cabinet);
   }
 
-  async get(take?: number, skip?: number, id?: string, cabinet?: string) {
-    return this.cabinetRepository
-      .createQueryBuilder("cabinet")
-      .where("cabinet.cabinetNumber LIKE :cabinetNumber OR cabinet.id = :id", { id, cabinetNumber: `%${cabinet}%` })
-      .offset(id ? 0 : skip ? skip : 0)
-      .limit(id ? 1 : take ? take : 10)
-      .leftJoinAndSelect("cabinet.teachers", "user")
-      .leftJoinAndSelect("cabinet.items", "item")
-      .getManyAndCount();
+  async get(institutionId?: string, take?: number, skip?: number, id?: string, cabinet?: string) {
+    if (!id && !institutionId) throw new BadRequestException(CabinetErrors.no_id_no_institution);
+    if (id) {
+      const cabinet = await this.cabinetRepository.findOne({ where: { id: id }, relations: ["items", "teachers"] });
+      return [[cabinet], 1];
+    } else {
+      return this.cabinetRepository
+        .createQueryBuilder("cabinet")
+        .where("(cabinet.cabinetNumber LIKE :cabinetNumber OR cabinet.id = :id) and cabinet.institution = :institutionId", { id, cabinetNumber: `%${cabinet}%`, institutionId })
+        .offset(id ? 0 : skip ? skip : 0)
+        .limit(id ? 1 : take ? take : 10)
+        .leftJoinAndSelect("cabinet.teachers", "user")
+        .leftJoinAndSelect("cabinet.items", "item")
+        .getManyAndCount();
+    }
   }
 
   async getAdminAll(userId: string, institution: string, take: number = 10, skip: number = 0) {
@@ -69,9 +76,7 @@ export class CabinetService {
   }
 
   async getTeacherAll(userId: string, institution: string, take: number = 10, skip: number = 0) {
-    console.log("отрабатываем");
     if (!institution) throw new BadRequestException(InstitutionErrors.institution_not_stated);
-    // return this.cabinetRepository.findAndCount({ where: { teachers: { id: userId }, institution: { id: institution } }, take, skip });
     return this.cabinetRepository
       .createQueryBuilder("cabinet")
       .leftJoinAndSelect("cabinet.institution", "institution")

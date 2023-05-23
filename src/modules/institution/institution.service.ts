@@ -48,7 +48,6 @@ export class InstitutionService {
     if (!institution) throw new Error(InstitutionErrors.institution_not_found);
 
     if (dto.teachers) {
-      console.log(dto.teachers);
       const teachers = await this.userRepository.findBy({ id: In(dto.teachers) });
       institution.teachers = teachers;
     }

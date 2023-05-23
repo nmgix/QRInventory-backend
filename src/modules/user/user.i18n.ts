@@ -33,5 +33,7 @@ export enum UserErrors {
   cant_pass_institutions = "Нельзя изменить учреждения данным методом",
   cant_pass_refreshToken = "Нельзя изменить refresh-токен данным методом",
 
-  image_upload_error = "Произошла ошибка при загрузке фотографии"
+  image_upload_error = "Произошла ошибка при загрузке фотографии",
+
+  no_id_no_institution = "Не указан id, в таком случае необходим id учреждения"
 }

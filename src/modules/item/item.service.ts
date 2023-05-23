@@ -32,6 +32,7 @@ export class ItemService {
   }
 
   async findMatching(institutionId?: string, take?: number, skip?: number, id?: string, article?: string) {
+    if (!id && !institutionId) throw new BadRequestException(ItemErrors.no_id_no_institution);
     if (id) {
       const item = await this.itemRepository.findOne({ where: { id }, relations: ["institution"] });
       return [[item], 1];
@@ -112,7 +113,6 @@ export class ItemService {
       }
       return itemImage;
     } catch (error) {
-      console.log(error);
       await this.itemRepository.update(itemId, { imageId: null });
       throw new Error(ImageErrors.image_upload_error);
     }

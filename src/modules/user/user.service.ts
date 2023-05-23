@@ -7,6 +7,7 @@ import { ImageService } from "../database/image.service";
 import { Institution } from "modules/institution/institution.entity";
 import { InstitutionErrors } from "modules/institution/institution.i18n";
 import { ImageErrors } from "modules/database/image.i18n";
+import { UserErrors } from "./user.i18n";
 
 @Injectable()
 export class UserService {
@@ -42,8 +43,6 @@ export class UserService {
           .limit(id ? 1 : take ? take : 10)
           .orderBy()
           .getManyAndCount();
-
-        console.log(result);
 
         return [
           result[0].map(u => {
@@ -104,8 +103,6 @@ export class UserService {
       await this.authService.updatePassword(data);
     }
 
-    console.log(data);
-
     delete data.id;
     delete data.oldPassword;
     delete data.newPassword;
@@ -120,8 +117,6 @@ export class UserService {
   }
 
   async update(userId: string, data: Partial<User>) {
-    // console.log("data");
-    // console.log(data);
     return this.userRepository.update({ id: userId }, data);
   }
 

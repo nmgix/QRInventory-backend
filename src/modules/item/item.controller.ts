@@ -45,7 +45,6 @@ export class ItemController {
   @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
   @ApiResponse({ status: 200, description: "Найденые предметы", type: Item })
   async findItems(@Query() { take, skip }, @Query("institution") institution?: string, @Query("id") id?: string, @Query("article") article?: string) {
-    if (!id && !institution) throw new BadRequestException(ItemErrors.no_id_no_institution);
     const [data, total] = await this.itemService.findMatching(institution, take, skip, id, article);
 
     if (id) {
