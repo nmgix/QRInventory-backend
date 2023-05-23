@@ -1,15 +1,12 @@
-import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { InstitutionErrors } from "modules/institution/institution.i18n";
-import { ItemErrors } from "modules/item/item.i18n";
-import { In, Like, QueryFailedError, Repository } from "typeorm";
-import { AuthErrors } from "../auth/auth.i18n";
+import { In, Repository } from "typeorm";
 import { Institution } from "../institution/institution.entity";
 import { Item } from "../item/item.entity";
 import { User, UserRoles } from "../user/user.entity";
-import { UserErrors } from "../user/user.i18n";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
-import { CabinetErrors, CabinetMessages } from "./cabinet.i18n";
+import { CabinetErrors } from "./cabinet.i18n";
 
 @Injectable()
 export class CabinetService {
@@ -129,9 +126,5 @@ export class CabinetService {
     });
     if (!cabinet) throw new Error(CabinetErrors.cabinet_not_found);
     return this.cabinetRepository.delete(id);
-  }
-
-  async clearTable() {
-    return this.cabinetRepository.delete({});
   }
 }

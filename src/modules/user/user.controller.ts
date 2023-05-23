@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Get, Param, Delete, HttpCode, UseFilters, Req, Query, ForbiddenException, BadRequestException, UseInterceptors, UploadedFile, Patch, UsePipes, ClassSerializerInterceptor, ParseFilePipe, FileTypeValidator, MaxFileSizeValidator } from "@nestjs/common";
+import { Controller, Body, Post, Get, Param, Delete, HttpCode, UseFilters, Req, Query, BadRequestException, UseInterceptors, UploadedFile, Patch, ParseFilePipe, FileTypeValidator, MaxFileSizeValidator } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/global.exceptions";
 import { Roles } from "../roles/roles.decorator";
@@ -9,7 +9,6 @@ import { UserService } from "./user.service";
 import { Public } from "../auth/auth.decorator";
 import { AuthedRequest } from "../auth/types";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { ItemErrors } from "modules/item/item.i18n";
 
 @ApiTags(UserSwagger.tag)
 @Controller("user")

@@ -1,13 +1,12 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query, Req, UseFilters, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Param, Patch, Post, Query, Req, UseFilters } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { InstitutionSwagger } from "../../documentation/institution.docs";
 import { GlobalException } from "../../helpers/global.exceptions";
-import { Public } from "../auth/auth.decorator";
 import { AuthedRequest } from "../auth/types";
 import { Roles } from "../roles/roles.decorator";
 import { UserRoles } from "../user/user.entity";
 import { CreateInstitutionDTO, EditInstitutionDTO, Institution } from "./institution.entity";
-import { InstitutionErrors, InstitutionMessages } from "./institution.i18n";
+import { InstitutionErrors } from "./institution.i18n";
 import { InstitutionService } from "./institution.service";
 
 @ApiTags(InstitutionSwagger.tag)
@@ -23,10 +22,7 @@ export class InstitutionController {
   @ApiResponse({ status: 200, description: "Привязанные учреждения", type: [Institution] })
   @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
   @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
-  // @ApiQuery({ required: false, name: "full", description: "Подгрузить все данные по учреждению (все кабинеты)", type: Boolean })
-  // @Query("full") full: string
   async getInstitutions(@Req() req: AuthedRequest, @Query() { take, skip }) {
-    // Boolean(full)
     const [data, total] = await this.institutionService.getAdminInstitutions(req.user.id, take, skip);
     return {
       institutions: data,
@@ -38,8 +34,6 @@ export class InstitutionController {
   @HttpCode(200)
   @ApiOperation({ summary: "Получение привязанного учреждения по id" })
   @ApiResponse({ status: 200, description: "Привязанное учреждение", type: Institution })
-  // @ApiQuery({ required: false, name: "full", description: "Подгрузить все данные по учреждению (все кабинеты)", type: Boolean })
-  // , @Query("full") full: string
   async getInstitutionById(@Req() req: AuthedRequest, @Param("id") id: string) {
     return this.institutionService.getInstitutionById(req.user.id, id);
   }
@@ -58,13 +52,13 @@ export class InstitutionController {
     return this.institutionService.editInstitution(req.user.id, dto);
   }
 
-  @ApiOperation({ summary: "Удаление учреждения по id" })
-  @ApiResponse({ status: 200, description: "Статус удалено ли учреждение или не найдено" })
-  @Delete(":id")
-  async deleteInstitution(@Req() req: AuthedRequest, @Param("id") id: string) {
-    const result = await this.institutionService.deleteInstitution(req.user.id, id);
-    return {
-      message: result.affected > 0 ? InstitutionMessages.institution_deleted : InstitutionErrors.institution_not_found
-    };
-  }
+  // @ApiOperation({ summary: "Удаление учреждения по id" })
+  // @ApiResponse({ status: 200, description: "Статус удалено ли учреждение или не найдено" })
+  // @Delete(":id")
+  // async deleteInstitution(@Req() req: AuthedRequest, @Param("id") id: string) {
+  //   const result = await this.institutionService.deleteInstitution(req.user.id, id);
+  //   return {
+  //     message: result.affected > 0 ? InstitutionMessages.institution_deleted : InstitutionErrors.institution_not_found
+  //   };
+  // }
 }

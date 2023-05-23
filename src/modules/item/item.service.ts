@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ImageErrors } from "modules/database/image.i18n";
 import { Institution } from "modules/institution/institution.entity";
@@ -86,13 +86,14 @@ export class ItemService {
       where: [{ admin: { id: userId } }, { teachers: { id: userId } }]
     });
     if (!foundInstitution) throw new BadRequestException(InstitutionErrors.institution_not_found);
-    const item = await this.itemRepository.findOne({ where: [{ id: searchString }, { article: searchString }] });
+    const item = await this.itemRepository.findOne({
+      where: [
+        { id: searchString, institution: { id: foundInstitution.id } },
+        { article: searchString, institution: { id: foundInstitution.id } }
+      ]
+    });
     if (!item) throw new BadRequestException(ItemErrors.item_not_found);
     return this.itemRepository.delete({ id: item.id });
-  }
-
-  async clearTable() {
-    return this.itemRepository.delete({});
   }
 
   async addImage(userId: string, itemId: string, imageBuffer: Buffer, filename: string) {

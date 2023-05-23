@@ -18,7 +18,6 @@ export class InstitutionService {
   ) {}
 
   getAdminInstitutions(id: string, take: number = 10, skip: number = 0) {
-    // full?: boolean
     return this.institutionRepository
       .createQueryBuilder("institution")
       .leftJoin("institution.admin", "user")
@@ -32,8 +31,6 @@ export class InstitutionService {
   }
 
   getInstitutionById(id: string, institutionId: string) {
-    // full?: boolean
-    // relations: full === true ? ["admin", "cabinets", "items", "teachers"] : []
     return this.institutionRepository.findOneOrFail({ where: { admin: { id }, id: institutionId } });
   }
 
@@ -62,11 +59,7 @@ export class InstitutionService {
     return this.institutionRepository.save(institution);
   }
 
-  async deleteInstitution(id: string, institutionId: string) {
-    return this.institutionRepository.delete({ id: institutionId, admin: { id } });
-  }
-
-  async clearTable() {
-    return this.institutionRepository.delete({});
-  }
+  // async deleteInstitution(id: string, institutionId: string) {
+  //   return this.institutionRepository.delete({ id: institutionId, admin: { id } });
+  // }
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, Get, HttpCode, MaxFileSizeValidator, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseFilters, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, FileTypeValidator, Get, HttpCode, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Post, Query, Req, UploadedFile, UseFilters, UseInterceptors } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Roles } from "../roles/roles.decorator";
 import { UserRoles } from "../user/user.entity";
@@ -10,7 +10,6 @@ import { ItemService } from "./item.service";
 import { CreateItemDTO, EditItemDTO, Item } from "./item.entity";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { AuthedRequest } from "modules/auth/types";
-import { InstitutionErrors } from "modules/institution/institution.i18n";
 
 @ApiTags(ItemSwagger.tag)
 @Controller("item")
