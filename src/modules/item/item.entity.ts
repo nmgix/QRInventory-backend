@@ -21,16 +21,14 @@ export class Item {
   @ApiProperty({ description: "Название предмета", example: "Стул обыкновенный" })
   name: string;
 
-  @ApiProperty()
-  @OneToOne(() => Image, { nullable: true, onDelete: "CASCADE" })
-  @JoinColumn({ name: "imageId" })
-  image: Image;
-
   @ApiProperty({ type: () => Institution })
   @ManyToOne(() => Institution, insitution => insitution.items)
   institution: Institution;
 
-  @ApiProperty()
+  @OneToOne(() => Image, { nullable: true, onDelete: "CASCADE" })
+  @JoinColumn({ name: "imageId" })
+  image: Image;
+
   @Column({ nullable: true })
   imageId?: number;
 }

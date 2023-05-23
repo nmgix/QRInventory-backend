@@ -31,5 +31,7 @@ export enum UserErrors {
   cant_pass_avatarId = "Нельзя изменить avatarId данным методом",
   cant_pass_avatar = "Нельзя изменить аватар данным методом",
   cant_pass_institutions = "Нельзя изменить учреждения данным методом",
-  cant_pass_refreshToken = "Нельзя изменить refresh-токен данным методом"
+  cant_pass_refreshToken = "Нельзя изменить refresh-токен данным методом",
+
+  image_upload_error = "Произошла ошибка при загрузке фотографии"
 }

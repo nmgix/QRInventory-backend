@@ -1,11 +1,12 @@
 import { BadRequestException, forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Like, Not, Repository } from "typeorm";
+import { Not, Repository } from "typeorm";
 import { AuthService } from "../auth/auth.service";
 import { CreateUserDTO, InternalUpdateUserDTO, User, UserRoles } from "./user.entity";
 import { ImageService } from "../database/image.service";
 import { Institution } from "modules/institution/institution.entity";
 import { InstitutionErrors } from "modules/institution/institution.i18n";
+import { ImageErrors } from "modules/database/image.i18n";
 
 @Injectable()
 export class UserService {
@@ -124,17 +125,33 @@ export class UserService {
 
   async addAvatar(userId: string, imageBuffer: Buffer, filename: string) {
     const user = await this.getById(userId, true);
-    const avatar = await this.imageService.uploadImage(imageBuffer, filename);
-    await this.userRepository.update(userId, { avatarId: avatar.id });
+
+    // try {
+    //   const avatar = await this.imageService.uploadImage(imageBuffer, filename);
+
+    //   if (user.avatarId) {
+    //     await this.imageService.deteleImageById(user.avatarId);
+    //   }
+
+    //   await this.userRepository.update(userId, { avatarId: avatar.id });
+
+    //   return avatar;
+    // } catch (error) {
+    //   console.log(error);
+    //   await this.userRepository.update(userId, { avatarId: null });
+    //   throw new Error(ImageErrors.image_upload_error);
+    // }
 
     try {
+      const avatar = await this.imageService.uploadImage(imageBuffer, filename);
+      await this.userRepository.update(userId, { avatarId: avatar.id });
       if (user.avatarId) {
         await this.imageService.deteleImageById(user.avatarId);
       }
+      return avatar;
     } catch (error) {
       await this.userRepository.update(userId, { avatarId: null });
+      throw new Error(ImageErrors.image_upload_error);
     }
-
-    return avatar;
   }
 }

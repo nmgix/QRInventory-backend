@@ -17,7 +17,9 @@ export enum ItemErrors {
   insitution_exists = "Должен быть указан институт",
 
   cant_pass_imageId = "Нельзя изменить imageId данным методом",
-  cant_pass_image = "Нельзя изменить изображение данным методом"
+  cant_pass_image = "Нельзя изменить изображение данным методом",
+
+  no_id_no_institution = "Не указан id, в таком случае необходим id учреждения"
 }
 
 export enum ItemMessages {

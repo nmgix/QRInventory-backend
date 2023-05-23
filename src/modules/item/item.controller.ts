@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, Get, HttpCode, MaxFileSizeValidator, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseFilters, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, Get, HttpCode, MaxFileSizeValidator, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseFilters, UseInterceptors } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Roles } from "../roles/roles.decorator";
 import { UserRoles } from "../user/user.entity";
@@ -10,6 +10,7 @@ import { ItemService } from "./item.service";
 import { CreateItemDTO, EditItemDTO, Item } from "./item.entity";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { AuthedRequest } from "modules/auth/types";
+import { InstitutionErrors } from "modules/institution/institution.i18n";
 
 @ApiTags(ItemSwagger.tag)
 @Controller("item")
@@ -37,13 +38,15 @@ export class ItemController {
   @Get()
   @HttpCode(200)
   @ApiOperation({ summary: "Получение всех подходящих предметов по айди либо артикулу" })
+  @ApiQuery({ name: "institution", description: "id учреждения", required: true })
   @ApiQuery({ name: "id", description: "id получаемого предмета", required: false })
   @ApiQuery({ name: "article", description: "article получаемого предмета", required: false })
   @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
   @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
   @ApiResponse({ status: 200, description: "Найденые предметы", type: Item })
-  async findItems(@Query() { take, skip }, @Query("id") id?: string, @Query("article") article?: string) {
-    const [data, total] = await this.itemService.findMatching(take, skip, id, article);
+  async findItems(@Query() { take, skip }, @Query("institution") institution?: string, @Query("id") id?: string, @Query("article") article?: string) {
+    if (!id && !institution) throw new BadRequestException(ItemErrors.no_id_no_institution);
+    const [data, total] = await this.itemService.findMatching(institution, take, skip, id, article);
 
     if (id) {
       return data[0];

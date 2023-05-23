@@ -17,19 +17,19 @@ export class Institution {
   name: string;
 
   @ApiProperty({ type: () => [Cabinet], uniqueItems: true, description: "Все кабинеты этого колледжа" })
-  @OneToMany(() => Cabinet, cabinet => cabinet.institution)
+  @OneToMany(() => Cabinet, cabinet => cabinet.institution, { cascade: true })
   cabinets: Cabinet[];
 
   @ApiProperty()
-  @OneToMany(() => Item, item => item.institution)
+  @OneToMany(() => Item, item => item.institution, { cascade: true })
   items: Item[];
 
   @ApiProperty()
-  @OneToMany(() => User, user => user.teacherInstitution)
+  @OneToMany(() => User, user => user.teacherInstitution, { cascade: true })
   teachers: User[];
 
   @ApiProperty({ type: () => [User], description: "Все админы, относящиеся к этому колледжу" })
-  @ManyToOne(() => User, user => user.institutions, { onDelete: "NO ACTION" })
+  @ManyToOne(() => User, user => user.institutions, { onDelete: "NO ACTION", onUpdate: "CASCADE" })
   admin: User;
 }
 

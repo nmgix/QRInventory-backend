@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { ImageErrors } from "modules/database/image.i18n";
 import { Institution } from "modules/institution/institution.entity";
 import { InstitutionErrors } from "modules/institution/institution.i18n";
-import { In, Like, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { ImageService } from "../database/image.service";
 import { CreateItemDTO, EditItemDTO, Item } from "./item.entity";
 import { ItemErrors, ItemMessages } from "./item.i18n";
@@ -30,15 +31,20 @@ export class ItemService {
     return this.itemRepository.createQueryBuilder("item").leftJoinAndSelect("item.institution", "institution").where("item.institution.id = :institution", { institution }).offset(skip).limit(take).getManyAndCount();
   }
 
-  async findMatching(take?: number, skip?: number, id?: string, article?: string) {
-    return this.itemRepository
-      .createQueryBuilder("item")
-      .where("item.article LIKE :article or item.id = :id", { id, article: `%${article}%` })
-      .leftJoinAndSelect("item.institution", "institution")
-      .offset(id ? 1 : skip ? skip : 0)
-      .limit(id ? 1 : take ? take : 10)
-      .orderBy()
-      .getManyAndCount();
+  async findMatching(institutionId?: string, take?: number, skip?: number, id?: string, article?: string) {
+    if (id) {
+      const item = await this.itemRepository.findOne({ where: { id }, relations: ["institution"] });
+      return [[item], 1];
+    } else {
+      return this.itemRepository
+        .createQueryBuilder("item")
+        .leftJoinAndSelect("item.institution", "institution")
+        .where("(item.article LIKE :article) AND institution.id = :institutionId", { article: `%${article}%`, institutionId })
+        .offset(skip ? skip : 0)
+        .limit(take ? take : 10)
+        .orderBy()
+        .getManyAndCount();
+    }
   }
 
   async create(userId: string, item: CreateItemDTO) {
@@ -90,22 +96,25 @@ export class ItemService {
 
   async addImage(userId: string, itemId: string, imageBuffer: Buffer, filename: string) {
     let foundInstitution = await this.institutionRepository.findOneOrFail({
-      where: [{ admin: { id: userId } }, { teachers: { id: userId } }]
+      where: [
+        { admin: { id: userId }, items: { id: itemId } },
+        { teachers: { id: userId }, items: { id: itemId } }
+      ]
     });
     if (!foundInstitution) throw new BadRequestException(InstitutionErrors.institution_not_found);
-
-    const item = await this.findMatching(undefined, undefined, itemId)[0];
-    const itemImage = await this.imageService.uploadImage(imageBuffer, filename);
-    await this.itemRepository.update(itemId, { imageId: itemImage.id });
+    let item = (await this.findMatching(foundInstitution.id, 1, 0, itemId))[0][0];
 
     try {
+      const itemImage = await this.imageService.uploadImage(imageBuffer, filename);
+      await this.itemRepository.update(itemId, { imageId: itemImage.id });
       if (item.imageId) {
         await this.imageService.deteleImageById(item.imageId);
       }
+      return itemImage;
     } catch (error) {
+      console.log(error);
       await this.itemRepository.update(itemId, { imageId: null });
+      throw new Error(ImageErrors.image_upload_error);
     }
-
-    return itemImage;
   }
 }
