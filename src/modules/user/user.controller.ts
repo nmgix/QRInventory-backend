@@ -9,6 +9,7 @@ import { UserService } from "./user.service";
 import { Public } from "../auth/auth.decorator";
 import { AuthedRequest } from "../auth/types";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { ItemErrors } from "modules/item/item.i18n";
 
 @ApiTags(UserSwagger.tag)
 @Controller("user")
@@ -37,13 +38,15 @@ export class UserController {
   @HttpCode(200)
   @ApiOperation({ summary: "Получение учителя по id, либо fio" })
   @ApiQuery({ name: "fio", required: false, description: "Для запроса другого пользователя по fio" })
+  @ApiQuery({ name: "institution", description: "id учреждения", required: false })
   @ApiQuery({ name: "id", required: false, description: "Для запроса другого пользователя по id" })
   @ApiQuery({ name: "email", required: false, description: "Для запроса другого пользователя по email" })
   @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
   @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
   @ApiResponse({ status: 200, description: "Учитель, найденный в БД (либо null)", type: User })
-  async getTeacher(@Query() { take, skip }, @Query("fio") fio?: string, @Query("id") id?: string, @Query("email") email?: string) {
-    const [data, total] = await this.userService.get(take, skip, email, id, fio, false);
+  async getTeacher(@Query() { take, skip }, @Query("fio") fio?: string, @Query("institution") institution?: string, @Query("id") id?: string, @Query("email") email?: string) {
+    if (!id && !institution) throw new BadRequestException(ItemErrors.no_id_no_institution);
+    const [data, total] = await this.userService.get(institution, take, skip, email, id, fio, false);
 
     if (id) {
       return data[0];
@@ -75,7 +78,7 @@ export class UserController {
   }
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
-  @Post("avatar")
+  @Post("avatar/:id")
   @ApiOperation({ summary: "Загрузка фотографии пользователя" })
   @ApiResponse({ status: 201, description: "Сообщение об успешной загрузке фотографии" })
   @UseInterceptors(FileInterceptor("file"))
@@ -87,9 +90,10 @@ export class UserController {
         validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })]
       })
     )
-    file: Express.Multer.File
+    file: Express.Multer.File,
+    @Param("id") id?: string
   ) {
-    const result = await this.userService.addAvatar(req.user.id, file.buffer, file.originalname);
+    const result = await this.userService.addAvatar(req.user.role === UserRoles.ADMIN ? id ?? req.user.id : req.user.id, file.buffer, file.originalname);
     return {
       message: `Фотография загружена, id: ${result.id}`
     };

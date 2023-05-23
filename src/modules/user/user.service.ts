@@ -27,34 +27,51 @@ export class UserService {
     return this.userRepository.createQueryBuilder("user").leftJoinAndSelect("user.teacherInstitution", "institution").where("user.teacherInstitution.id = :teacherInstitution", { teacherInstitution }).offset(skip).limit(take).getManyAndCount();
   }
 
-  async get(take?: number, skip?: number, email?: string, id?: string, fio?: string, admin?: boolean) {
+  async get(institutionId?: string, take?: number, skip?: number, email?: string, id?: string, fio?: string, admin?: boolean) {
     if (admin) {
-      let result = await this.userRepository
-        .createQueryBuilder("user")
-        .where("user.email LIKE :email OR user.fullName LIKE :fullName OR user.id = :id", { id, email: `%${email}%`, fullName: `%${fio}%` })
-        .leftJoinAndSelect("user.institutions", "institution")
-        .leftJoinAndSelect("user.teacherInstitution", "teacherInstitution")
-        .offset(id ? 1 : skip ? skip : 0)
-        .limit(id ? 1 : take ? take : 10)
-        .orderBy()
-        .getManyAndCount();
+      if (id) {
+        const user = await this.userRepository.findOne({ where: { id }, relations: ["institution", "teacherInstitution"] });
+        return [[user], 1];
+      } else {
+        let result = await this.userRepository
+          .createQueryBuilder("user")
+          .leftJoinAndSelect("user.institutions", "institution")
+          .leftJoinAndSelect("user.teacherInstitution", "teacherInstitution")
+          .where(institutionId ? "(user.email LIKE :email OR user.fullName LIKE :fullName) AND institution.id = :institutionId" : "user.email LIKE :email OR user.fullName LIKE :fullName", { email: `%${email}%`, fullName: `%${fio}%`, institutionId })
+          .offset(id ? 1 : skip ? skip : 0)
+          .limit(id ? 1 : take ? take : 10)
+          .orderBy()
+          .getManyAndCount();
 
-      return [
-        result[0].map(u => {
-          if (u.role !== UserRoles.ADMIN) delete u.institutions;
-          return u;
-        }),
-        result[1]
-      ];
+        console.log(result);
+
+        return [
+          result[0].map(u => {
+            if (u.role !== UserRoles.ADMIN) delete u.institutions;
+            return u;
+          }),
+          result[1]
+        ];
+      }
     } else {
-      return this.userRepository
-        .createQueryBuilder("user")
-        .where("(user.email LIKE :email OR user.fullName LIKE :fullName OR user.id = :id) AND user.role != :role", { id, email: `%${email}%`, fullName: `%${fio}%`, role: UserRoles.ADMIN })
-        .leftJoinAndSelect("user.teacherInstitution", "teacherInstitution")
-        .offset(id ? 1 : skip ? skip : 0)
-        .limit(id ? 1 : take ? take : 10)
-        .orderBy()
-        .getManyAndCount();
+      if (id) {
+        const user = await this.userRepository.findOne({ where: { id }, relations: ["teacherInstitution"] });
+        return [[user], 1];
+      } else {
+        return this.userRepository
+          .createQueryBuilder("user")
+          .where(institutionId ? "((user.email LIKE :email OR user.fullName LIKE :fullName) AND user.role != :role) AND institution.id = :institutionId" : "(user.email LIKE :email OR user.fullName LIKE :fullName) AND user.role != :role", {
+            email: `%${email}%`,
+            fullName: `%${fio}%`,
+            role: UserRoles.ADMIN,
+            institutionId
+          })
+          .leftJoinAndSelect("user.teacherInstitution", "teacherInstitution")
+          .offset(id ? 1 : skip ? skip : 0)
+          .limit(id ? 1 : take ? take : 10)
+          .orderBy()
+          .getManyAndCount();
+      }
     }
   }
 
@@ -125,22 +142,6 @@ export class UserService {
 
   async addAvatar(userId: string, imageBuffer: Buffer, filename: string) {
     const user = await this.getById(userId, true);
-
-    // try {
-    //   const avatar = await this.imageService.uploadImage(imageBuffer, filename);
-
-    //   if (user.avatarId) {
-    //     await this.imageService.deteleImageById(user.avatarId);
-    //   }
-
-    //   await this.userRepository.update(userId, { avatarId: avatar.id });
-
-    //   return avatar;
-    // } catch (error) {
-    //   console.log(error);
-    //   await this.userRepository.update(userId, { avatarId: null });
-    //   throw new Error(ImageErrors.image_upload_error);
-    // }
 
     try {
       const avatar = await this.imageService.uploadImage(imageBuffer, filename);

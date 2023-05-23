@@ -26,7 +26,7 @@ export class AuthService {
   }
 
   async login(dto: AuthLoginDTO) {
-    const res = await this.userService.get(undefined, undefined, dto.email, undefined, undefined, true);
+    const res = await this.userService.get(undefined, undefined, undefined, dto.email, undefined, undefined, true);
     const user = res[0][0];
     if (!user) throw new BadRequestException(AuthErrors.user_not_found);
     const passwordMatch = await argon2.verify(user.password, dto.password);

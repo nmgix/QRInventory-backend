@@ -38,7 +38,7 @@ export class ItemController {
   @Get()
   @HttpCode(200)
   @ApiOperation({ summary: "Получение всех подходящих предметов по айди либо артикулу" })
-  @ApiQuery({ name: "institution", description: "id учреждения", required: true })
+  @ApiQuery({ name: "institution", description: "id учреждения", required: false })
   @ApiQuery({ name: "id", description: "id получаемого предмета", required: false })
   @ApiQuery({ name: "article", description: "article получаемого предмета", required: false })
   @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
