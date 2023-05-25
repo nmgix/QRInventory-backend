@@ -1,20 +1,23 @@
 import { Controller, Body, Post, Get, Param, Delete, HttpCode, UseFilters, Req, Query, BadRequestException, UseInterceptors, UploadedFile, Patch, ParseFilePipe, FileTypeValidator, MaxFileSizeValidator } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { FileInterceptor } from "@nestjs/platform-express";
+
 import { GlobalException } from "../../helpers/global.exceptions";
 import { Roles } from "../roles/roles.decorator";
+import { Public } from "../auth/auth.decorator";
 import { UserSwagger } from "../../documentation/user.docs";
+
 import { CreateUserDTO, UpdateUserDTO, User, UserRoles } from "./user.entity";
 import { UserErrors } from "./user.i18n";
-import { UserService } from "./user.service";
-import { Public } from "../auth/auth.decorator";
 import { AuthedRequest } from "../auth/types";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { AuthService } from "modules/auth/auth.service";
+import { UserService } from "./user.service";
 
 @ApiTags(UserSwagger.tag)
 @Controller("user")
 @UseFilters(new GlobalException(UserErrors.user_data_input_error, UserErrors.user_data_input_error, UserErrors.user_not_found))
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private authService: AuthService) {}
 
   @Roles(UserRoles.ADMIN)
   @Get("all")
@@ -72,8 +75,8 @@ export class UserController {
   @ApiOperation({ summary: "Создание учителя" })
   @ApiResponse({ status: 201, description: "Созданный учитель в БД", type: User })
   @HttpCode(201)
-  async createTeacher(@Body() dto: CreateUserDTO, @UploadedFile() file: Express.Multer.File) {
-    return this.userService.create(dto);
+  async createTeacher(@Body() dto: CreateUserDTO) {
+    return this.authService.register(dto);
   }
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)

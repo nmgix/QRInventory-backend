@@ -13,7 +13,7 @@ export class Institution {
   id: string;
 
   @ApiProperty()
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @ApiProperty({ type: () => [Cabinet], uniqueItems: true, description: "Все кабинеты этого колледжа" })
