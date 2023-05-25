@@ -42,7 +42,8 @@ export class InstitutionController {
   @ApiResponse({ status: 200, description: "Привязанное учреждение", type: Institution })
   @Post("create")
   async createInstitution(@Req() req: AuthedRequest, @Body() dto: CreateInstitutionDTO) {
-    return this.institutionService.createInstitution(req.user.id, dto);
+    const createdInstitution = await this.institutionService.createInstitution(req.user.id, dto);
+    return { ...createdInstitution, cabinets: createdInstitution.cabinets.length, items: createdInstitution.items.length, teachers: createdInstitution.teachers.length };
   }
 
   @ApiOperation({ summary: "Изменение учреждения" })
