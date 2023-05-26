@@ -12,7 +12,9 @@ export enum CabinetErrors {
   cabinet_teachers = "Id учителей должны быть представлены массивом строчек id",
   cabinet_items = "Id предметов должны быть представлены массивом строчек id",
   cabinet_field_array = "Поле должно быть представлено массивом",
-  no_id_no_institution = "Не указан id, в таком случае необходим id учреждения"
+  no_id_no_institution = "Не указан id, в таком случае необходим id учреждения",
+
+  cabinet_number_regexp = "Допустимый формат номера кабинета - [номер(|&)текст][дефис]..."
 }
 
 export enum CabinetMessages {

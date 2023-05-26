@@ -1,11 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
-import { Equals, IsArray, isArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsArray, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { Institution } from "../institution/institution.entity";
 import { Item } from "../item/item.entity";
 import { User } from "../user/user.entity";
 import { CabinetErrors } from "./cabinet.i18n";
+
+const cabinetNumbetRegexp = "^[а-яА-ЯёЁ0-9]+(-[а-яА-ЯёЁ0-9]+)*$";
 
 @Entity()
 export class Cabinet {
@@ -16,6 +18,7 @@ export class Cabinet {
   @ApiProperty()
   @IsNotEmpty({ message: CabinetErrors.cabinet_number_empty })
   @IsString({ message: CabinetErrors.cabinet_number_string })
+  @Matches(cabinetNumbetRegexp, "", { message: CabinetErrors.cabinet_number_regexp })
   @Column()
   cabinetNumber: string;
 
@@ -54,6 +57,7 @@ export class EditCabinetDTO {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString({ message: CabinetErrors.cabinet_number_string })
+  @Matches(cabinetNumbetRegexp, "", { message: CabinetErrors.cabinet_number_regexp })
   cabinetNumber?: string;
 
   @ApiProperty({ type: [String], required: false, uniqueItems: true })
@@ -78,6 +82,7 @@ export class CreateCabinetDTO {
   @ApiProperty()
   @IsNotEmpty({ message: CabinetErrors.cabinet_number_empty })
   @IsString({ message: CabinetErrors.cabinet_number_string })
+  @Matches(cabinetNumbetRegexp, "", { message: CabinetErrors.cabinet_number_regexp })
   cabinetNumber: string;
 
   @ApiProperty({ type: [String], required: false, uniqueItems: true })
