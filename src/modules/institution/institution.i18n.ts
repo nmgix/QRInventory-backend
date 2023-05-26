@@ -7,7 +7,12 @@ export enum InstitutionErrors {
   institution_not_stated = "Учреждение не указано",
 
   cant_pass_admin = "Нельзя изменить админа данным методом",
-  cant_pass_cabinets = "Нельзя изменить кабинеты данным методом"
+  cant_pass_cabinets = "Нельзя изменить кабинеты данным методом",
+
+  institution_id_regexp = "UUID учреждения неверен",
+  institution_name_regexp = "Допустимый формат названия учреждения - [номер(|&)текст][пробел]...",
+
+  institution_name_length = "Длина названия учреждения должна быть в рамках 2=> && <=50"
 }
 
 export enum InstitutionMessages {

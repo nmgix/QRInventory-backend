@@ -61,7 +61,7 @@ export class CabinetController {
   @HttpCode(201)
   async createCabinet(@Req() req: AuthedRequest, @Body() dto: CreateCabinetDTO) {
     // здесь привязывать к колледжу
-    const cabinet = await this.cabinetService.create(req.user.id, { ...dto, teachers: req.user.role !== UserRoles.ADMIN ? [String(req.user.id)] : [] });
+    const cabinet = await this.cabinetService.create(req.user.id, { ...dto, teachers: req.user.role !== UserRoles.ADMIN ? [String(req.user.id)] : dto.teachers });
     const [data, total] = await this.cabinetService.get(dto.institution, undefined, undefined, cabinet.id);
     return data[0];
   }
@@ -77,6 +77,7 @@ export class CabinetController {
     if (!cabinet) throw new BadRequestException(CabinetErrors.cabinet_not_found);
     // здесь проверять что админ/учитель привязан к этому колледжу этого кабинета
     if ((req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) || req.user.role === UserRoles.ADMIN) {
+      console.log(dto);
       if (req.user.role === UserRoles.TEACHER) {
         const userInTeachers = dto.teachers?.find(teacherId => teacherId === req.user.id);
         const teachers = dto.teachers ? (userInTeachers ? dto.teachers : [...dto.teachers, req.user.id]) : undefined;

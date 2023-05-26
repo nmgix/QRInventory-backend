@@ -19,7 +19,20 @@ export enum ItemErrors {
   cant_pass_imageId = "Нельзя изменить imageId данным методом",
   cant_pass_image = "Нельзя изменить изображение данным методом",
 
-  no_id_no_institution = "Не указан id, в таком случае необходим id учреждения"
+  no_id_no_institution = "Не указан id, в таком случае необходим id учреждения",
+
+  item_institution_empty = "Отсутствует id учереждения",
+  item_institution_string = "Id учереждения должен быть строчкой",
+  item_institution_regexp = "UUID учреждения неверен",
+
+  item_article_regexp = "Допустимый формат артикула предмета - [номер(|&)текст][дефис]...",
+  item_id_string = "UUID кабинета должен быть строчкой",
+  item_id_regexp = "UUID кабинета неверен",
+
+  item_name_regexp = "Допустимый формат названия предмета - [номер(|&)текст][пробел]...",
+
+  item_article_length = "Длина артикула предмета должна быть в рамках 7=> && <=40",
+  item_name_length = "Длина названия предмета должна быть в рамках 5=> && <=40"
 }
 
 export enum ItemMessages {

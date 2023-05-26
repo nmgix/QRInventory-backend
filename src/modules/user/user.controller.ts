@@ -8,10 +8,11 @@ import { Public } from "../auth/auth.decorator";
 import { UserSwagger } from "../../documentation/user.docs";
 
 import { CreateUserDTO, UpdateUserDTO, User, UserRoles } from "./user.entity";
-import { UserErrors } from "./user.i18n";
+import { UserErrors, UserMessages } from "./user.i18n";
 import { AuthedRequest } from "../auth/types";
 import { AuthService } from "modules/auth/auth.service";
 import { UserService } from "./user.service";
+import { UpdateResult } from "typeorm";
 
 @ApiTags(UserSwagger.tag)
 @Controller("user")
@@ -109,12 +110,17 @@ export class UserController {
   @HttpCode(200)
   async updateUser(@Req() req: AuthedRequest, @Body() dto: UpdateUserDTO, @Query("id") id?: string) {
     console.log(req.body);
+    let updateResult: UpdateResult;
     if (id !== undefined && req.user.role === UserRoles.ADMIN) {
       // другим только учителям (не админам)
-      return this.userService.updateUser(id, { ...dto, id }, false);
+      updateResult = await this.userService.updateUser(id, { ...dto, id }, false);
     } else {
-      return this.userService.updateUser(req.user.id, { ...dto, id: req.user.id }, true);
+      updateResult = await this.userService.updateUser(req.user.id, { ...dto, id: req.user.id }, true);
     }
+
+    return {
+      message: updateResult.affected === 0 ? UserErrors.user_not_updated : UserMessages.user_updated
+    };
   }
 
   @Roles(UserRoles.ADMIN)
@@ -126,7 +132,7 @@ export class UserController {
     const deleteResult = await this.userService.delete(id);
 
     return {
-      message: UserErrors[deleteResult.affected === 0 ? "user_not_found" : "user_deleted"]
+      message: deleteResult.affected === 0 ? UserErrors.user_not_found : UserMessages.user_deleted
     };
   }
 }

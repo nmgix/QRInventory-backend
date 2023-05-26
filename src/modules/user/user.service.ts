@@ -1,6 +1,6 @@
 import { BadRequestException, forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Not, Repository } from "typeorm";
+import { Not, Repository, UpdateResult } from "typeorm";
 import { AuthService } from "../auth/auth.service";
 import { CreateUserDTO, InternalUpdateUserDTO, User, UserRoles } from "./user.entity";
 import { ImageService } from "../database/image.service";
@@ -112,7 +112,7 @@ export class UserService {
     if (Object.keys(data).length > 0) {
       return this.update(userId, data as unknown as Partial<User>);
     } else {
-      return this.getById(userId, admin);
+      return { affected: 0 } as UpdateResult;
     }
   }
 

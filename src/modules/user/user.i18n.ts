@@ -18,13 +18,14 @@ export enum UserErrors {
   password_empty = "Пароль должен присутствовать",
   password_string = "Пароль должен быть строкой",
   password_weak = "Пароль слишком слабый",
+  password_invalid_format = "Недопустимый формат пароля",
 
   fullname_empty = "Отсутствует ФИО",
   fullname_string = "ФИО должно быть строчкой",
   role_empty = "Должна быть установлена роль",
 
   user_not_found = "Пользователь не найден",
-  user_deleted = "Пользователь удалён",
+  user_not_updated = "Пользователь не обновлён",
 
   user_data_input_error = "Ошибка ввода пользовательских данных",
 
@@ -35,5 +36,15 @@ export enum UserErrors {
 
   image_upload_error = "Произошла ошибка при загрузке фотографии",
 
-  no_id_no_institution = "Не указан id, в таком случае необходим id учреждения"
+  no_id_no_institution = "Не указан id, в таком случае необходим id учреждения",
+  user_teacher_institution_id_regexp = "UUID учреждения учителя неверен",
+  user_fullname_regexp = "Допустимый формат ФИО - [текст(2+)][пробел][текст(2+)][пробел][текст(1+)]",
+
+  user_fullname_length = "Длина ФИО должна быть в рамках 5=> && <=40",
+  user_password_length = "Длина пароля должна быть в рамках 8=> && <=30"
+}
+
+export enum UserMessages {
+  user_deleted = "Пользователь удалён",
+  user_updated = "Пользователь обновлён"
 }

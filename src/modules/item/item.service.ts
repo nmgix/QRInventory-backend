@@ -62,7 +62,10 @@ export class ItemService {
 
   async update(userId: string, item: EditItemDTO) {
     let foundInstitution = await this.institutionRepository.findOne({
-      where: [{ admin: { id: userId } }, { teachers: { id: userId } }]
+      where: [
+        { admin: { id: userId }, items: { id: item.id } },
+        { teachers: { id: userId }, items: { id: item.id } }
+      ]
     });
     if (!foundInstitution) throw new BadRequestException(InstitutionErrors.institution_not_found);
 

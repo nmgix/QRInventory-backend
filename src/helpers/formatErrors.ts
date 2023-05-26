@@ -25,3 +25,5 @@ export const formatErrorPipe = new ValidationPipe({
     return new BadRequestException(formatErrorsHelper(errors));
   }
 });
+
+export const uuidRegexp = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;

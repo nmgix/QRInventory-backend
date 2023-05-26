@@ -96,7 +96,12 @@ export class CabinetService {
       ]
     });
     if (!cabinet) throw new Error(CabinetErrors.cabinet_not_found);
-    let currentInstitution = await this.institutionRepository.findOne({ where: [{ admin: { id: userId } }, { teachers: { id: userId } }] });
+    let currentInstitution = await this.institutionRepository.findOne({
+      where: [
+        { admin: { id: userId }, cabinets: { id: dto.id } },
+        { teachers: { id: userId }, cabinets: { id: dto.id } }
+      ]
+    });
     let futureInstitution: Institution;
 
     if (dto.institution) {
