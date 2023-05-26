@@ -80,10 +80,10 @@ export class CabinetController {
       if (req.user.role === UserRoles.TEACHER) {
         const userInTeachers = dto.teachers?.find(teacherId => teacherId === req.user.id);
         const teachers = dto.teachers ? (userInTeachers ? dto.teachers : [...dto.teachers, req.user.id]) : undefined;
-        return this.cabinetService.update(req.user.id, dto.id, { ...dto, teachers });
+        return this.cabinetService.update(req.user.id, { ...dto, teachers });
       } else if (req.user.role === UserRoles.ADMIN) {
         const teachers = dto.teachers?.filter(teacherId => teacherId !== req.user.id);
-        return this.cabinetService.update(req.user.id, dto.id, { ...dto, teachers });
+        return this.cabinetService.update(req.user.id, { ...dto, teachers });
       } else {
         throw new ForbiddenException(AuthErrors.access_denied);
       }

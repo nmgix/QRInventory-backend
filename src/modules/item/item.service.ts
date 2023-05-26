@@ -28,7 +28,7 @@ export class ItemService {
     });
     if (!foundInstitution) throw new BadRequestException(InstitutionErrors.institution_not_found);
 
-    return this.itemRepository.createQueryBuilder("item").leftJoinAndSelect("item.institution", "institution").where("item.institution.id = :institution", { institution }).offset(skip).limit(take).getManyAndCount();
+    return this.itemRepository.createQueryBuilder("item").leftJoinAndSelect("item.institution", "institution").where("item.institution.id = :institution", { institution }).orderBy("item.article", "ASC").offset(skip).limit(take).getManyAndCount();
   }
 
   async findMatching(institutionId?: string, take?: number, skip?: number, id?: string, article?: string) {
@@ -43,7 +43,7 @@ export class ItemService {
         .where("(item.article LIKE :article) AND institution.id = :institutionId", { article: `%${article}%`, institutionId })
         .offset(skip ? skip : 0)
         .limit(take ? take : 10)
-        .orderBy()
+        .orderBy("item.article", "ASC")
         .getManyAndCount();
     }
   }

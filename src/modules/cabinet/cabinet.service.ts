@@ -51,10 +51,11 @@ export class CabinetService {
       return this.cabinetRepository
         .createQueryBuilder("cabinet")
         .where("(cabinet.cabinetNumber LIKE :cabinetNumber OR cabinet.id = :id) and cabinet.institution = :institutionId", { id, cabinetNumber: `%${cabinet}%`, institutionId })
-        .offset(id ? 0 : skip ? skip : 0)
-        .limit(id ? 1 : take ? take : 10)
         .leftJoinAndSelect("cabinet.teachers", "user")
         .leftJoinAndSelect("cabinet.items", "item")
+        .orderBy("cabinet.cabinetNumber", "ASC")
+        .offset(id ? 0 : skip ? skip : 0)
+        .limit(id ? 1 : take ? take : 10)
         .getManyAndCount();
     }
   }
@@ -67,6 +68,7 @@ export class CabinetService {
       .where("institution.id = :institutionId AND institution.admin.id = :adminId", { institutionId: institution, adminId: userId })
       .leftJoinAndSelect("cabinet.teachers", "teachers")
       .leftJoinAndSelect("cabinet.items", "items")
+      .orderBy("cabinet.cabinetNumber", "ASC")
       .offset(skip)
       .limit(take)
       .getManyAndCount();
@@ -80,12 +82,13 @@ export class CabinetService {
       .leftJoinAndSelect("cabinet.teachers", "teachers")
       .leftJoinAndSelect("cabinet.items", "items")
       .where("institution.id = :institutionId AND teachers.id = :teacherId", { institutionId: institution, teacherId: userId })
+      .orderBy("cabinet.cabinetNumber", "ASC")
       .offset(skip)
       .limit(take)
       .getManyAndCount();
   }
 
-  async update(userId: string, id: string, dto: EditCabinetDTO): Promise<Cabinet | null> {
+  async update(userId: string, dto: EditCabinetDTO): Promise<Cabinet | null> {
     const cabinet = await this.cabinetRepository.findOne({
       where: [
         { id: dto.id, institution: { admin: { id: userId } } },
@@ -97,7 +100,7 @@ export class CabinetService {
     let futureInstitution: Institution;
 
     if (dto.institution) {
-      futureInstitution = await this.institutionRepository.findOne({ where: { id: dto.institution, admin: { id } } });
+      futureInstitution = await this.institutionRepository.findOne({ where: { id: dto.institution, admin: { id: userId } } });
       cabinet.institution = futureInstitution;
     }
 

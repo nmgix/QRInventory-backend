@@ -25,6 +25,7 @@ export class InstitutionService {
       .loadRelationCountAndMap("institution.items", "institution.items")
       .loadRelationCountAndMap("institution.cabinets", "institution.cabinets")
       .where("user.id = :admin", { admin: id })
+      .orderBy("institution.name", "ASC")
       .offset(skip)
       .limit(take)
       .getManyAndCount();

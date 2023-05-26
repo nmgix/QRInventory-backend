@@ -25,7 +25,7 @@ export class UserService {
     if (!teacherInstitution) throw new BadRequestException(InstitutionErrors.institution_not_stated);
     let institution = await this.institutionRepository.findOne({ where: { id: teacherInstitution } });
     if (!institution) throw new Error(InstitutionErrors.institution_not_found);
-    return this.userRepository.createQueryBuilder("user").leftJoinAndSelect("user.teacherInstitution", "institution").where("user.teacherInstitution.id = :teacherInstitution", { teacherInstitution }).offset(skip).limit(take).getManyAndCount();
+    return this.userRepository.createQueryBuilder("user").leftJoinAndSelect("user.teacherInstitution", "institution").where("user.teacherInstitution.id = :teacherInstitution", { teacherInstitution }).orderBy("user.fullName", "ASC").offset(skip).limit(take).getManyAndCount();
   }
 
   async get(institutionId?: string, take?: number, skip?: number, email?: string, id?: string, fio?: string, admin?: boolean) {
@@ -41,7 +41,7 @@ export class UserService {
           .where(institutionId ? "(user.email LIKE :email OR user.fullName LIKE :fullName) AND institution.id = :institutionId" : "user.email LIKE :email OR user.fullName LIKE :fullName", { email: `%${email}%`, fullName: `%${fio}%`, institutionId })
           .offset(id ? 1 : skip ? skip : 0)
           .limit(id ? 1 : take ? take : 10)
-          .orderBy()
+          .orderBy("user.fullName", "ASC")
           .getManyAndCount();
 
         return [
@@ -68,7 +68,7 @@ export class UserService {
           .leftJoinAndSelect("user.teacherInstitution", "teacherInstitution")
           .offset(id ? 1 : skip ? skip : 0)
           .limit(id ? 1 : take ? take : 10)
-          .orderBy()
+          .orderBy("user.fullName", "ASC")
           .getManyAndCount();
       }
     }
