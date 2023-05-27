@@ -16,7 +16,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./jest-e2e.json --watch --detectOpenHandles --forceExit",
-    "docker:compose": "docker-compose build && docker compose up -d"
+    "docker:compose": "docker-compose up --build -d"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
