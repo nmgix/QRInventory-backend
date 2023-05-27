@@ -13,9 +13,13 @@
 `.env`
 
 ```md
+# nginx
+
+DOMAIN=api-proxy CONTAINER=qr-inventory-api:5000
+
 # app
 
-GLOBAL_PORT=80 APP_PORT=5000 UPLOADED_FILES_DESTINATION=./uploads
+APP_PORT=5000 UPLOADED_FILES_DESTINATION=./uploads
 
 # auth
 

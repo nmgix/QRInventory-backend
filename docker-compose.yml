@@ -10,11 +10,28 @@ services:
     environment:
       NODE_ENV: developmentdocker
     command: npm run start:prod
-    ports:
-      - "${GLOBAL_PORT}:${APP_PORT}"
     depends_on:
       - postgres
       - postgres_test
+    networks:
+      - qr-inventory-proxy
+      - api
+  nginx:
+    container_name: reverse-proxy
+    image: nginx
+    build:
+      context: .
+      dockerfile: ./nginx.Dockerfile
+    env_file:
+      - .env
+    ports:
+      - 8000:80
+    command: >
+      /bin/sh -c "envsubst < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
+
+
+    depends_on:
+      - qr-inventory-api
     networks:
       - qr-inventory-proxy
       - api
@@ -27,8 +44,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     networks:
       - api
   postgres_test:
@@ -40,8 +55,6 @@ services:
       POSTGRES_DB: ${POSTGRES_TEST_DB}
       POSTGRES_USER: ${POSTGRES_TEST_USER}
       POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD}
-    ports:
-      - "${POSTGRES_TEST_PORT}:${POSTGRES_TEST_PORT}"
     networks:
       - api
   pgadmin:
@@ -64,5 +77,6 @@ volumes:
 networks:
   api:
     name: api
+    driver: bridge
   qr-inventory-proxy:
     name: qr-inventory

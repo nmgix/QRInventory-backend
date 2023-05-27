@@ -57,7 +57,7 @@
 //     itemService = module.get<ItemService>(ItemService);
 //     institutionService = module.get<InstitutionService>(InstitutionService);
 
-//     apiUrl = `http://localhost:${configService.get("NODE_ENV") !== NodeENV.prod ? configService.get("APP_PORT") : configService.get("GLOBAL_PORT")}`;
+//     apiUrl = `http://localhost:${configService.get("APP_PORT")}`;
 //     agent = request.agent(apiUrl);
 
 //     await userService.clearTable();
