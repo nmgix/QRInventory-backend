@@ -1,0 +1,19 @@
+events {
+    worker_connections 1024;
+}
+
+http {
+    upstream backend {
+        server qr-inventory-api-1:5001 weight=1;
+    }
+
+    server {
+        listen 80;
+        server_name $DOMAIN;
+
+        location /api/ {
+            proxy_set_header content-type "application/json";
+            proxy_pass http://backend/;
+        }
+    }
+}

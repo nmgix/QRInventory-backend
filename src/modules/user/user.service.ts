@@ -98,7 +98,7 @@ export class UserService {
     return this.userRepository.save(createdUser);
   }
 
-  async updateUser(userId: string, data: InternalUpdateUserDTO, admin: boolean) {
+  async updateUser(userId: string, data: InternalUpdateUserDTO, role: UserRoles) {
     if (data.newPassword) {
       await this.authService.updatePassword(data);
     }
@@ -110,6 +110,8 @@ export class UserService {
     Object.keys(data).forEach(key => data[key] === undefined && delete data[key]);
 
     if (Object.keys(data).length > 0) {
+      let foundUser = await this.getById(userId, true);
+      if (!foundUser || (foundUser.id !== userId && role !== UserRoles.ADMIN) || (foundUser.id !== userId && role === UserRoles.ADMIN && foundUser.role === UserRoles.ADMIN)) return { affected: 0 } as UpdateResult;
       return this.update(userId, data as unknown as Partial<User>);
     } else {
       return { affected: 0 } as UpdateResult;

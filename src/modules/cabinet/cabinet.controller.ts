@@ -75,9 +75,7 @@ export class CabinetController {
     const [data, total] = await this.cabinetService.get(undefined, undefined, undefined, dto.id);
     const cabinet = data[0];
     if (!cabinet) throw new BadRequestException(CabinetErrors.cabinet_not_found);
-    // здесь проверять что админ/учитель привязан к этому колледжу этого кабинета
     if ((req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) || req.user.role === UserRoles.ADMIN) {
-      console.log(dto);
       if (req.user.role === UserRoles.TEACHER) {
         const userInTeachers = dto.teachers?.find(teacherId => teacherId === req.user.id);
         const teachers = dto.teachers ? (userInTeachers ? dto.teachers : [...dto.teachers, req.user.id]) : undefined;

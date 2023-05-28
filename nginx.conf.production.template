@@ -4,12 +4,14 @@ events {
 
 http {
     upstream backend {
-        server $CONTAINER weight=1;
+        server qr-inventory-api-1:5001 weight=1;
+        server qr-inventory-api-2:5002 weight=1;
+        server qr-inventory-api-3:5003 weight=1;
     }
 
     server {
         listen 80;
-        server_name $DOMAIN;
+        server_name domain;
 
         location /api/ {
             proxy_set_header content-type "application/json";

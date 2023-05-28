@@ -1,0 +1,69 @@
+services:
+  qr-inventory-api-1:
+    build:
+      target: production
+    environment:
+      NODE_ENV: production
+    command: npm run start:prod
+    depends_on:
+      - postgres
+
+  qr-inventory-api-2:
+    container_name: qr-inventory-api-2
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: production
+    env_file:
+      - .env
+    environment:
+      APP_PORT: 5002
+      NODE_ENV: production
+    command: npm run start:prod
+    depends_on:
+      - postgres
+    networks:
+      - qr-inventory-proxy
+      - api
+
+  qr-inventory-api-3:
+    container_name: qr-inventory-api-3
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: production
+    env_file:
+      - .env
+    environment:
+      APP_PORT: 5003
+      NODE_ENV: production
+    command: npm run start:prod
+    depends_on:
+      - postgres
+    networks:
+      - qr-inventory-proxy
+      - api
+
+  postgres:
+    image: postgres
+    restart: always
+    container_name: ${POSTGRES_HOST}
+    command: postgres -c port=${POSTGRES_PORT} -c listen_addresses='*'
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - api
+
+  pgadmin:
+    depends_on:
+      - postgres
+
+  nginx:
+    build:
+      args:
+        NODE_ENV: production
+    command: >
+      /bin/sh -c "envsubst < /etc/nginx/nginx.conf.production.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
+

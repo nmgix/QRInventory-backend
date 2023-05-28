@@ -109,13 +109,11 @@ export class UserController {
   @ApiResponse({ status: 200, description: "Статус удален ли пользователь или не найден", type: User })
   @HttpCode(200)
   async updateUser(@Req() req: AuthedRequest, @Body() dto: UpdateUserDTO, @Query("id") id?: string) {
-    console.log(req.body);
     let updateResult: UpdateResult;
     if (id !== undefined && req.user.role === UserRoles.ADMIN) {
-      // другим только учителям (не админам)
-      updateResult = await this.userService.updateUser(id, { ...dto, id }, false);
+      updateResult = await this.userService.updateUser(id, { ...dto, id }, req.user.role);
     } else {
-      updateResult = await this.userService.updateUser(req.user.id, { ...dto, id: req.user.id }, true);
+      updateResult = await this.userService.updateUser(req.user.id, { ...dto, id: req.user.id }, req.user.role);
     }
 
     return {
