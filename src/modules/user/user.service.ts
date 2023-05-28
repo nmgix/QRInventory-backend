@@ -7,7 +7,6 @@ import { ImageService } from "../database/image.service";
 import { Institution } from "modules/institution/institution.entity";
 import { InstitutionErrors } from "modules/institution/institution.i18n";
 import { ImageErrors } from "modules/database/image.i18n";
-import { UserErrors } from "./user.i18n";
 
 @Injectable()
 export class UserService {

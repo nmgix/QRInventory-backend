@@ -11,8 +11,6 @@ services:
   qr-inventory-api-2:
     container_name: qr-inventory-api-2
     build:
-      dockerfile: Dockerfile
-      context: .
       target: production
     env_file:
       - .env
@@ -29,8 +27,6 @@ services:
   qr-inventory-api-3:
     container_name: qr-inventory-api-3
     build:
-      dockerfile: Dockerfile
-      context: .
       target: production
     env_file:
       - .env
@@ -47,12 +43,12 @@ services:
   postgres:
     image: postgres
     restart: always
-    container_name: ${POSTGRES_HOST}
-    command: postgres -c port=${POSTGRES_PORT} -c listen_addresses='*'
+    container_name: ${POSTGRES_HOST:?err}
+    command: postgres -c port=${POSTGRES_PORT:?err} -c listen_addresses='*'
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:?err}
+      POSTGRES_USER: ${POSTGRES_USER:?err}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?err}
     networks:
       - api
 

@@ -77,7 +77,7 @@ export class UserController {
   @ApiResponse({ status: 201, description: "Созданный учитель в БД", type: User })
   @HttpCode(201)
   async createTeacher(@Body() dto: CreateUserDTO) {
-    return this.authService.register(dto);
+    return (await this.authService.register(dto)).user;
   }
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
