@@ -18,9 +18,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Docker
-        uses: docker/setup-docker@v1
-
       - name: executing remote ssh commands to set env
         uses: appleboy/ssh-action@master
         with:
