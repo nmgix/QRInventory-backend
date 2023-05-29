@@ -1,0 +1,43 @@
+name: API DEPLOY
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-docker@v1
+
+      - name: executing remote ssh commands to set env
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_USER_PASSWORD }}
+          script:
+            echo JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }} > .env echo JWT_COOKIE=${{ secrets.JWT_COOKIE }} > .env echo JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }} > .env echo PGADMIN_PASSWORD=${{ secrets.PGADMIN_PASSWORD }} > .env echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} > .env echo SSH_USER=${{ secrets.SSH_USER }} > .env echo SSH_USER_PASSWORD=${{ secrets.SSH_USER_PASSWORD }} > .env
+
+            echo ACCESS_TIMEOUT=${{ env.ACCESS_TIMEOUT }} > .env echo APP_PORT=${{ env.APP_PORT }} > .env echo DOMAIN=${{ env.DOMAIN }} > .env echo PGADMIN_EMAIL=${{ env.PGADMIN_EMAIL }} > .env echo PGADMIN_PORT=${{ env.PGADMIN_PORT }} > .env echo POSTGRES_DB=${{ env.POSTGRES_DB }} > .env echo POSTGRES_HOST=${{ env.POSTGRES_HOST }} > .env echo POSTGRES_PORT=${{ env.POSTGRES_PORT }} > .env echo POSTGRES_USER=${{ env.POSTGRES_USER }} > .env echo REFRESH_TIMEOUT=${{ env.REFRESH_TIMEOUT }} > .env echo SSH_HOST=${{ env.SSH_HOST }} > .env echo UPLOADED_FILES_DESTINATION=${{ env.UPLOADED_FILES_DESTINATION }} > .env
+
+      - name: Build and run Docker Compose
+        run: |
+          docker-compose up --build -d
+
+      # Add additional steps for testing or other actions
+
+      # - name: Stop Docker Compose
+      #   run: |
+      #     docker-compose stop
