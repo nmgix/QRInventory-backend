@@ -34,7 +34,6 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 .git
-package-lock.json
 *.env*
 server_ssh.ppk
 server_ssh.txt
