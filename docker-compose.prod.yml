@@ -43,12 +43,12 @@ services:
   postgres:
     image: postgres
     restart: always
-    container_name: ${POSTGRES_HOST:?err}
-    command: postgres -c port=${POSTGRES_PORT:?err} -c listen_addresses='*'
+    container_name: ${POSTGRES_HOST:?}
+    command: postgres -c port=${POSTGRES_PORT:?} -c listen_addresses='*'
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:?err}
-      POSTGRES_USER: ${POSTGRES_USER:?err}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?err}
+      POSTGRES_DB: ${POSTGRES_DB:?}
+      POSTGRES_USER: ${POSTGRES_USER:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
     networks:
       - api
 
