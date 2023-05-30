@@ -1,5 +1,6 @@
 services:
   qr-inventory-api-1:
+    restart: unless-stopped
     build:
       target: production
     environment:
@@ -44,7 +45,8 @@ services:
     image: postgres
     restart: always
     container_name: ${POSTGRES_HOST:?}
-    command: postgres -c port=${POSTGRES_PORT:?} -c listen_addresses='${REAL_IP:?}'
+    command: postgres -c port=${POSTGRES_PORT:?} -c listen_addresses='*'
+
     environment:
       POSTGRES_DB: ${POSTGRES_DB:?}
       POSTGRES_USER: ${POSTGRES_USER:?}

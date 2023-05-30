@@ -29,7 +29,6 @@ jobs:
           echo SSH_USER="${{ secrets.SSH_USER }}" >> .env |
           echo SSH_USER_PASSWORD="${{ secrets.SSH_USER_PASSWORD }}" >> .env |
 
-          echo REAL_IP="${{ vars.REAL_IP }}" >> .env |
           echo ACCESS_TIMEOUT="${{ vars.ACCESS_TIMEOUT }}" >> .env | 
           echo APP_PORT="${{ vars.APP_PORT }}" >> .env | 
           echo NGINX_PORT="${{ vars.NGINX_PORT }}" >> .env |

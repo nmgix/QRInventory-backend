@@ -17,7 +17,7 @@
 ```md
 # nginx
 
-REAL_IP=\*(вставить IP-адрес сервера) NGINX_PORT=8000 DOMAIN=localhost CONTAINER=qr-inventory-api:5000
+NGINX_PORT=8000 DOMAIN=localhost CONTAINER=qr-inventory-api:5000
 
 # app
 
