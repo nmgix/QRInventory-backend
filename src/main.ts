@@ -6,10 +6,11 @@ import appSetup from "./modules/app/app.setup";
 import { NodeENV } from "./helpers/types";
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  if (process.env.NODE_ENV !== NodeENV.prod) {
-    swaggerSetup(app);
-  }
+  const app =
+    await NestFactory.create<NestExpressApplication>(
+      AppModule
+    );
+  swaggerSetup(app);
   await appSetup(app);
 }
 bootstrap();
