@@ -1,3 +1,5 @@
 node_modules
 dist
 .git
+server_ssh.ppk
+server_ssh.txt

@@ -36,3 +36,5 @@ lerna-debug.log*
 .git
 package-lock.json
 *.env*
+server_ssh.ppk
+server_ssh.txt
