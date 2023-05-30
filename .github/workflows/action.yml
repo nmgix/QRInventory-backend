@@ -29,6 +29,7 @@ jobs:
           echo SSH_USER="${{ secrets.SSH_USER }}" >> .env |
           echo SSH_USER_PASSWORD="${{ secrets.SSH_USER_PASSWORD }}" >> .env |
 
+          echo REAL_IP="${{ vars.REAL_IP }}" >> .env |
           echo ACCESS_TIMEOUT="${{ vars.ACCESS_TIMEOUT }}" >> .env | 
           echo APP_PORT="${{ vars.APP_PORT }}" >> .env | 
           echo NGINX_PORT="${{ vars.NGINX_PORT }}" >> .env |
@@ -42,6 +43,7 @@ jobs:
           echo REFRESH_TIMEOUT="${{ vars.REFRESH_TIMEOUT }}" >> .env |
           echo SSH_HOST="${{ vars.SSH_HOST }}" >> .env |
           echo UPLOADED_FILES_DESTINATION="${{ vars.UPLOADED_FILES_DESTINATION }}" >> .env
+
       - name: Сборка Docker и деплой
         run: |
           docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d

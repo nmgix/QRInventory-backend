@@ -44,7 +44,7 @@ services:
     image: postgres
     restart: always
     container_name: ${POSTGRES_HOST:?}
-    command: postgres -c port=${POSTGRES_PORT:?} -c listen_addresses='*'
+    command: postgres -c port=${POSTGRES_PORT:?} -c listen_addresses='${REAL_IP:?}'
     environment:
       POSTGRES_DB: ${POSTGRES_DB:?}
       POSTGRES_USER: ${POSTGRES_USER:?}
