@@ -1,5 +1,7 @@
 # Бекенд дипломного проекта по инвентаризации
 
+[![Деплой бекенда](https://github.com/nmgix/QRInventory-backend/actions/workflows/action.yml/badge.svg?branch=main)](https://github.com/nmgix/QRInventory-backend/actions/workflows/action.yml)
+
 Команда для генерации секрета
 
 ```ts
