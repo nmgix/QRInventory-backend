@@ -43,4 +43,4 @@ jobs:
           echo UPLOADED_FILES_DESTINATION="${{ vars.UPLOADED_FILES_DESTINATION }}" >> .env
       - name: Сборка Docker и деплой
         run: |
-          npm run docker:compose:prod
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
