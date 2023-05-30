@@ -65,7 +65,9 @@ const config = new DocumentBuilder()
     },
     Tokens.refresh_token
   )
-  .addServer(`http://localhost:8000/api`)
+  .addServer(
+    `http://${process.env.DOMAIN}:${process.env.NGINX_PORT}/api`
+  )
   .build();
 
 export default function swaggerSetup(

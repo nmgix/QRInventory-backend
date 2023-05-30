@@ -17,7 +17,7 @@
 ```md
 # nginx
 
-DOMAIN=api-proxy CONTAINER=qr-inventory-api:5000
+NGINX_PORT=8000 DOMAIN=localhost CONTAINER=qr-inventory-api:5000
 
 # app
 

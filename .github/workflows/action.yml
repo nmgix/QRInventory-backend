@@ -31,6 +31,7 @@ jobs:
 
           echo ACCESS_TIMEOUT="${{ vars.ACCESS_TIMEOUT }}" >> .env | 
           echo APP_PORT="${{ vars.APP_PORT }}" >> .env | 
+          echo NGINX_PORT="${{ vars.NGINX_PORT }}" >> .env |
           echo DOMAIN="${{ vars.DOMAIN }}" >> .env | 
           echo PGADMIN_EMAIL="${{ vars.PGADMIN_EMAIL }}" >> .env | 
           echo PGADMIN_PORT="${{ vars.PGADMIN_PORT }}" >> .env | 
