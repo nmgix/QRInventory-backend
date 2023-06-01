@@ -46,7 +46,8 @@ services:
     restart: always
     container_name: ${POSTGRES_HOST:?}
     command: postgres -c port=${POSTGRES_PORT:?} -c listen_addresses='*'
-
+    volumes:
+      - docker-qr-invetorying-pg:/var/lib/postgresql/data/
     environment:
       POSTGRES_DB: ${POSTGRES_DB:?}
       POSTGRES_USER: ${POSTGRES_USER:?}
@@ -65,3 +66,6 @@ services:
     command: >
       /bin/sh -c "envsubst < /etc/nginx/nginx.conf.production.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
 
+
+volumes:
+  docker-qr-invetorying-pg:

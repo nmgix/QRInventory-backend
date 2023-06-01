@@ -43,8 +43,6 @@ services:
     networks:
       - api
 
-volumes:
-  docker-nest-invetorying:
 networks:
   api:
     name: api
