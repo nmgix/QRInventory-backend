@@ -43,6 +43,16 @@ jobs:
           echo SSH_HOST="${{ vars.SSH_HOST }}" >> .env |
           echo UPLOADED_FILES_DESTINATION="${{ vars.UPLOADED_FILES_DESTINATION }}" >> .env
 
+      - name: Дамп БД
+        run: |
+          docker exec -u ${{ vars.POSTGRES_USER }} ${{ vars.POSTGRES_HOST }} pg_dump -Fc ${{ vars.POSTGRES_DB }} > db.dump
+
       - name: Сборка Docker и деплой
+        if: success() || failure()
         run: |
           docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+
+      # - name: Фикс БД при ошибке
+      #   if: failure()
+      #   run: |
+      #     docker exec -i -u ${{ vars.POSTGRES_USER }} ${{ vars.POSTGRES_HOST }} pg_restore -C -d postgres < db.dump
