@@ -39,6 +39,8 @@ services:
       - postgres_test
 
   nginx:
+    ports:
+      - 8000:80
     build:
       args:
         NODE_ENV: development
