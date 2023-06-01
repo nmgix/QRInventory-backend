@@ -1,24 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import {
-  Equals,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  isStrongPassword,
-  Length,
-  Matches
-} from "class-validator";
-import { uuidRegexp } from "helpers/formatErrors";
-import { Institution } from "modules/institution/institution.entity";
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn
-} from "typeorm";
+import { Equals, IsNotEmpty, IsOptional, IsString, Length, Matches } from "class-validator";
+import { uuidRegexp } from "../../helpers/formatErrors";
+import { Institution } from "../institution/institution.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import Image from "../database/image.entity";
 import { ItemErrors } from "./item.i18n";
 

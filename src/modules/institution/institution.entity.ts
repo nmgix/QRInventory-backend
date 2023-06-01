@@ -1,11 +1,19 @@
-import { Equals, IsArray, IsNotEmpty, IsOptional, IsString, Length, Matches } from "class-validator";
+import {
+  Equals,
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+  Matches
+} from "class-validator";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 import { Cabinet } from "../cabinet/cabinet.entity";
 import { User } from "../user/user.entity";
 import { InstitutionErrors } from "./institution.i18n";
-import { Item } from "modules/item/item.entity";
-import { uuidRegexp } from "helpers/formatErrors";
+import { Item } from "../item/item.entity";
+import { uuidRegexp } from "../../helpers/formatErrors";
 
 const nameRegexp = /^(([а-яА-ЯёЁ0-9]+)\s?)*$/;
 
@@ -19,7 +27,11 @@ export class Institution {
   @Column({ unique: true })
   name: string;
 
-  @ApiProperty({ type: () => [Cabinet], uniqueItems: true, description: "Все кабинеты этого колледжа" })
+  @ApiProperty({
+    type: () => [Cabinet],
+    uniqueItems: true,
+    description: "Все кабинеты этого колледжа"
+  })
   @OneToMany(() => Cabinet, cabinet => cabinet.institution, { cascade: true })
   cabinets: Cabinet[];
 

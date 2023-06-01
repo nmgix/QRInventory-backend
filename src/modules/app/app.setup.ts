@@ -9,7 +9,7 @@ import { JwtService } from "@nestjs/jwt";
 import { Reflector } from "@nestjs/core";
 import { AuthService } from "../auth/auth.service";
 import { ClassSerializerInterceptor } from "@nestjs/common";
-import { NodeENV } from "helpers/types";
+import { NodeENV } from "../../helpers/types";
 
 export default async function appSetup(app: NestExpressApplication) {
   const configService: ConfigService = app.get(ConfigService);
@@ -23,6 +23,9 @@ export default async function appSetup(app: NestExpressApplication) {
   app.use(cookieParser(configService.get("JWT_COOKIE")));
   app.useGlobalPipes(formatErrorPipe);
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
-  app.useGlobalGuards(new AuthGuard(jwtService, configService, reflector, authService), new RolesGuard(reflector));
+  app.useGlobalGuards(
+    new AuthGuard(jwtService, configService, reflector, authService),
+    new RolesGuard(reflector)
+  );
   await app.listen(configService.get("APP_PORT"));
 }

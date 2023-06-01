@@ -1,8 +1,16 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
 import { IsArray, IsNotEmpty, IsOptional, IsString, Length, Matches } from "class-validator";
-import { uuidRegexp } from "helpers/formatErrors";
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { uuidRegexp } from "../../helpers/formatErrors";
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Unique
+} from "typeorm";
 import { Institution } from "../institution/institution.entity";
 import { Item } from "../item/item.entity";
 import { User } from "../user/user.entity";
@@ -21,12 +29,22 @@ export class Cabinet {
   cabinetNumber: string;
 
   @ApiProperty({ type: [User], uniqueItems: true })
-  @ManyToMany(() => User, user => user.id, { cascade: true, eager: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
+  @ManyToMany(() => User, user => user.id, {
+    cascade: true,
+    eager: true,
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+  })
   @JoinTable()
   teachers: User[];
 
   @ApiProperty({ type: [Item], uniqueItems: true })
-  @ManyToMany(() => Item, item => item.id, { cascade: true, eager: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
+  @ManyToMany(() => Item, item => item.id, {
+    cascade: true,
+    eager: true,
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+  })
   @JoinTable()
   items: Item[];
 

@@ -4,7 +4,7 @@ import { User } from "../../modules/user/user.entity";
 import { Cabinet } from "../cabinet/cabinet.entity";
 import { Item } from "../item/item.entity";
 import Image from "./image.entity";
-import { NodeENV } from "helpers/types";
+import { NodeENV } from "../../helpers/types";
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { DataSource, DataSourceOptions } from "typeorm";
 
@@ -13,7 +13,6 @@ import "dotenv/config";
 export const entities = [User, Cabinet, Item, Institution, Image];
 
 export const developmentConfig: TypeOrmModuleOptions = {
-  driver: "postgres",
   type: "postgres",
   logging: true,
   host: process.env.NODE_ENV !== NodeENV.devDocker ? "localhost" : process.env.POSTGRES_TEST_HOST,
@@ -32,7 +31,6 @@ export const developmentConfig: TypeOrmModuleOptions = {
 export const dbConfigDevelopment = registerAs("database-development", () => developmentConfig);
 
 export const productionConfig: TypeOrmModuleOptions = {
-  driver: "postgres",
   type: "postgres",
   logging: true,
   host: process.env.POSTGRES_HOST,

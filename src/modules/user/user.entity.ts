@@ -1,12 +1,30 @@
 import { Exclude, Expose } from "class-transformer";
-import { Equals, IsEmail, IsNotEmpty, IsOptional, IsString, IsStrongPassword, isStrongPassword, Length, Matches } from "class-validator";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Equals,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsStrongPassword,
+  isStrongPassword,
+  Length,
+  Matches
+} from "class-validator";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn
+} from "typeorm";
 import { UserErrors } from "./user.i18n";
 import { ApiProperty } from "@nestjs/swagger";
 import { Institution } from "../institution/institution.entity";
 import Image from "../database/image.entity";
-import { uuidRegexp } from "helpers/formatErrors";
-import { IsPasswordValid } from "helpers/passwordValid";
+import { uuidRegexp } from "../../helpers/formatErrors";
+import { IsPasswordValid } from "../../helpers/passwordValid";
 
 export enum UserRoles {
   ADMIN = "admin",
@@ -14,7 +32,8 @@ export enum UserRoles {
 }
 
 // const fullNameRegexp = /^([а-яА-ЯёЁ]{2,}\s([а-яА-ЯёЁ]{2,})\s?([а-яА-ЯёЁ]{1,})?)$/;
-const fullNameRegexp = /^[А-ЯЁ][а-яё]+([-][А-ЯЁ][а-яё]+)?\s[А-ЯЁ][а-яё]+([-][А-ЯЁ][а-яё]+)?(\s[А-ЯЁ][а-яё]+([-][А-ЯЁ][а-яё]+)?)?$/;
+const fullNameRegexp =
+  /^[А-ЯЁ][а-яё]+([-][А-ЯЁ][а-яё]+)?\s[А-ЯЁ][а-яё]+([-][А-ЯЁ][а-яё]+)?(\s[А-ЯЁ][а-яё]+([-][А-ЯЁ][а-яё]+)?)?$/;
 
 @Entity()
 export class User {
