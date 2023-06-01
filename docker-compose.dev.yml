@@ -4,7 +4,7 @@ services:
       target: production
     environment:
       NODE_ENV: developmentdocker
-    command: npm run start:prod
+    command: npm run start:docker
     depends_on:
       - postgres_test
 
