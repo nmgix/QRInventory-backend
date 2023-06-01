@@ -3,23 +3,20 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ImageController } from "./image.controller";
 import { ImageService } from "./image.service";
-import { dbConfigDevelopment, dbConfigProduction, entities } from "./db.config";
+import { developmentConfig, productionConfig, entities } from "./db.config";
+import { NodeENV } from "helpers/types";
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [dbConfigDevelopment, dbConfigProduction]
-    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
-        console.log(process.env.NODE_ENV);
+        const config =
+          configService.get("NODE_ENV") === NodeENV.prod ? productionConfig : developmentConfig;
+
         return Object.assign(
-          {
-            ...configService.get(`database-${process.env.NODE_ENV}`)
-          },
+          { ...config },
           {
             autoLoadEntities: true
           }

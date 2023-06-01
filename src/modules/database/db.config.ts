@@ -29,8 +29,6 @@ export const developmentConfig: TypeOrmModuleOptions = {
   dropSchema: false
 };
 
-export const dbConfigDevelopment = registerAs("database-development", () => developmentConfig);
-
 export const productionConfig: TypeOrmModuleOptions = {
   type: "postgres",
   logging: true,
@@ -48,6 +46,8 @@ export const productionConfig: TypeOrmModuleOptions = {
   dropSchema: false
 };
 
-export const dbConfigProduction = registerAs("database-production", () => productionConfig);
-
-export default new DataSource(developmentConfig as DataSourceOptions);
+export default new DataSource(
+  process.env.NODE_ENV === NodeENV.prod
+    ? { type: "postgres", ...productionConfig }
+    : { type: "postgres", ...developmentConfig }
+);

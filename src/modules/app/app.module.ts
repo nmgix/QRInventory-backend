@@ -11,7 +11,15 @@ import { NodeENV } from "../../helpers/types";
 import { PaginationMiddleware } from "helpers/pagination.middleware";
 
 @Module({
-  imports: [ConfigModule.forRoot({ envFilePath: [".env"], isGlobal: true }), AuthModule, DatabaseModule, UserModule, CabinetModule, ItemModule, InstitutionModule],
+  imports: [
+    ConfigModule.forRoot({ envFilePath: [".env"], isGlobal: true }),
+    AuthModule,
+    UserModule,
+    CabinetModule,
+    ItemModule,
+    InstitutionModule,
+    DatabaseModule
+  ],
   controllers: [],
   providers: []
 })
