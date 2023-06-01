@@ -1,4 +1,12 @@
-import { Controller, Get, HttpCode, Param, ParseIntPipe, Res, StreamableFile } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Res,
+  StreamableFile
+} from "@nestjs/common";
 import { Readable } from "typeorm/platform/PlatformTools";
 import { ImageService } from "./image.service";
 import { Response } from "express";
@@ -18,7 +26,10 @@ export class ImageController {
   @ApiResponse({ status: 200, description: "Фотография в виде stream", type: StreamableFile })
   @Get(":id")
   @HttpCode(200)
-  async getImageById(@Param("id", ParseIntPipe) id: number, @Res({ passthrough: true }) response: Response) {
+  async getImageById(
+    @Param("id", ParseIntPipe) id: number,
+    @Res({ passthrough: true }) response: Response
+  ) {
     const file = await this.imageService.getImageById(id);
     const stream = Readable.from(file.data);
 

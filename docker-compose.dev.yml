@@ -13,6 +13,8 @@ services:
     restart: always
     container_name: ${POSTGRES_TEST_HOST:?}
     command: postgres -c port=${POSTGRES_TEST_PORT:?} -c listen_addresses='*'
+    ports:
+      - "${POSTGRES_TEST_PORT}:${POSTGRES_TEST_PORT}"
     volumes:
       - docker-qr-invetorying-pg-test:/var/lib/postgresql/data/
     environment:

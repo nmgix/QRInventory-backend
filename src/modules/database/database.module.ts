@@ -1,119 +1,22 @@
 import { Logger, Module } from "@nestjs/common";
-import {
-  ConfigModule,
-  ConfigService
-} from "@nestjs/config";
-import {
-  TypeOrmModule,
-  TypeOrmModuleOptions
-} from "@nestjs/typeorm";
-import { Institution } from "../institution/institution.entity";
-import { User } from "../../modules/user/user.entity";
-import { Cabinet } from "../cabinet/cabinet.entity";
-import { Item } from "../item/item.entity";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { ImageController } from "./image.controller";
 import { ImageService } from "./image.service";
-import Image from "./image.entity";
-import { NodeENV } from "../../helpers/types";
-
-export const entities = [
-  User,
-  Cabinet,
-  Item,
-  Institution,
-  Image
-];
-
-const getDatabaseConfig = (
-  configService: ConfigService
-): TypeOrmModuleOptions => {
-  const mode = configService.get("NODE_ENV");
-
-  const configs: {
-    developmentdocker: TypeOrmModuleOptions;
-    development: TypeOrmModuleOptions;
-    production: TypeOrmModuleOptions;
-  } = {
-    developmentdocker: {
-      type: "postgres",
-      host: configService.get(
-        "POSTGRES_TEST_HOST"
-      ),
-      port: configService.get(
-        "POSTGRES_TEST_PORT"
-      ),
-      username: configService.get(
-        "POSTGRES_TEST_USER"
-      ),
-      password: configService.get(
-        "POSTGRES_TEST_PASSWORD"
-      ),
-      database: configService.get(
-        "POSTGRES_TEST_DB"
-      ),
-      entities,
-      synchronize: true,
-      retryAttempts: 5
-    },
-    development: {
-      type: "postgres",
-      host:
-        configService.get("NODE_ENV") !==
-        NodeENV.prod
-          ? "localhost"
-          : configService.get(
-              "POSTGRES_TEST_HOST"
-            ),
-      port: configService.get(
-        "POSTGRES_TEST_PORT"
-      ),
-      username: configService.get(
-        "POSTGRES_TEST_USER"
-      ),
-      password: configService.get(
-        "POSTGRES_TEST_PASSWORD"
-      ),
-      database: configService.get(
-        "POSTGRES_TEST_DB"
-      ),
-      entities,
-      synchronize: true,
-      retryAttempts: 5
-    },
-    production: {
-      type: "postgres",
-      host:
-        configService.get("NODE_ENV") !==
-        NodeENV.prod
-          ? "localhost"
-          : configService.get("POSTGRES_HOST"),
-      port: configService.get("POSTGRES_PORT"),
-      username: configService.get(
-        "POSTGRES_USER"
-      ),
-      password: configService.get(
-        "POSTGRES_PASSWORD"
-      ),
-      database: configService.get("POSTGRES_DB"),
-      entities,
-      // synchronize: false,
-      synchronize: true
-      // migrations: ["src/modules/database/migrations/*.ts"]
-    }
-  };
-  Logger.warn(`Подключение к ${mode} БД`);
-
-  return configs[mode];
-};
+import { dbConfigDevelopment, dbConfigProduction, entities } from "./db.config";
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [dbConfigDevelopment, dbConfigProduction]
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (
-        configService: ConfigService
-      ) => getDatabaseConfig(configService)
+      useFactory: async (configService: ConfigService) => ({
+        ...configService.get(`database-${process.env.NODE_ENV}`)
+      })
     }),
     TypeOrmModule.forFeature(entities)
   ],
