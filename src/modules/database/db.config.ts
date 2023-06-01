@@ -9,6 +9,7 @@ import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { DataSource, DataSourceOptions } from "typeorm";
 
 import "dotenv/config";
+import { join } from "path";
 
 export const entities = [User, Cabinet, Item, Institution, Image];
 
@@ -21,8 +22,8 @@ export const developmentConfig: TypeOrmModuleOptions = {
   password: process.env.POSTGRES_TEST_PASSWORD,
   database: process.env.POSTGRES_TEST_DB,
   autoLoadEntities: true,
-  entities: ["src/**/*.entity.ts"],
-  migrations: ["src/migrations/*{.ts,.js}"],
+  entities: [join(__dirname, "../", "**", "*.entity.{ts,js}")],
+  migrations: [join(__dirname, "../../", "migrations", "*.{ts,js}")],
   migrationsRun: true,
   retryAttempts: 10,
   dropSchema: false
@@ -39,8 +40,9 @@ export const productionConfig: TypeOrmModuleOptions = {
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
   autoLoadEntities: true,
-  entities: ["src/**/*.entity.ts"],
-  migrations: ["src/migrations/*{.ts,.js}"],
+  entities: [join(__dirname, "../", "**", "*.entity.{ts,js}")],
+  migrations: [join(__dirname, "../../", "migrations", "*.{ts,js}")],
+
   retryAttempts: 10,
   migrationsRun: true,
   dropSchema: false

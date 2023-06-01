@@ -14,15 +14,17 @@ import { dbConfigDevelopment, dbConfigProduction, entities } from "./db.config";
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) =>
-        Object.assign(
+      useFactory: async (configService: ConfigService) => {
+        console.log(process.env.NODE_ENV);
+        return Object.assign(
           {
             ...configService.get(`database-${process.env.NODE_ENV}`)
           },
           {
             autoLoadEntities: true
           }
-        )
+        );
+      }
     }),
     TypeOrmModule.forFeature(entities)
   ],
