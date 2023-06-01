@@ -43,7 +43,7 @@ export class Institution {
   @OneToMany(() => User, user => user.teacherInstitution, { cascade: true })
   teachers: User[];
 
-  @ApiProperty({ type: () => [User], description: "Все админы, относящиеся к этому колледжу" })
+  @ApiProperty({ type: () => User, description: "Админ, относящийся к этому колледжу" })
   @ManyToOne(() => User, user => user.institutions, { onDelete: "NO ACTION", onUpdate: "CASCADE" })
   admin: User;
 }
