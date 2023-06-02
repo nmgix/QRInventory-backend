@@ -26,8 +26,7 @@ jobs:
           echo JWT_REFRESH_SECRET="${{ secrets.JWT_REFRESH_SECRET }}" >> .env |
           echo PGADMIN_PASSWORD="${{ secrets.PGADMIN_PASSWORD }}" >> .env |
           echo POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" >> .env |
-          echo TEST_ADMIN_MAIL="${{ secrets.TEST_ADMIN_MAIL }}" >> .env |
-          echo TEST_ADMIN_PASSWORD="${{ secrets.TEST_ADMIN_PASSWORD }}" >> .env |
+          cat ../../../../.env >> .env |
 
           echo ACCESS_TIMEOUT="${{ vars.ACCESS_TIMEOUT }}" >> .env | 
           echo APP_PORT="${{ vars.APP_PORT }}" >> .env | 
@@ -44,17 +43,16 @@ jobs:
           echo UPLOADED_FILES_DESTINATION="${{ vars.UPLOADED_FILES_DESTINATION }}" >> .env
 
       - name: Дамп БД
+        continue-on-error: true
         run: |
           docker exec -u ${{ vars.POSTGRES_USER }} ${{ vars.POSTGRES_HOST }} pg_dump -Fc ${{ vars.POSTGRES_DB }} > db.dump
 
       - name: Удаление контейнеров
         continue-on-error: true
         run: |
-          docker-compose stop |
-          docker-compose down
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
 
       - name: Сборка Docker и деплой
-        continue-on-error: true
         run: |
           docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d --force-recreate
 

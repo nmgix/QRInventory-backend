@@ -43,7 +43,9 @@ PGADMIN_EMAIL=test@mail.com PGADMIN_PASSWORD=any-password PGADMIN_PORT=5480
 
 # test admin for showcase
 
-TEST_ADMIN_MAIL=admin@mail.com TEST_ADMIN_PASSWORD='$argon2id$v=19$m=65536,t=3,p=4$USXvM0Gx1hAnsazvNNQkXA$py/zN5qguEElCxEoP+nLMkaaB1NiRFX+BnRZBvyOoS4'
+### их необходимо поместить в .env по пути `/home/user` т.к. `$` плохо читается переменными и секретами github, а с докером вкупе ещё больше проблем
+
+TEST_ADMIN_MAIL=admin@mail.com TEST_ADMIN_PASSWORD=\$argon2id\$v=19\$m=65536,t=3,p=4$USXvM0Gx1hAnsazvNNQkXA$py/zN5qguEElCxEoP+nLMkaaB1NiRFX+BnRZBvyOoS4
 ```
 
 ## Shorthand-команды для БД
