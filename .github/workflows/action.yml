@@ -48,14 +48,18 @@ jobs:
         run: |
           docker exec -u ${{ vars.POSTGRES_USER }} ${{ vars.POSTGRES_HOST }} pg_dump -Fc ${{ vars.POSTGRES_DB }} > db.dump
 
+      - name: Сборка Docker
+        run: |
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
+
       - name: Удаление контейнеров
         continue-on-error: true
         run: |
           docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
 
-      - name: Сборка Docker и деплой
+      - name: Деплой
         run: |
-          docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d --force-recreate
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --force-recreate
 
       # - name: Фикс БД при ошибке
       #   if: failure()
