@@ -26,7 +26,8 @@ jobs:
           echo JWT_REFRESH_SECRET="${{ secrets.JWT_REFRESH_SECRET }}" >> .env |
           echo PGADMIN_PASSWORD="${{ secrets.PGADMIN_PASSWORD }}" >> .env |
           echo POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" >> .env |
-          cat ../../../../.env >> .env |
+          echo TEST_ADMIN_MAIL="${{ secrets.TEST_ADMIN_MAIL }}" >> .env |
+          echo TEST_ADMIN_PASSWORD="${{ secrets.TEST_ADMIN_PASSWORD//\/ }}" >> .env |
 
           echo ACCESS_TIMEOUT="${{ vars.ACCESS_TIMEOUT }}" >> .env | 
           echo APP_PORT="${{ vars.APP_PORT }}" >> .env | 
