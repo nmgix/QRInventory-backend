@@ -1,5 +1,6 @@
 services:
   qr-inventory-api-1:
+    restart: unless-stopped
     build:
       target: production
     environment:
