@@ -2,12 +2,12 @@ services:
   qr-inventory-api-1:
     restart: unless-stopped
     build:
-      target: production
+      target: development
     environment:
       NODE_ENV: developmentdocker
     command: npm run start:docker
     ports:
-      - "5000:5000"
+      - "5000:5001"
     depends_on:
       - postgres_test
 
