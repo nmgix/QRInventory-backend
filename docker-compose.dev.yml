@@ -6,6 +6,8 @@ services:
     environment:
       NODE_ENV: developmentdocker
     command: npm run start:docker
+    ports:
+      - "5000:5000"
     depends_on:
       - postgres_test
 
