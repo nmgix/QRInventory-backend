@@ -135,8 +135,14 @@ export class UserController {
   }
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
-  @Post("avatar/:id")
+  @Post("avatar")
   @ApiOperation({ summary: "Загрузка фотографии пользователя" })
+  @ApiQuery({
+    name: "id",
+    type: String,
+    description: "id пользователя для обновления фотографии, только для администраторов",
+    required: false
+  })
   @ApiResponse({ status: 201, description: "Сообщение об успешной загрузке фотографии" })
   @UseInterceptors(FileInterceptor("file"))
   @HttpCode(201)
@@ -151,7 +157,7 @@ export class UserController {
       })
     )
     file: Express.Multer.File,
-    @Param("id") id?: string
+    @Query("id") id?: string
   ) {
     const result = await this.userService.addAvatar(
       req.user.role === UserRoles.ADMIN ? id ?? req.user.id : req.user.id,
