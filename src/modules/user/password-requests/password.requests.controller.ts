@@ -9,7 +9,8 @@ import {
   Param,
   Post,
   Req,
-  UseFilters
+  UseFilters,
+  UseGuards
 } from "@nestjs/common";
 import { getRandomValues } from "crypto";
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
@@ -17,8 +18,6 @@ import { UserSwagger } from "documentation/user.docs";
 import { GlobalException } from "helpers/global.exceptions";
 import { Public } from "modules/auth/auth.decorator";
 import { AuthService } from "modules/auth/auth.service";
-// import { AuthedRequest } from "modules/auth/types";
-// import { InstitutionService } from "modules/institution/institution.service";
 import { Roles } from "modules/roles/roles.decorator";
 import { User, UserRoles } from "../user.entity";
 import { UserErrors } from "../user.i18n";
@@ -26,11 +25,13 @@ import { UserService } from "../user.service";
 import { PasswordRequestErrors, PasswordRequestMessages } from "./password.requests.i18n";
 import { PasswordRequestsService } from "./password.requests.service";
 import { CreateTicketDTO } from "./ticket.entity";
+import { AdminInstitutionGuard, InstitutionExistsGuard } from "./password.requests.guards";
 
 // https://stackoverflow.com/questions/50438986/how-to-create-nested-routes-with-parameters-using-nestjs
 
 @ApiTags(UserSwagger.subtag)
 @Controller("user/tickets/:institutionId")
+@UseGuards(InstitutionExistsGuard)
 @UseFilters(
   new GlobalException(
     UserErrors.user_data_input_error,
@@ -42,14 +43,13 @@ import { CreateTicketDTO } from "./ticket.entity";
 export class PasswordRequestsController {
   constructor(
     private passwordRequestService: PasswordRequestsService,
-    // private institutionService: InstitutionService,
     private userService: UserService,
     private authService: AuthService
   ) {}
 
-  // тут должна быть middleware что к выбраному учрждению у администратора есть доступ (middleware с services)
   @Roles(UserRoles.ADMIN)
   @Get("all")
+  @UseGuards(AdminInstitutionGuard)
   @HttpCode(200)
   @ApiOperation({ summary: "Получение всех тикетов учреждения" })
   @ApiParam({ name: "institutionId", description: "Id учреждения", type: String })
@@ -64,9 +64,9 @@ export class PasswordRequestsController {
     };
   }
 
-  // тут должна быть middleware что к выбраному учрждению у администратора есть доступ (middleware с services)
   @Roles(UserRoles.ADMIN)
   @Get(":id")
+  @UseGuards(AdminInstitutionGuard)
   @HttpCode(200)
   @ApiParam({ name: "institutionId", description: "Id учреждения", type: String })
   @ApiParam({ name: "id", description: "Id тикета в учреждении", type: String })
@@ -115,7 +115,9 @@ export class PasswordRequestsController {
   // тут должна быть middleware что к выбраному учрждению у администратора есть доступ (middleware с services)
   @Roles(UserRoles.ADMIN)
   @Delete(":id")
+  @UseGuards(AdminInstitutionGuard)
   @HttpCode(200)
+  @ApiParam({ name: "id", description: "Id учреждения", type: String })
   @ApiOperation({ summary: "Удаление существующего тикета" })
   @ApiResponse({ status: 200 })
   async deleteTicket(@Param("id") id: string) {
@@ -131,7 +133,12 @@ export class PasswordRequestsController {
 
   // тут должна быть middleware что к выбраному учрждению у администратора есть доступ (middleware с services)
   @Roles(UserRoles.ADMIN)
+  @UseGuards(AdminInstitutionGuard)
+  @HttpCode(200)
   @Post(":id/approve")
+  @ApiParam({ name: "id", description: "Id учреждения", type: String })
+  @ApiOperation({ summary: "Удаление существующего тикета" })
+  @ApiResponse({ status: 200 })
   async approveRequest(@Param("institutionId") institutionId: string, @Param("id") id: string) {
     const existingTicket = await this.passwordRequestService.getTicket(institutionId, id);
     if (!existingTicket) throw new BadRequestException(PasswordRequestErrors.ticket_not_found);

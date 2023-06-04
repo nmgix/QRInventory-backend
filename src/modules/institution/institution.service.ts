@@ -31,18 +31,33 @@ export class InstitutionService {
       .getManyAndCount();
   }
 
-  getInstitutionById(id: string, institutionId: string) {
-    return this.institutionRepository.findOneOrFail({ where: { admin: { id }, id: institutionId } });
+  async getInstitutionById(id: string, institutionId: string) {
+    return this.institutionRepository.findOneOrFail({
+      where: { admin: { id }, id: institutionId }
+    });
+  }
+
+  async institutionExists(institutionId: string) {
+    const institution = await this.institutionRepository.count({ where: { id: institutionId } });
+    return institution === 1;
   }
 
   async createInstitution(id: string, dto: CreateInstitutionDTO) {
     const admin = await this.userRepository.findOne({ where: { id } });
-    const institution = await this.institutionRepository.create({ ...dto, admin, cabinets: [], teachers: [], items: [] });
+    const institution = await this.institutionRepository.create({
+      ...dto,
+      admin,
+      cabinets: [],
+      teachers: [],
+      items: []
+    });
     return this.institutionRepository.save(institution);
   }
 
   async editInstitution(id: string, dto: EditInstitutionDTO) {
-    const institution = await this.institutionRepository.findOne({ where: { id: dto.id, admin: { id } } });
+    const institution = await this.institutionRepository.findOne({
+      where: { id: dto.id, admin: { id } }
+    });
     if (!institution) throw new Error(InstitutionErrors.institution_not_found);
 
     if (dto.teachers) {
