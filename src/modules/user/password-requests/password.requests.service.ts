@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Institution } from "modules/institution/institution.entity";
 import { Repository } from "typeorm";
 import { PasswordRequestTicket } from "./ticket.entity";
+import * as dayjs from "dayjs";
 
 @Injectable()
 export class PasswordRequestsService {
@@ -28,7 +29,12 @@ export class PasswordRequestsService {
 
   async createTicket(email: string, institutionId: string) {
     const institution = await this.institutionRepository.findOne({ where: { id: institutionId } });
-    const ticket = this.passwordRequestTicketRepository.create({ email, institution });
+    const date = dayjs().format();
+    const ticket = this.passwordRequestTicketRepository.create({
+      email,
+      institution,
+      created_date: date
+    });
     return this.passwordRequestTicketRepository.save(ticket);
   }
 

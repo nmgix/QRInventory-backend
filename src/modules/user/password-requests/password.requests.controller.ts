@@ -12,6 +12,7 @@ import {
   UseFilters,
   UseGuards
 } from "@nestjs/common";
+import * as dayjs from "dayjs";
 import { getRandomValues } from "crypto";
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { UserSwagger } from "documentation/user.docs";
@@ -26,6 +27,8 @@ import { PasswordRequestErrors, PasswordRequestMessages } from "./password.reque
 import { PasswordRequestsService } from "./password.requests.service";
 import { CreateTicketDTO } from "./ticket.entity";
 import { AdminInstitutionGuard, InstitutionExistsGuard } from "./password.requests.guards";
+import { SupportMailService } from "modules/mail/support.mail.service";
+import { dateDiff } from "helpers/dates";
 
 // https://stackoverflow.com/questions/50438986/how-to-create-nested-routes-with-parameters-using-nestjs
 
@@ -44,7 +47,8 @@ export class PasswordRequestsController {
   constructor(
     private passwordRequestService: PasswordRequestsService,
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private supportMailService: SupportMailService
   ) {}
 
   @Roles(UserRoles.ADMIN)
@@ -91,6 +95,18 @@ export class PasswordRequestsController {
     const [data, total] = await this.userService.get(institutionId, 1, 0, dto.email);
     const user: User = data[0];
     if (!user) throw new BadRequestException(UserErrors.user_not_found);
+
+    let currentDate = new Date();
+    let datesDifference = dateDiff(currentDate, user.nextAvailableRequestDate);
+    if (user.nextAvailableRequestDate.getTime() > currentDate.getTime())
+      throw new BadRequestException(
+        PasswordRequestErrors.request_denied_available_date +
+          (datesDifference > 1
+            ? `. Доступно через ${datesDifference} дня.`
+            : datesDifference === 1
+            ? ". Доступно завтра."
+            : ". Доступно сегодня, попробуйте позже.")
+      );
 
     const existingTicket = await this.passwordRequestService.getTicket(
       user.teacherInstitution.id,
@@ -142,8 +158,8 @@ export class PasswordRequestsController {
   async approveRequest(@Param("institutionId") institutionId: string, @Param("id") id: string) {
     const existingTicket = await this.passwordRequestService.getTicket(institutionId, id);
     if (!existingTicket) throw new BadRequestException(PasswordRequestErrors.ticket_not_found);
-    const [data, total] = await this.userService.get(institutionId, 1, 0, existingTicket.email);
-    const user: User = data[0];
+    let [data, total] = await this.userService.get(institutionId, 1, 0, existingTicket.email);
+    let user: User = data[0];
     if (!user) {
       await this.passwordRequestService.deleteTicket(existingTicket.id);
       throw new BadRequestException(UserErrors.user_not_found + ", запрос удалён");
@@ -155,11 +171,19 @@ export class PasswordRequestsController {
     } catch (error) {
       throw new Error(PasswordRequestErrors.password_not_updated);
     }
+
+    let nextDate = dayjs();
+    let nextAvailableRequestDate = nextDate.add(3, "days").toDate();
     await this.passwordRequestService.deleteTicket(existingTicket.id);
+    await this.userService.update(user.id, { nextAvailableRequestDate });
 
-    // здесь должен быть запрос на сервис почты где будет отправлять сообщение, не догадаться отправить его Зимину XD
-
-    console.log(newPassword);
+    let mail = await this.supportMailService.resetPasswordResponse(
+      user.fullName,
+      existingTicket.created_date,
+      nextAvailableRequestDate,
+      user.email,
+      newPassword
+    );
 
     return { message: PasswordRequestMessages.password_updated };
   }

@@ -10,5 +10,6 @@ export enum PasswordRequestErrors {
   ticket_not_found = "Запрос не найден",
   ticket_exists = "Запрос существует",
 
-  password_not_updated = "Пароль не обновлён"
+  password_not_updated = "Пароль не обновлён",
+  request_denied_available_date = "Пароль недавно был обновлён"
 }

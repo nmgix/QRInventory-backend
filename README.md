@@ -51,7 +51,7 @@ TEST_ADMIN_MAIL=admin@mail.com TEST_ADMIN_PASSWORD=\$\$argon2id\$\$v=19\$\$m=655
 
 # mail
 
-DOMAIN=qrinventory.ru MAIL=support MAIL_LOGIN=some@mail.com MAIL_PASSWORD=some-password
+DOMAIN=qrinventory.ru MAIL=support MAIL_PASSWORD=some-password
 ```
 
 ## Shorthand-команды для БД

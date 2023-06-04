@@ -12,6 +12,7 @@ import {
 } from "class-validator";
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -87,7 +88,8 @@ export class User {
   @Column({ nullable: true })
   avatarId?: number;
 
-  // lastRecoveredPassword: Date
+  @CreateDateColumn()
+  nextAvailableRequestDate: Date;
 }
 
 export class CreateUserDTO {

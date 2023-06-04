@@ -4,6 +4,7 @@ import { AuthModule } from "modules/auth/auth.module";
 import { DatabaseModule } from "modules/database/database.module";
 import { Institution } from "modules/institution/institution.entity";
 import { InstitutionModule } from "modules/institution/institution.module";
+import { SupportMailModule } from "modules/mail/support.mail.module";
 import { User } from "../user.entity";
 import { UserModule } from "../user.module";
 import { PasswordRequestsController } from "./password.requests.controller";
@@ -15,6 +16,7 @@ import { PasswordRequestTicket } from "./ticket.entity";
     TypeOrmModule.forFeature([User, Institution, PasswordRequestTicket]),
     DatabaseModule,
     InstitutionModule,
+    SupportMailModule,
     forwardRef(() => AuthModule),
     forwardRef(() => UserModule)
   ],

@@ -28,7 +28,6 @@ jobs:
           echo POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" >> .env |
           echo TEST_ADMIN_MAIL="${{ secrets.TEST_ADMIN_MAIL }}" >> .env |
           echo TEST_ADMIN_PASSWORD="${{ secrets.TEST_ADMIN_PASSWORD }}" >> .env |
-          echo MAIL_LOGIN="${{ secrets.MAIL_LOGIN }}" >> .env |
           echo MAIL_PASSWORD="${{ secrets.MAIL_PASSWORD }}" >> .env |
 
           echo ACCESS_TIMEOUT="${{ vars.ACCESS_TIMEOUT }}" >> .env | 
