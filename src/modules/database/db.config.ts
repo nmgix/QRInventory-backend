@@ -1,17 +1,17 @@
-import { registerAs } from "@nestjs/config";
+import "dotenv/config";
+import { join } from "path";
+import { NodeENV } from "../../helpers/types";
+import { TypeOrmModuleOptions } from "@nestjs/typeorm";
+import { DataSource } from "typeorm";
+
 import { Institution } from "../institution/institution.entity";
 import { User } from "../../modules/user/user.entity";
 import { Cabinet } from "../cabinet/cabinet.entity";
 import { Item } from "../item/item.entity";
+import { PasswordRequestTicket } from "../user/password-requests/ticket.entity";
 import Image from "./image.entity";
-import { NodeENV } from "../../helpers/types";
-import { TypeOrmModuleOptions } from "@nestjs/typeorm";
-import { DataSource, DataSourceOptions } from "typeorm";
 
-import "dotenv/config";
-import { join } from "path";
-
-export const entities = [User, Cabinet, Item, Institution, Image];
+export const entities = [User, Cabinet, Item, Institution, Image, PasswordRequestTicket];
 
 export const developmentConfig: TypeOrmModuleOptions = {
   type: "postgres",

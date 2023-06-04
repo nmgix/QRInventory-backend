@@ -27,6 +27,7 @@
     "typeorm:migration:revert": "npm run typeorm -- migration:revert -d src/modules/database/db.config"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^1.8.1",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
@@ -43,6 +44,7 @@
     "cross-var": "^1.1.0",
     "dotenv": "^16.1.3",
     "express-rate-limit": "^6.7.0",
+    "nodemailer": "^6.9.3",
     "pg": "^8.10.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",

@@ -31,9 +31,7 @@ export class Cabinet {
   @ApiProperty({ type: [User], uniqueItems: true })
   @ManyToMany(() => User, user => user.id, {
     cascade: true,
-    eager: true,
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE"
+    eager: true
   })
   @JoinTable()
   teachers: User[];
@@ -41,16 +39,14 @@ export class Cabinet {
   @ApiProperty({ type: [Item], uniqueItems: true })
   @ManyToMany(() => Item, item => item.id, {
     cascade: true,
-    eager: true,
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE"
+    eager: true
   })
   @JoinTable()
   items: Item[];
 
   @Exclude()
   @ApiProperty({ type: () => Institution, uniqueItems: true })
-  @ManyToOne(() => Institution, institution => institution.cabinets)
+  @ManyToOne(() => Institution, institution => institution.cabinets, { cascade: true })
   institution: Institution;
 }
 

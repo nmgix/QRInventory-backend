@@ -26,7 +26,7 @@ export class Item {
   name: string;
 
   @ApiProperty({ type: () => Institution })
-  @ManyToOne(() => Institution, insitution => insitution.items)
+  @ManyToOne(() => Institution, insitution => insitution.items, { cascade: true })
   institution: Institution;
 
   @OneToOne(() => Image, { nullable: true, onDelete: "CASCADE" })

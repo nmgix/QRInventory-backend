@@ -28,11 +28,11 @@ jobs:
           echo POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" >> .env |
           echo TEST_ADMIN_MAIL="${{ secrets.TEST_ADMIN_MAIL }}" >> .env |
           echo TEST_ADMIN_PASSWORD="${{ secrets.TEST_ADMIN_PASSWORD }}" >> .env |
+          echo MAIL_LOGIN="${{ secrets.MAIL_LOGIN }}" >> .env |
+          echo MAIL_PASSWORD="${{ secrets.MAIL_PASSWORD }}" >> .env |
 
           echo ACCESS_TIMEOUT="${{ vars.ACCESS_TIMEOUT }}" >> .env | 
           echo APP_PORT="${{ vars.APP_PORT }}" >> .env | 
-          echo NGINX_PORT="${{ vars.NGINX_PORT }}" >> .env |
-          echo DOMAIN="${{ vars.DOMAIN }}" >> .env | 
           echo PGADMIN_EMAIL="${{ vars.PGADMIN_EMAIL }}" >> .env | 
           echo PGADMIN_PORT="${{ vars.PGADMIN_PORT }}" >> .env | 
           echo POSTGRES_DB="${{ vars.POSTGRES_DB }}" >> .env | 
@@ -41,7 +41,9 @@ jobs:
           echo POSTGRES_USER="${{ vars.POSTGRES_USER }}" >> .env | 
           echo REFRESH_TIMEOUT="${{ vars.REFRESH_TIMEOUT }}" >> .env |
           echo SSH_HOST="${{ vars.SSH_HOST }}" >> .env |
-          echo UPLOADED_FILES_DESTINATION="${{ vars.UPLOADED_FILES_DESTINATION }}" >> .env
+          echo UPLOADED_FILES_DESTINATION="${{ vars.UPLOADED_FILES_DESTINATION }}" >> .env |
+          echo DOMAIN="${{ vars.DOMAIN }}" >> .env |
+          echo MAIL="${{ vars.MAIL }}" >> .env
 
       - name: Дамп БД
         continue-on-error: true

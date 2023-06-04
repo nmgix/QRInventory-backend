@@ -21,23 +21,49 @@ export class UserService {
   ) {}
 
   async getAllTeachers(teacherInstitution: string, take: number = 10, skip: number = 0) {
-    if (!teacherInstitution) throw new BadRequestException(InstitutionErrors.institution_not_stated);
-    let institution = await this.institutionRepository.findOne({ where: { id: teacherInstitution } });
+    if (!teacherInstitution)
+      throw new BadRequestException(InstitutionErrors.institution_not_stated);
+    let institution = await this.institutionRepository.findOne({
+      where: { id: teacherInstitution }
+    });
     if (!institution) throw new Error(InstitutionErrors.institution_not_found);
-    return this.userRepository.createQueryBuilder("user").leftJoinAndSelect("user.teacherInstitution", "institution").where("user.teacherInstitution.id = :teacherInstitution", { teacherInstitution }).orderBy("user.fullName", "ASC").offset(skip).limit(take).getManyAndCount();
+    return this.userRepository
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.teacherInstitution", "institution")
+      .where("user.teacherInstitution.id = :teacherInstitution", { teacherInstitution })
+      .orderBy("user.fullName", "ASC")
+      .offset(skip)
+      .limit(take)
+      .getManyAndCount();
   }
 
-  async get(institutionId?: string, take?: number, skip?: number, email?: string, id?: string, fio?: string, admin?: boolean) {
+  async get(
+    institutionId?: string,
+    take?: number,
+    skip?: number,
+    email?: string,
+    id?: string,
+    fio?: string,
+    admin?: boolean
+  ) {
     if (admin) {
       if (id) {
-        const user = await this.userRepository.findOne({ where: { id }, relations: ["institution", "teacherInstitution"] });
+        const user = await this.userRepository.findOne({
+          where: { id },
+          relations: ["institution", "teacherInstitution"]
+        });
         return [[user], 1];
       } else {
         let result = await this.userRepository
           .createQueryBuilder("user")
           .leftJoinAndSelect("user.institutions", "institution")
           .leftJoinAndSelect("user.teacherInstitution", "teacherInstitution")
-          .where(institutionId ? "(user.email LIKE :email OR user.fullName LIKE :fullName) AND institution.id = :institutionId" : "user.email LIKE :email OR user.fullName LIKE :fullName", { email: `%${email}%`, fullName: `%${fio}%`, institutionId })
+          .where(
+            institutionId
+              ? "(user.email LIKE :email OR user.fullName LIKE :fullName) AND institution.id = :institutionId"
+              : "user.email LIKE :email OR user.fullName LIKE :fullName",
+            { email: `%${email}%`, fullName: `%${fio}%`, institutionId }
+          )
           .offset(id ? 1 : skip ? skip : 0)
           .limit(id ? 1 : take ? take : 10)
           .orderBy("user.fullName", "ASC")
@@ -53,17 +79,25 @@ export class UserService {
       }
     } else {
       if (id) {
-        const user = await this.userRepository.findOne({ where: { id }, relations: ["teacherInstitution"] });
+        const user = await this.userRepository.findOne({
+          where: { id, role: Not(UserRoles.ADMIN) },
+          relations: ["teacherInstitution"]
+        });
         return [[user], 1];
       } else {
         return this.userRepository
           .createQueryBuilder("user")
-          .where(institutionId ? "((user.email LIKE :email OR user.fullName LIKE :fullName) AND user.role != :role) AND institution.id = :institutionId" : "(user.email LIKE :email OR user.fullName LIKE :fullName) AND user.role != :role", {
-            email: `%${email}%`,
-            fullName: `%${fio}%`,
-            role: UserRoles.ADMIN,
+          .where(
             institutionId
-          })
+              ? "((user.email LIKE :email OR user.fullName LIKE :fullName) AND user.role != :role) AND institution.id = :institutionId"
+              : "(user.email LIKE :email OR user.fullName LIKE :fullName) AND user.role != :role",
+            {
+              email: `%${email}%`,
+              fullName: `%${fio}%`,
+              role: UserRoles.ADMIN,
+              institutionId
+            }
+          )
           .leftJoinAndSelect("user.teacherInstitution", "teacherInstitution")
           .offset(id ? 1 : skip ? skip : 0)
           .limit(id ? 1 : take ? take : 10)
@@ -90,9 +124,15 @@ export class UserService {
   }
 
   async create(user: CreateUserDTO) {
-    let institution = await this.institutionRepository.findOne({ where: { id: user.teacherInstitution } });
+    let institution = await this.institutionRepository.findOne({
+      where: { id: user.teacherInstitution }
+    });
     if (!institution) throw new Error(InstitutionErrors.institution_not_found);
-    const createdUser = await this.userRepository.create({ ...user, teacherInstitution: institution, refreshToken: null });
+    const createdUser = await this.userRepository.create({
+      ...user,
+      teacherInstitution: institution,
+      refreshToken: null
+    });
 
     return this.userRepository.save(createdUser);
   }
@@ -110,7 +150,12 @@ export class UserService {
 
     if (Object.keys(data).length > 0) {
       let foundUser = await this.getById(userId, true);
-      if (!foundUser || (foundUser.id !== userId && role !== UserRoles.ADMIN) || (foundUser.id !== userId && role === UserRoles.ADMIN && foundUser.role === UserRoles.ADMIN)) return { affected: 0 } as UpdateResult;
+      if (
+        !foundUser ||
+        (foundUser.id !== userId && role !== UserRoles.ADMIN) ||
+        (foundUser.id !== userId && role === UserRoles.ADMIN && foundUser.role === UserRoles.ADMIN)
+      )
+        return { affected: 0 } as UpdateResult;
       return this.update(userId, data as unknown as Partial<User>);
     } else {
       return { affected: 0 } as UpdateResult;
@@ -125,15 +170,18 @@ export class UserService {
     return this.userRepository.delete({ id });
   }
 
-  async clearTable() {
-    return this.userRepository.delete({});
-  }
-
   async createAdmin(user: CreateUserDTO) {
-    let institution = await this.institutionRepository.findOne({ where: { id: user.teacherInstitution } });
+    let institution = await this.institutionRepository.findOne({
+      where: { id: user.teacherInstitution }
+    });
     if (!institution) throw new Error(InstitutionErrors.institution_not_found);
 
-    await this.userRepository.create({ ...user, teacherInstitution: institution, role: UserRoles.ADMIN, refreshToken: null });
+    await this.userRepository.create({
+      ...user,
+      teacherInstitution: institution,
+      role: UserRoles.ADMIN,
+      refreshToken: null
+    });
   }
 
   async addAvatar(userId: string, imageBuffer: Buffer, filename: string) {

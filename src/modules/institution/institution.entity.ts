@@ -9,11 +9,13 @@ import {
 } from "class-validator";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
+import { uuidRegexp } from "../../helpers/formatErrors";
+
 import { Cabinet } from "../cabinet/cabinet.entity";
 import { User } from "../user/user.entity";
 import { InstitutionErrors } from "./institution.i18n";
 import { Item } from "../item/item.entity";
-import { uuidRegexp } from "../../helpers/formatErrors";
+import { PasswordRequestTicket } from "../user/password-requests/ticket.entity";
 
 const nameRegexp = /^(([а-яА-ЯёЁ0-9]+)\s?)*$/;
 
@@ -32,16 +34,20 @@ export class Institution {
     uniqueItems: true,
     description: "Все кабинеты этого колледжа"
   })
-  @OneToMany(() => Cabinet, cabinet => cabinet.institution, { cascade: true })
+  @OneToMany(() => Cabinet, cabinet => cabinet.institution)
   cabinets: Cabinet[];
 
   @ApiProperty()
-  @OneToMany(() => Item, item => item.institution, { cascade: true })
+  @OneToMany(() => Item, item => item.institution)
   items: Item[];
 
   @ApiProperty()
-  @OneToMany(() => User, user => user.teacherInstitution, { cascade: true })
+  @OneToMany(() => User, user => user.teacherInstitution)
   teachers: User[];
+
+  @ApiProperty()
+  @OneToMany(() => PasswordRequestTicket, ticket => ticket.institution)
+  tickets: PasswordRequestTicket[];
 
   @ApiProperty({ type: () => User, description: "Админ, относящийся к этому колледжу" })
   @ManyToOne(() => User, user => user.institutions, { onDelete: "NO ACTION", onUpdate: "CASCADE" })

@@ -9,10 +9,19 @@ import { InstitutionModule } from "../institution/institution.module";
 import { AppLoggerMiddleware } from "../../helpers/requests.logger";
 import { NodeENV } from "../../helpers/types";
 import { PaginationMiddleware } from "helpers/pagination.middleware";
+import { MailerModule } from "@nestjs-modules/mailer";
 
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: [".env"], isGlobal: true }),
+    MailerModule.forRootAsync({
+      useFactory: () => ({
+        transport: `smtps://${process.env.MAIL_LOGIN}@${process.env.DOMAIN}:${process.env.MAIL_PASSWORD}@mail.hosting.reg.ru`,
+        defaults: {
+          from: `"QRInventory Support" <${process.env.MAIL}@${process.env.DOMAIN}>`
+        }
+      })
+    }),
     AuthModule,
     UserModule,
     CabinetModule,

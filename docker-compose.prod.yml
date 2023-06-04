@@ -55,10 +55,6 @@ services:
     networks:
       - api
 
-  pgadmin:
-    depends_on:
-      - postgres
-
   nginx:
     build:
       args:

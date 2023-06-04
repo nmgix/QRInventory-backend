@@ -17,7 +17,7 @@
 ```md
 # nginx
 
-DOMAIN=localhost CONTAINER=qr-inventory-api:5000
+CONTAINER=qr-inventory-api:5000
 
 # app
 
@@ -48,6 +48,10 @@ PGADMIN_EMAIL=test@mail.com PGADMIN_PASSWORD=any-password PGADMIN_PORT=5480
 ### локально в пароле нужно убрать бэкслеши и возможно второй пароль (они для github чтобы не удалять $argon2id и пр. содержащие $)
 
 TEST_ADMIN_MAIL=admin@mail.com TEST_ADMIN_PASSWORD=\$\$argon2id\$\$v=19\$\$m=65536,t=3,p=4\$\$USXvM0Gx1hAnsazvNNQkXA\$\$py/zN5qguEElCxEoP+nLMkaaB1NiRFX+BnRZBvyOoS4
+
+# mail
+
+DOMAIN=qrinventory.ru MAIL=support MAIL_LOGIN=some@mail.com MAIL_PASSWORD=some-password
 ```
 
 ## Shorthand-команды для БД

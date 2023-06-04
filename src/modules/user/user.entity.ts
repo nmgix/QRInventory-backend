@@ -74,7 +74,10 @@ export class User {
   institutions: Institution[];
 
   @ApiProperty({ type: () => Institution })
-  @ManyToOne(() => Institution, institution => institution.teachers, { nullable: true })
+  @ManyToOne(() => Institution, institution => institution.teachers, {
+    nullable: true,
+    cascade: true
+  })
   teacherInstitution: Institution;
 
   @OneToOne(() => Image, { nullable: true, onDelete: "CASCADE" })
@@ -83,6 +86,8 @@ export class User {
 
   @Column({ nullable: true })
   avatarId?: number;
+
+  // lastRecoveredPassword: Date
 }
 
 export class CreateUserDTO {

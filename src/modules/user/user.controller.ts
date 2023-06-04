@@ -1,4 +1,22 @@
-import { Controller, Body, Post, Get, Param, Delete, HttpCode, UseFilters, Req, Query, BadRequestException, UseInterceptors, UploadedFile, Patch, ParseFilePipe, FileTypeValidator, MaxFileSizeValidator } from "@nestjs/common";
+import {
+  Controller,
+  Body,
+  Post,
+  Get,
+  Param,
+  Delete,
+  HttpCode,
+  UseFilters,
+  Req,
+  Query,
+  BadRequestException,
+  UseInterceptors,
+  UploadedFile,
+  Patch,
+  ParseFilePipe,
+  FileTypeValidator,
+  MaxFileSizeValidator
+} from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 
@@ -16,7 +34,13 @@ import { UpdateResult } from "typeorm";
 
 @ApiTags(UserSwagger.tag)
 @Controller("user")
-@UseFilters(new GlobalException(UserErrors.user_data_input_error, UserErrors.user_data_input_error, UserErrors.user_not_found))
+@UseFilters(
+  new GlobalException(
+    UserErrors.user_data_input_error,
+    UserErrors.user_data_input_error,
+    UserErrors.user_not_found
+  )
+)
 export class UserController {
   constructor(private userService: UserService, private authService: AuthService) {}
 
@@ -24,7 +48,11 @@ export class UserController {
   @Get("all")
   @HttpCode(200)
   @ApiOperation({ summary: "Получение всех учителей" })
-  @ApiQuery({ name: "institution", required: true, description: "Учреждение по которому искать (id)" })
+  @ApiQuery({
+    name: "institution",
+    required: true,
+    description: "Учреждение по которому искать (id)"
+  })
   @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
   @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
   @ApiResponse({ status: 200, description: "Все учителя", type: [User] })
@@ -40,16 +68,38 @@ export class UserController {
   @Get("search")
   @HttpCode(200)
   @ApiOperation({ summary: "Получение учителя по id, либо fio" })
-  @ApiQuery({ name: "fio", required: false, description: "Для запроса другого пользователя по fio" })
+  @ApiQuery({
+    name: "fio",
+    required: false,
+    description: "Для запроса другого пользователя по fio"
+  })
   @ApiQuery({ name: "institution", description: "id учреждения", required: false })
   @ApiQuery({ name: "id", required: false, description: "Для запроса другого пользователя по id" })
-  @ApiQuery({ name: "email", required: false, description: "Для запроса другого пользователя по email" })
+  @ApiQuery({
+    name: "email",
+    required: false,
+    description: "Для запроса другого пользователя по email"
+  })
   @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
   @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
   @ApiResponse({ status: 200, description: "Учитель, найденный в БД (либо null)", type: User })
-  async getTeacher(@Query() { take, skip }, @Query("fio") fio?: string, @Query("institution") institution?: string, @Query("id") id?: string, @Query("email") email?: string) {
+  async getTeacher(
+    @Query() { take, skip },
+    @Query("fio") fio?: string,
+    @Query("institution") institution?: string,
+    @Query("id") id?: string,
+    @Query("email") email?: string
+  ) {
     if (!id && !institution) throw new BadRequestException(UserErrors.no_id_no_institution);
-    const [data, total] = await this.userService.get(institution, take, skip, email, id, fio, false);
+    const [data, total] = await this.userService.get(
+      institution,
+      take,
+      skip,
+      email,
+      id,
+      fio,
+      false
+    );
 
     if (id) {
       return data[0];
@@ -65,7 +115,11 @@ export class UserController {
   @Roles(UserRoles.TEACHER, UserRoles.ADMIN)
   @Get()
   @ApiOperation({ summary: "Получение себя" })
-  @ApiResponse({ status: 200, description: "Учитель или админ с привязанными учереждениями", type: User })
+  @ApiResponse({
+    status: 200,
+    description: "Учитель или админ с привязанными учереждениями",
+    type: User
+  })
   @HttpCode(200)
   async getUser(@Req() req: AuthedRequest) {
     return this.userService.getById(req.user.id, req.user.role === UserRoles.ADMIN);
@@ -90,13 +144,20 @@ export class UserController {
     @Req() req: AuthedRequest,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })]
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }),
+          new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })
+        ]
       })
     )
     file: Express.Multer.File,
     @Param("id") id?: string
   ) {
-    const result = await this.userService.addAvatar(req.user.role === UserRoles.ADMIN ? id ?? req.user.id : req.user.id, file.buffer, file.originalname);
+    const result = await this.userService.addAvatar(
+      req.user.role === UserRoles.ADMIN ? id ?? req.user.id : req.user.id,
+      file.buffer,
+      file.originalname
+    );
     return {
       message: `Фотография загружена, id: ${result.id}`
     };
@@ -105,15 +166,33 @@ export class UserController {
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
   @Patch("edit")
   @ApiOperation({ summary: "Изменение пользователя" })
-  @ApiQuery({ name: "id", description: "Id пользователя, передавать этот параметр только при авторизации от имени администратора", required: false, type: String })
-  @ApiResponse({ status: 200, description: "Статус удален ли пользователь или не найден", type: User })
+  @ApiQuery({
+    name: "id",
+    description:
+      "Id пользователя, передавать этот параметр только при авторизации от имени администратора",
+    required: false,
+    type: String
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Статус удален ли пользователь или не найден",
+    type: User
+  })
   @HttpCode(200)
-  async updateUser(@Req() req: AuthedRequest, @Body() dto: UpdateUserDTO, @Query("id") id?: string) {
+  async updateUser(
+    @Req() req: AuthedRequest,
+    @Body() dto: UpdateUserDTO,
+    @Query("id") id?: string
+  ) {
     let updateResult: UpdateResult;
     if (id !== undefined && req.user.role === UserRoles.ADMIN) {
       updateResult = await this.userService.updateUser(id, { ...dto, id }, req.user.role);
     } else {
-      updateResult = await this.userService.updateUser(req.user.id, { ...dto, id: req.user.id }, req.user.role);
+      updateResult = await this.userService.updateUser(
+        req.user.id,
+        { ...dto, id: req.user.id },
+        req.user.role
+      );
     }
 
     return {
@@ -132,5 +211,19 @@ export class UserController {
     return {
       message: deleteResult.affected === 0 ? UserErrors.user_not_found : UserMessages.user_deleted
     };
+  }
+
+  @Public()
+  @Post("reset-password/:email")
+  @ApiOperation({ summary: "Восстановление пароля" })
+  @ApiResponse({
+    status: 200,
+    description:
+      "Либо пользователь не найден, либо заявка отправлена на почту администратора учреждения"
+  })
+  async resetPassword(@Param("email") email: string) {
+    // поискать этого пользователя
+    // если нет, респонс что не найден
+    // если есть, то на сервис smtp отправлять на почту нужного админа или пока что на общую
   }
 }

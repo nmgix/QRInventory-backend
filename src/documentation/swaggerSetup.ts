@@ -1,8 +1,5 @@
 import { INestApplication } from "@nestjs/common";
-import {
-  DocumentBuilder,
-  SwaggerModule
-} from "@nestjs/swagger";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { Tokens } from "../modules/auth/types";
 
 import { AuthSwagger } from "./auth.docs";
@@ -23,30 +20,12 @@ const config = new DocumentBuilder()
   .setTitle(SwaggerData.api_name)
   .setDescription(SwaggerData.api_description)
   .setVersion(SwaggerData.api_version)
-  .addTag(
-    AuthSwagger.tag,
-    AuthSwagger.description
-  )
-  .addTag(
-    UserSwagger.tag,
-    UserSwagger.description
-  )
-  .addTag(
-    CabinetSwagger.tag,
-    CabinetSwagger.description
-  )
-  .addTag(
-    ItemSwagger.tag,
-    ItemSwagger.description
-  )
-  .addTag(
-    InstitutionSwagger.tag,
-    InstitutionSwagger.description
-  )
-  .addTag(
-    DocumentFileSwagger.tag,
-    DocumentFileSwagger.description
-  )
+  .addTag(AuthSwagger.tag, AuthSwagger.description)
+  .addTag(UserSwagger.tag, UserSwagger.description)
+  .addTag(CabinetSwagger.tag, CabinetSwagger.description)
+  .addTag(ItemSwagger.tag, ItemSwagger.description)
+  .addTag(InstitutionSwagger.tag, InstitutionSwagger.description)
+  .addTag(DocumentFileSwagger.tag, DocumentFileSwagger.description)
   .addCookieAuth(
     Tokens.access_token,
     {
@@ -65,32 +44,19 @@ const config = new DocumentBuilder()
     },
     Tokens.refresh_token
   )
-  .addServer(
-    `http://${process.env.DOMAIN}:${process.env.NGINX_PORT}/api`
-  )
   .build();
 
-export default function swaggerSetup(
-  app: INestApplication
-) {
-  const document = SwaggerModule.createDocument(
-    app,
-    config
-  );
-  SwaggerModule.setup(
-    "documentation",
-    app,
-    document,
-    {
-      customSiteTitle: SwaggerData.swagger_title,
-      swaggerOptions: {
-        docExpansion: "none",
-        operationsSorter: "alpha",
-        tagsSorter: "alpha",
-        showExtensions: true,
-        defaultModelsExpandDepth: 3,
-        defaultModelExpandDepth: 3
-      }
+export default function swaggerSetup(app: INestApplication) {
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup("documentation", app, document, {
+    customSiteTitle: SwaggerData.swagger_title,
+    swaggerOptions: {
+      docExpansion: "none",
+      operationsSorter: "alpha",
+      tagsSorter: "alpha",
+      showExtensions: true,
+      defaultModelsExpandDepth: 3,
+      defaultModelExpandDepth: 3
     }
-  );
+  });
 }
