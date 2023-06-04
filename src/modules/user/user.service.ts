@@ -60,7 +60,7 @@ export class UserService {
           .leftJoinAndSelect("user.teacherInstitution", "teacherInstitution")
           .where(
             institutionId
-              ? "(user.email LIKE :email OR user.fullName LIKE :fullName) AND institution.id = :institutionId"
+              ? "(user.email LIKE :email OR user.fullName LIKE :fullName) AND (teacherInstitution.id = :institutionId OR institution.id = :institutionId)"
               : "user.email LIKE :email OR user.fullName LIKE :fullName",
             { email: `%${email}%`, fullName: `%${fio}%`, institutionId }
           )
@@ -87,9 +87,10 @@ export class UserService {
       } else {
         return this.userRepository
           .createQueryBuilder("user")
+          .leftJoinAndSelect("user.teacherInstitution", "teacherInstitution")
           .where(
             institutionId
-              ? "((user.email LIKE :email OR user.fullName LIKE :fullName) AND user.role != :role) AND institution.id = :institutionId"
+              ? "((user.email LIKE :email OR user.fullName LIKE :fullName) AND user.role != :role) AND teacherInstitution.id = :institutionId"
               : "(user.email LIKE :email OR user.fullName LIKE :fullName) AND user.role != :role",
             {
               email: `%${email}%`,
@@ -98,7 +99,6 @@ export class UserService {
               institutionId
             }
           )
-          .leftJoinAndSelect("user.teacherInstitution", "teacherInstitution")
           .offset(id ? 1 : skip ? skip : 0)
           .limit(id ? 1 : take ? take : 10)
           .orderBy("user.fullName", "ASC")

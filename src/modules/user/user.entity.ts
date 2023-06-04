@@ -157,3 +157,4 @@ export class UpdateUserDTO {
 }
 
 export type InternalUpdateUserDTO = UpdateUserDTO & { id: string };
+export type InternalUpdatePassword = { id: string; password: string };

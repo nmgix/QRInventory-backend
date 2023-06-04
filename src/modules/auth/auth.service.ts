@@ -7,7 +7,13 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { CreateUserDTO, InternalUpdateUserDTO, UpdateUserDTO, User } from "../user/user.entity";
+import {
+  CreateUserDTO,
+  InternalUpdatePassword,
+  InternalUpdateUserDTO,
+  UpdateUserDTO,
+  User
+} from "../user/user.entity";
 import { UserService } from "../user/user.service";
 import * as argon2 from "argon2";
 import { AuthLoginDTO } from "./auth.dto";
@@ -68,6 +74,15 @@ export class AuthService {
     await this.userService.update(user.id, { password: hashedPassword });
     const tokens = await this.createTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
+    return true;
+  }
+
+  async internalUpdatePassword(dto: InternalUpdatePassword) {
+    let user = await this.userService.getById(dto.id, true);
+    if (!user) throw new BadRequestException(AuthErrors.user_not_found);
+    if (!dto.password) throw new BadRequestException(AuthErrors.password_empty);
+    const hashedPassword = await argon2.hash(dto.password);
+    await this.userService.update(user.id, { password: hashedPassword });
     return true;
   }
 

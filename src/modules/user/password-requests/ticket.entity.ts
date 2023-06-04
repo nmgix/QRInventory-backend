@@ -1,6 +1,8 @@
 import { Institution } from "../../institution/institution.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
+import { IsEmail } from "class-validator";
+import { UserErrors } from "../user.i18n";
 
 @Entity()
 export class PasswordRequestTicket {
@@ -19,5 +21,6 @@ export class PasswordRequestTicket {
 
 export class CreateTicketDTO {
   @ApiProperty({ description: "Почта учителя" })
+  @IsEmail({}, { message: UserErrors.email_not_email })
   email: string;
 }
