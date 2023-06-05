@@ -34,13 +34,7 @@ import { UpdateResult } from "typeorm";
 
 @ApiTags(UserSwagger.tag)
 @Controller("user")
-@UseFilters(
-  new GlobalException(
-    UserErrors.user_data_input_error,
-    UserErrors.user_data_input_error,
-    UserErrors.user_not_found
-  )
-)
+@UseFilters(new GlobalException(UserErrors.user_data_input_error, UserErrors.user_data_input_error, UserErrors.user_not_found))
 export class UserController {
   constructor(private userService: UserService, private authService: AuthService) {}
 
@@ -91,22 +85,13 @@ export class UserController {
     @Query("email") email?: string
   ) {
     if (!id && !institution) throw new BadRequestException(UserErrors.no_id_no_institution);
-    const [data, total] = await this.userService.get(
-      institution,
-      take,
-      skip,
-      email,
-      id,
-      fio,
-      false
-    );
+    const [data, total] = await this.userService.get(institution, take, skip, email, id, fio, false);
 
     if (id) {
       return data[0];
     } else {
       return {
         users: data,
-
         total
       };
     }
@@ -150,10 +135,7 @@ export class UserController {
     @Req() req: AuthedRequest,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }),
-          new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })
-        ]
+        validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })]
       })
     )
     file: Express.Multer.File,
@@ -174,8 +156,7 @@ export class UserController {
   @ApiOperation({ summary: "Изменение пользователя" })
   @ApiQuery({
     name: "id",
-    description:
-      "Id пользователя, передавать этот параметр только при авторизации от имени администратора",
+    description: "Id пользователя, передавать этот параметр только при авторизации от имени администратора",
     required: false,
     type: String
   })
@@ -185,20 +166,12 @@ export class UserController {
     type: User
   })
   @HttpCode(200)
-  async updateUser(
-    @Req() req: AuthedRequest,
-    @Body() dto: UpdateUserDTO,
-    @Query("id") id?: string
-  ) {
+  async updateUser(@Req() req: AuthedRequest, @Body() dto: UpdateUserDTO, @Query("id") id?: string) {
     let updateResult: UpdateResult;
     if (id !== undefined && req.user.role === UserRoles.ADMIN) {
       updateResult = await this.userService.updateUser(id, { ...dto, id }, req.user.role);
     } else {
-      updateResult = await this.userService.updateUser(
-        req.user.id,
-        { ...dto, id: req.user.id },
-        req.user.role
-      );
+      updateResult = await this.userService.updateUser(req.user.id, { ...dto, id: req.user.id }, req.user.role);
     }
 
     return {
@@ -224,8 +197,7 @@ export class UserController {
   @ApiOperation({ summary: "Восстановление пароля" })
   @ApiResponse({
     status: 200,
-    description:
-      "Либо пользователь не найден, либо заявка отправлена на почту администратора учреждения"
+    description: "Либо пользователь не найден, либо заявка отправлена на почту администратора учреждения"
   })
   async resetPassword(@Param("email") email: string) {
     // поискать этого пользователя

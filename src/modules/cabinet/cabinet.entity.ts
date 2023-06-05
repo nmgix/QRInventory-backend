@@ -2,15 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
 import { IsArray, IsNotEmpty, IsOptional, IsString, Length, Matches } from "class-validator";
 import { uuidRegexp } from "../../helpers/formatErrors";
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  Unique
-} from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { Institution } from "../institution/institution.entity";
 import { Item } from "../item/item.entity";
 import { User } from "../user/user.entity";
@@ -68,11 +60,11 @@ export class EditCabinetDTO {
   @Matches(uuidRegexp, { message: CabinetErrors.cabinet_id_regexp })
   id: string;
 
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString({ message: CabinetErrors.cabinet_institution_string })
-  @Matches(uuidRegexp, { message: CabinetErrors.cabinet_institution_regexp })
-  institution?: string;
+  // @ApiProperty({ required: false })
+  // @IsOptional()
+  // @IsString({ message: CabinetErrors.cabinet_institution_string })
+  // @Matches(uuidRegexp, { message: CabinetErrors.cabinet_institution_regexp })
+  // institution?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

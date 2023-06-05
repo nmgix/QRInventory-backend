@@ -1,4 +1,18 @@
-import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, HttpCode, Param, Patch, Post, Query, Req, UseFilters } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseFilters
+} from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GlobalException } from "../../helpers/global.exceptions";
 import { Cabinet, CreateCabinetDTO, EditCabinetDTO } from "./cabinet.entity";
@@ -25,7 +39,10 @@ export class CabinetController {
   @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
   @HttpCode(200)
   async getAllCabinets(@Req() req: AuthedRequest, @Query() { take, skip }, @Query("institution") institution: string) {
-    const [data, total] = req.user.role === UserRoles.ADMIN ? await this.cabinetService.getAdminAll(req.user.id, institution, take, skip) : await this.cabinetService.getTeacherAll(req.user.id, institution, take, skip);
+    const [data, total] =
+      req.user.role === UserRoles.ADMIN
+        ? await this.cabinetService.getAdminAll(req.user.id, institution, take, skip)
+        : await this.cabinetService.getTeacherAll(req.user.id, institution, take, skip);
     return {
       cabinets: data,
       total
@@ -34,15 +51,20 @@ export class CabinetController {
 
   @Public()
   @Get()
-  @ApiOperation({ summary: "Поиск кабинета по id" })
+  @ApiOperation({ summary: "Поиск кабинета по id либо номеру" })
+  @ApiQuery({ name: "cabinet", description: "Номер кабинета", required: false, type: String })
   @ApiQuery({ name: "institution", description: "id учреждения", required: false })
   @ApiQuery({ name: "id", description: "Id кабинета", required: false })
-  @ApiQuery({ name: "cabinet", description: "Номер кабинета", required: false, type: String })
   @ApiQuery({ name: "take", required: false, description: "Сколько записей взять" })
   @ApiQuery({ name: "skip", required: false, description: "Сколько записей пропустить" })
   @ApiResponse({ status: 200, description: "Найденный кабинет (со всеми найденными в БД учителями и предметами)", type: Cabinet })
   @HttpCode(200)
-  async findCabinets(@Query() { take, skip }, @Query("institution") institution?: string, @Query("id") id?: string, @Query("cabinet") cabinet?: string) {
+  async findCabinets(
+    @Query() { take, skip },
+    @Query("institution") institution?: string,
+    @Query("id") id?: string,
+    @Query("cabinet") cabinet?: string
+  ) {
     const [data, total] = await this.cabinetService.get(institution, take, skip, id, cabinet);
     if (id) {
       return data[0];
@@ -61,7 +83,10 @@ export class CabinetController {
   @HttpCode(201)
   async createCabinet(@Req() req: AuthedRequest, @Body() dto: CreateCabinetDTO) {
     // здесь привязывать к колледжу
-    const cabinet = await this.cabinetService.create(req.user.id, { ...dto, teachers: req.user.role !== UserRoles.ADMIN ? [String(req.user.id)] : dto.teachers });
+    const cabinet = await this.cabinetService.create(req.user.id, {
+      ...dto,
+      teachers: req.user.role !== UserRoles.ADMIN ? [String(req.user.id)] : dto.teachers
+    });
     const [data, total] = await this.cabinetService.get(dto.institution, undefined, undefined, cabinet.id);
     return data[0];
   }

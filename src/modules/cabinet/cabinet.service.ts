@@ -27,7 +27,8 @@ export class CabinetService {
     if (!institution) throw new Error(InstitutionErrors.institution_not_found);
 
     let cabinet = await this.cabinetRepository.create({ cabinetNumber: dto.cabinetNumber, institution });
-    if (institution.cabinets.find(instCab => instCab.cabinetNumber === cabinet.cabinetNumber)) throw new BadRequestException(CabinetErrors.cabinet_exists);
+    if (institution.cabinets.find(instCab => instCab.cabinetNumber === cabinet.cabinetNumber))
+      throw new BadRequestException(CabinetErrors.cabinet_exists);
 
     if (user.role === UserRoles.TEACHER) dto.teachers.length > 0 ? dto.teachers.push(id) : (dto.teachers = [id]);
     if (dto.teachers) {
@@ -50,7 +51,11 @@ export class CabinetService {
     } else {
       return this.cabinetRepository
         .createQueryBuilder("cabinet")
-        .where("(cabinet.cabinetNumber LIKE :cabinetNumber OR cabinet.id = :id) and cabinet.institution = :institutionId", { id, cabinetNumber: `%${cabinet}%`, institutionId })
+        .where("(cabinet.cabinetNumber LIKE :cabinetNumber OR cabinet.id = :id) and cabinet.institution = :institutionId", {
+          id,
+          cabinetNumber: `%${cabinet}%`,
+          institutionId
+        })
         .leftJoinAndSelect("cabinet.teachers", "user")
         .leftJoinAndSelect("cabinet.items", "item")
         .orderBy("cabinet.cabinetNumber", "ASC")
@@ -104,21 +109,27 @@ export class CabinetService {
     });
     let futureInstitution: Institution;
 
-    if (dto.institution) {
-      futureInstitution = await this.institutionRepository.findOne({ where: { id: dto.institution, admin: { id: userId } } });
-      cabinet.institution = futureInstitution;
-    }
+    // if (dto.institution) {
+    //   futureInstitution = await this.institutionRepository.findOne({ where: { id: dto.institution, admin: { id: userId } } });
+    //   cabinet.institution = futureInstitution;
+    // }
 
     if (dto.cabinetNumber !== undefined) cabinet.cabinetNumber = dto.cabinetNumber;
     if (dto.teachers !== undefined) {
       // разобраться как можно передавать учителей и предметы без этих костылей
-      const teachers = await this.userRepository.findBy({ id: In(dto.teachers), teacherInstitution: { id: futureInstitution ? futureInstitution.id : currentInstitution.id } });
+      const teachers = await this.userRepository.findBy({
+        id: In(dto.teachers),
+        teacherInstitution: { id: futureInstitution ? futureInstitution.id : currentInstitution.id }
+      });
       // и начать пользоваться repository.update({ id }, dto)
       cabinet.teachers = teachers;
     }
 
     if (dto.items !== undefined) {
-      const items = await this.itemRepository.findBy({ id: In(dto.items), institution: { id: futureInstitution ? futureInstitution.id : currentInstitution.id } });
+      const items = await this.itemRepository.findBy({
+        id: In(dto.items),
+        institution: { id: futureInstitution ? futureInstitution.id : currentInstitution.id }
+      });
       cabinet.items = items;
     }
 
