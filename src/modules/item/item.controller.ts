@@ -103,12 +103,13 @@ export class ItemController {
     @Req() req: AuthedRequest,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })]
+        validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })],
+        fileIsRequired: false
       })
     )
     file?: Express.Multer.File
   ) {
-    const result = await this.itemService.addImage(req.user.id, id, file.buffer, file.originalname);
+    const result = await this.itemService.addImage(req.user.id, id, file?.buffer, file?.originalname);
 
     if (!result) return { message: "Фотография удалена" };
 

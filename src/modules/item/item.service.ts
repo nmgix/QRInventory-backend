@@ -118,6 +118,7 @@ export class ItemService {
 
     if (!imageBuffer) {
       try {
+        await this.itemRepository.update(itemId, { imageId: null });
         await this.imageService.deteleImageById(item.imageId);
       } catch (error) {}
 

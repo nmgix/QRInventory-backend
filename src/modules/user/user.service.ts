@@ -166,6 +166,7 @@ export class UserService {
 
     if (!imageBuffer) {
       try {
+        await this.userRepository.update(user.id, { avatarId: null });
         await this.imageService.deteleImageById(user.avatarId);
       } catch (error) {}
 
