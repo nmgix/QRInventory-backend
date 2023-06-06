@@ -80,7 +80,7 @@ export class CabinetController {
   @Post("create")
   @ApiOperation({ summary: "Создание кабинета, необходим номер кабинета, опционально предметы и учителя" })
   @ApiResponse({ status: 201, description: "Созданный кабинет (со всеми найденными в БД учителями и предметами)", type: Cabinet })
-  @HttpCode(201)
+  @HttpCode(200)
   async createCabinet(@Req() req: AuthedRequest, @Body() dto: CreateCabinetDTO) {
     // здесь привязывать к колледжу
     const cabinet = await this.cabinetService.create(req.user.id, {

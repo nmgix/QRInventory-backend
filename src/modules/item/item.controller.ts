@@ -1,4 +1,21 @@
-import { Body, Controller, Delete, FileTypeValidator, Get, HttpCode, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Post, Query, Req, UploadedFile, UseFilters, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  FileTypeValidator,
+  Get,
+  HttpCode,
+  MaxFileSizeValidator,
+  Param,
+  ParseFilePipe,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UploadedFile,
+  UseFilters,
+  UseInterceptors
+} from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Roles } from "../roles/roles.decorator";
 import { UserRoles } from "../user/user.entity";
@@ -60,7 +77,7 @@ export class ItemController {
   @Post("create")
   @ApiOperation({ summary: "Создание предмета в БД" })
   @ApiResponse({ status: 201, description: "Созданный предмет", type: Item })
-  @HttpCode(201)
+  @HttpCode(200)
   async createItem(@Body() dto: CreateItemDTO, @Req() req: AuthedRequest) {
     return this.itemService.create(req.user.id, dto);
   }
@@ -80,18 +97,21 @@ export class ItemController {
   @ApiQuery({ name: "id", description: "Id предмета" })
   @ApiResponse({ status: 201, description: "Сообщение об успешной загрузке фотографии" })
   @UseInterceptors(FileInterceptor("file"))
-  @HttpCode(201)
+  @HttpCode(200)
   async addImage(
     @Query("id") id: string,
+    @Req() req: AuthedRequest,
     @UploadedFile(
       new ParseFilePipe({
         validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })]
       })
     )
-    file: Express.Multer.File,
-    @Req() req: AuthedRequest
+    file?: Express.Multer.File
   ) {
     const result = await this.itemService.addImage(req.user.id, id, file.buffer, file.originalname);
+
+    if (!result) return { message: "Фотография удалена" };
+
     return {
       message: `Фотография загружена, id: ${result.id}`
     };

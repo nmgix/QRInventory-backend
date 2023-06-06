@@ -21,8 +21,7 @@ export class UserService {
   ) {}
 
   async getAllTeachers(teacherInstitution: string, take: number = 10, skip: number = 0) {
-    if (!teacherInstitution)
-      throw new BadRequestException(InstitutionErrors.institution_not_stated);
+    if (!teacherInstitution) throw new BadRequestException(InstitutionErrors.institution_not_stated);
     let institution = await this.institutionRepository.findOne({
       where: { id: teacherInstitution }
     });
@@ -37,15 +36,7 @@ export class UserService {
       .getManyAndCount();
   }
 
-  async get(
-    institutionId?: string,
-    take?: number,
-    skip?: number,
-    email?: string,
-    id?: string,
-    fio?: string,
-    admin?: boolean
-  ) {
+  async get(institutionId?: string, take?: number, skip?: number, email?: string, id?: string, fio?: string, admin?: boolean) {
     if (admin) {
       if (id) {
         const user = await this.userRepository.findOne({
@@ -170,22 +161,16 @@ export class UserService {
     return this.userRepository.delete({ id });
   }
 
-  async createAdmin(user: CreateUserDTO) {
-    let institution = await this.institutionRepository.findOne({
-      where: { id: user.teacherInstitution }
-    });
-    if (!institution) throw new Error(InstitutionErrors.institution_not_found);
-
-    await this.userRepository.create({
-      ...user,
-      teacherInstitution: institution,
-      role: UserRoles.ADMIN,
-      refreshToken: null
-    });
-  }
-
   async addAvatar(userId: string, imageBuffer: Buffer, filename: string) {
     const user = await this.getById(userId, true);
+
+    if (!imageBuffer) {
+      try {
+        await this.imageService.deteleImageById(user.avatarId);
+      } catch (error) {}
+
+      return;
+    }
 
     try {
       const avatar = await this.imageService.uploadImage(imageBuffer, filename);

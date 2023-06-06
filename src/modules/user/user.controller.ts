@@ -114,7 +114,7 @@ export class UserController {
   @Post("create")
   @ApiOperation({ summary: "Создание учителя" })
   @ApiResponse({ status: 201, description: "Созданный учитель в БД", type: User })
-  @HttpCode(201)
+  @HttpCode(200)
   async createTeacher(@Body() dto: CreateUserDTO) {
     return (await this.authService.register(dto)).user;
   }
@@ -130,7 +130,7 @@ export class UserController {
   })
   @ApiResponse({ status: 201, description: "Сообщение об успешной загрузке фотографии" })
   @UseInterceptors(FileInterceptor("file"))
-  @HttpCode(201)
+  @HttpCode(200)
   async addAvatar(
     @Req() req: AuthedRequest,
     @UploadedFile(
@@ -138,7 +138,7 @@ export class UserController {
         validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })]
       })
     )
-    file: Express.Multer.File,
+    file?: Express.Multer.File,
     @Query("id") id?: string
   ) {
     const result = await this.userService.addAvatar(
@@ -146,6 +146,9 @@ export class UserController {
       file.buffer,
       file.originalname
     );
+
+    if (!result) return { message: "Фотография удалена" };
+
     return {
       message: `Фотография загружена, id: ${result.id}`
     };
