@@ -115,6 +115,7 @@ export class ItemService {
     });
     if (!foundInstitution) throw new BadRequestException(InstitutionErrors.institution_not_found);
     let item = (await this.findMatching(foundInstitution.id, 1, 0, itemId))[0][0] as Item;
+    if (!item) throw new Error(ItemErrors.item_not_found);
 
     if (!imageBuffer) {
       try {
