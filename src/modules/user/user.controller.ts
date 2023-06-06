@@ -144,8 +144,8 @@ export class UserController {
   ) {
     const result = await this.userService.addAvatar(
       req.user.role === UserRoles.ADMIN ? id ?? req.user.id : req.user.id,
-      file.buffer,
-      file.originalname
+      file?.buffer,
+      file?.originalname
     );
 
     if (!result) return { message: "Фотография удалена" };

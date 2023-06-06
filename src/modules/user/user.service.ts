@@ -162,7 +162,7 @@ export class UserService {
     return this.userRepository.delete({ id });
   }
 
-  async addAvatar(userId: string, imageBuffer: Buffer, filename: string) {
+  async addAvatar(userId: string, imageBuffer?: Buffer, filename?: string) {
     const user = await this.getById(userId, true);
     if (!user) throw new Error(UserErrors.user_not_found);
 
