@@ -103,7 +103,7 @@ export class ItemController {
     @Req() req: AuthedRequest,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })],
+        validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }), new FileTypeValidator({ fileType: ".(png|jpeg|jpg|gif)" })],
         fileIsRequired: false
       })
     )

@@ -16,7 +16,6 @@ http {
         location /api/ {
             # proxy_set_header Host $host;
             # proxy_set_header Connection $http_connection;
-            proxy_set_header content-type "application/json";
             proxy_pass http://backend/;
         }
     }
