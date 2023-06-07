@@ -49,6 +49,10 @@ jobs:
         run: |
           docker exec -u ${{ vars.POSTGRES_USER }} ${{ vars.POSTGRES_HOST }} pg_dump -Fc ${{ vars.POSTGRES_DB }} > db.dump
 
+      - name: Копирование deep dark secrets
+        run: |
+          cp -rv ../../../../resources ./
+
       - name: Сборка Docker
         run: |
           docker-compose -f docker-compose.yml -f docker-compose.prod.yml build

@@ -98,12 +98,12 @@ export class CabinetController {
   @HttpCode(200)
   async editCabinet(@Req() req: AuthedRequest, @Body() dto: EditCabinetDTO) {
     const [data, total] = await this.cabinetService.get(undefined, undefined, undefined, dto.id);
-    const cabinet = data[0];
+    const cabinet: Cabinet = data[0];
     if (!cabinet) throw new BadRequestException(CabinetErrors.cabinet_not_found);
     if ((req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) || req.user.role === UserRoles.ADMIN) {
-      if (req.user.role === UserRoles.TEACHER) {
-        const userInTeachers = dto.teachers?.find(teacherId => teacherId === req.user.id);
-        const teachers = dto.teachers ? (userInTeachers ? dto.teachers : [...dto.teachers, req.user.id]) : undefined;
+      const userInTeachers = cabinet.teachers?.some(ct => ct.id === req.user.id);
+      if (req.user.role === UserRoles.TEACHER && userInTeachers) {
+        const teachers = dto.teachers ? dto.teachers : undefined;
         return this.cabinetService.update(req.user.id, { ...dto, teachers });
       } else if (req.user.role === UserRoles.ADMIN) {
         const teachers = dto.teachers?.filter(teacherId => teacherId !== req.user.id);
