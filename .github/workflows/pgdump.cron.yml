@@ -2,7 +2,7 @@ name: Дамп Базы Данных
 
 on:
   schedule:
-    - cron: "0 12 * * *"
+    - cron: "0 */4 * * *"
 jobs:
   dumping_db:
     runs-on: self-hosted
