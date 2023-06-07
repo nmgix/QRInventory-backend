@@ -47,7 +47,7 @@ jobs:
       - name: Дамп БД
         continue-on-error: true
         run: |
-          docker exec -u ${{ vars.POSTGRES_USER }} ${{ vars.POSTGRES_HOST }} pg_dump -Fc ${{ vars.POSTGRES_DB }} > db.dump
+          docker exec -u ${{ vars.POSTGRES_USER }} ${{ vars.POSTGRES_HOST }} pg_dump -Fc ${{ vars.POSTGRES_DB }} > ../../../../db.dump
 
       - name: Копирование deep dark secrets
         run: |
