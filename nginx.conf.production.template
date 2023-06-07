@@ -10,7 +10,7 @@ http {
     }
 
     server {
-        add_header x-powered-by "nmgix"
+        add_header x-powered-by "nmgix";
         listen 8000;
         server_name $DOMAIN;
 
