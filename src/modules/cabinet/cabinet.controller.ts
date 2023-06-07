@@ -126,6 +126,9 @@ export class CabinetController {
     const [data, total] = await this.cabinetService.get(undefined, undefined, undefined, id);
     const cabinet = data[0];
     if ((req.user.role === UserRoles.TEACHER && cabinet.teachers.some(teacher => teacher.id === req.user.id)) || req.user.role === UserRoles.ADMIN) {
+      const userInTeachers = cabinet.teachers?.some(ct => ct.id === req.user.id);
+      if (req.user.role === UserRoles.TEACHER && !userInTeachers) throw new ForbiddenException(AuthErrors.access_denied);
+
       const result = await this.cabinetService.delete(req.user.id, id);
       return {
         message: result.affected > 0 ? CabinetMessages.cabinet_deleted : CabinetErrors.cabinet_not_found
