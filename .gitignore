@@ -38,4 +38,3 @@ lerna-debug.log*
 server_ssh.ppk
 server_ssh.txt
 very-secret-page.*
-/src/resources

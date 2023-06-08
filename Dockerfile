@@ -1,6 +1,7 @@
 FROM node:18-alpine As build
 WORKDIR /usr/src/app
 COPY --chown=node:node package*.json ./
+COPY --chown=node:node nest-cli.json ./
 RUN npm ci && npm cache clean --force
 COPY --chown=node:node . .
 RUN npm run build

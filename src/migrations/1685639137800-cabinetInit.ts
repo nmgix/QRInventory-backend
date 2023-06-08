@@ -23,7 +23,7 @@ export class CabinetInit1685639137800 implements MigrationInterface {
       items: [item],
       teachers: [teacher]
     });
-    await queryRunner.manager.insert(Cabinet, cabinet);
+    await queryRunner.manager.save(Cabinet, cabinet);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

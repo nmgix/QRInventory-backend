@@ -15,7 +15,7 @@ export const entities = [User, Cabinet, Item, Institution, Image, PasswordReques
 
 export const developmentConfig: TypeOrmModuleOptions = {
   type: "postgres",
-  logging: true,
+  logging: false,
   host: process.env.NODE_ENV !== NodeENV.devDocker ? "localhost" : process.env.POSTGRES_TEST_HOST,
   port: parseInt(process.env.POSTGRES_TEST_PORT),
   username: process.env.POSTGRES_TEST_USER,
@@ -31,7 +31,7 @@ export const developmentConfig: TypeOrmModuleOptions = {
 
 export const productionConfig: TypeOrmModuleOptions = {
   type: "postgres",
-  logging: true,
+  logging: false,
   host: process.env.POSTGRES_HOST,
   port: parseInt(process.env.POSTGRES_PORT),
   username: process.env.POSTGRES_USER,
@@ -47,7 +47,5 @@ export const productionConfig: TypeOrmModuleOptions = {
 };
 
 export default new DataSource(
-  process.env.NODE_ENV === NodeENV.prod
-    ? { type: "postgres", ...productionConfig }
-    : { type: "postgres", ...developmentConfig }
+  process.env.NODE_ENV === NodeENV.prod ? { type: "postgres", ...productionConfig } : { type: "postgres", ...developmentConfig }
 );
