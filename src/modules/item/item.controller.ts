@@ -119,12 +119,12 @@ export class ItemController {
   }
 
   @Roles(UserRoles.ADMIN, UserRoles.TEACHER)
-  @Delete(":searchString")
-  @ApiOperation({ summary: "Удаление предмета по id или артикулу" })
+  @Delete(":id")
+  @ApiOperation({ summary: "Удаление предмета по id" })
   @ApiResponse({ status: 200, description: "Статус удален ли предмет или не найден" })
   @HttpCode(200)
-  async deleteItem(@Param("searchString") searchString: string, @Req() req: AuthedRequest) {
-    const result = await this.itemService.deleteBy(req.user.id, searchString);
+  async deleteItem(@Param("id") id: string, @Req() req: AuthedRequest) {
+    const result = await this.itemService.deleteBy(req.user.id, id);
     return {
       message: ItemErrors[result.affected > 0 ? "item_deleted" : "item_not_found"]
     };

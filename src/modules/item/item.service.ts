@@ -91,17 +91,16 @@ export class ItemService {
     }
   }
 
-  async deleteBy(userId: string, searchString: string) {
-    let foundInstitution = await this.institutionRepository.findOneOrFail({
-      where: [{ admin: { id: userId } }, { teachers: { id: userId } }]
-    });
-    if (!foundInstitution) throw new BadRequestException(InstitutionErrors.institution_not_found);
+  async deleteBy(userId: string, id: string) {
     const item = await this.itemRepository.findOne({
       where: [
-        { id: searchString, institution: { id: foundInstitution.id } },
-        { article: searchString, institution: { id: foundInstitution.id } }
+        { id: id, institution: { admin: { id: userId } } },
+        { id: id, institution: { teachers: { id: userId } } },
+        { article: id, institution: { admin: { id: userId } } },
+        { article: id, institution: { teachers: { id: userId } } }
       ]
     });
+    console.log(item);
     if (!item) throw new BadRequestException(ItemErrors.item_not_found);
     return this.itemRepository.delete({ id: item.id });
   }
